@@ -22,7 +22,11 @@ export interface IpcDeps {
     availableGroups: AvailableGroup[],
     registeredJids: Set<string>,
   ) => void;
-  spawnAgent: (targetFolder: string, prompt: string, contextMode: 'isolated' | 'group') => void;
+  spawnAgent: (
+    targetFolder: string,
+    prompt: string,
+    contextMode: 'isolated' | 'group',
+  ) => void;
 }
 
 let ipcWatcherRunning = false;
@@ -387,32 +391,40 @@ export async function processTaskIpc(
 
     case 'spawn_agent': {
       if (!data.group_folder || !data.prompt) {
-        logger.warn({ sourceGroup, data }, 'spawn_agent missing required fields');
+        logger.warn(
+          { sourceGroup, data },
+          'spawn_agent missing required fields',
+        );
         break;
       }
 
       const targetFolder = data.group_folder as string;
 
-      // Authorization: non-main can only spawn for themselves
-      if (!isMain && targetFolder !== sourceGroup) {
-        logger.warn(
-          { sourceGroup, targetFolder },
-          'Unauthorized spawn_agent attempt blocked',
-        );
-        break;
-      }
-
       // Validate target folder exists in registered groups
       const targetEntry = Object.entries(registeredGroups).find(
         ([_, g]) => g.folder === targetFolder,
       );
+
+      // Authorization: non-main can spawn itself or the main group
+      if (!isMain && targetFolder !== sourceGroup) {
+        const targetIsMain = targetEntry && targetEntry[1].isMain;
+        if (!targetIsMain) {
+          logger.warn(
+            { sourceGroup, targetFolder },
+            'Unauthorized spawn_agent attempt blocked',
+          );
+          break;
+        }
+      }
       if (!targetEntry) {
-        logger.warn({ targetFolder }, 'spawn_agent: target group not registered');
+        logger.warn(
+          { targetFolder },
+          'spawn_agent: target group not registered',
+        );
         break;
       }
 
-      const contextMode =
-        data.context_mode === 'group' ? 'group' : 'isolated';
+      const contextMode = data.context_mode === 'group' ? 'group' : 'isolated';
 
       deps.spawnAgent(targetFolder, data.prompt, contextMode);
       logger.info(

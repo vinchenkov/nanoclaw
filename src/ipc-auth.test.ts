@@ -652,7 +652,11 @@ describe('spawn_agent authorization', () => {
       deps,
     );
 
-    expect(deps.spawnAgent).toHaveBeenCalledWith('other-group', 'do work', 'isolated');
+    expect(deps.spawnAgent).toHaveBeenCalledWith(
+      'other-group',
+      'do work',
+      'isolated',
+    );
   });
 
   it('non-main group can spawn for itself', async () => {
@@ -667,14 +671,37 @@ describe('spawn_agent authorization', () => {
       deps,
     );
 
-    expect(deps.spawnAgent).toHaveBeenCalledWith('other-group', 'self spawn', 'isolated');
+    expect(deps.spawnAgent).toHaveBeenCalledWith(
+      'other-group',
+      'self spawn',
+      'isolated',
+    );
   });
 
-  it('non-main group cannot spawn for another group', async () => {
+  it('non-main group can spawn the main group', async () => {
     await processTaskIpc(
       {
         type: 'spawn_agent',
         group_folder: 'whatsapp_main',
+        prompt: 'trigger planner',
+      },
+      'other-group',
+      false,
+      deps,
+    );
+
+    expect(deps.spawnAgent).toHaveBeenCalledWith(
+      'whatsapp_main',
+      'trigger planner',
+      'isolated',
+    );
+  });
+
+  it('non-main group cannot spawn another non-main group', async () => {
+    await processTaskIpc(
+      {
+        type: 'spawn_agent',
+        group_folder: 'third-group',
         prompt: 'unauthorized',
       },
       'other-group',
@@ -741,7 +768,11 @@ describe('spawn_agent authorization', () => {
       deps,
     );
 
-    expect(deps.spawnAgent).toHaveBeenCalledWith('other-group', 'group context', 'group');
+    expect(deps.spawnAgent).toHaveBeenCalledWith(
+      'other-group',
+      'group context',
+      'group',
+    );
   });
 
   it('defaults invalid context_mode to isolated', async () => {
@@ -757,7 +788,11 @@ describe('spawn_agent authorization', () => {
       deps,
     );
 
-    expect(deps.spawnAgent).toHaveBeenCalledWith('other-group', 'bad context', 'isolated');
+    expect(deps.spawnAgent).toHaveBeenCalledWith(
+      'other-group',
+      'bad context',
+      'isolated',
+    );
   });
 });
 
