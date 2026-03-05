@@ -427,12 +427,13 @@ async function runQuery(
       allowedTools: [
         'Bash',
         'Read', 'Write', 'Edit', 'Glob', 'Grep',
-        'WebSearch', 'WebFetch',
         'Task', 'TaskOutput', 'TaskStop',
         'TeamCreate', 'TeamDelete', 'SendMessage',
         'TodoWrite', 'ToolSearch', 'Skill',
         'NotebookEdit',
-        'mcp__nanoclaw__*'
+        'mcp__nanoclaw__*',
+        'mcp__brave__*',
+        'mcp__firecrawl__*',
       ],
       env: sdkEnv,
       permissionMode: 'bypassPermissions',
@@ -446,6 +447,20 @@ async function runQuery(
             NANOCLAW_CHAT_JID: containerInput.chatJid,
             NANOCLAW_GROUP_FOLDER: containerInput.groupFolder,
             NANOCLAW_IS_MAIN: containerInput.isMain ? '1' : '0',
+          },
+        },
+        brave: {
+          command: 'mcp-server-brave-search',
+          args: [],
+          env: {
+            BRAVE_API_KEY: containerInput.secrets?.BRAVE_API_KEY || '',
+          },
+        },
+        firecrawl: {
+          command: 'firecrawl-mcp',
+          args: [],
+          env: {
+            FIRECRAWL_API_KEY: containerInput.secrets?.FIRECRAWL_API_KEY || '',
           },
         },
       },

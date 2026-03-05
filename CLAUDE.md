@@ -141,27 +141,31 @@ Secrets (`ANTHROPIC_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`, etc.) are read in `cont
 | `homie` | `dc:1468824513654423697` | yes | Orchestrator — tick loop, task dispatch, Discord comms |
 | `worker` | `worker-agent` | no | Task execution — spawned by orchestrator via IPC |
 
-### Homie group layout
+### Group layouts
 ```
 groups/homie/
   CLAUDE.md               # Orchestrator tick loop instructions
-  bin/mc.ts               # Mission control CLI (standalone, node, --base-dir flag)
-  workers/CLAUDE.md      # Worker agent instructions (path-adjusted for NanoClaw mounts)
   briefings/              # Daily briefings written by orchestrator
+
+groups/worker/
+  CLAUDE.md               # Worker agent instructions
+
+groups/shared/
+  bin/mc.ts               # Mission control CLI (standalone, node, --base-dir flag)
   mission-control/
-    tasks/                # Task files (6 tasks)
-    initiatives/          # Initiative files (2 initiatives)
-    outputs/              # Task output files (4 outputs)
+    tasks/                # Task files
+    initiatives/          # Initiative files
+    outputs/              # Task output files
     activity.log.ndjson   # Audit log
     lock.json             # Worker lock (locked/unlocked)
 ```
 
 ### Container mounts for homie/worker
-Both groups get `dirtsignals` (rw) and `groups/homie` (rw) as additional mounts at `/workspace/extra/`.
+Both groups get `dirtsignals` (rw) and `groups/shared` (rw) as additional mounts at `/workspace/extra/`.
 
-Workers access mission-control via:
+Agents access mission-control via:
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie <resource> <command>
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared <resource> <command>
 ```
 
 ### Orchestrator heartbeat
@@ -170,7 +174,7 @@ id: heartbeat-5min  |  interval: 300000ms  |  context_mode: isolated
 ```
 
 ### Mount allowlist
-`~/.config/nanoclaw/mount-allowlist.json` — two allowed roots: `~/Documents/dev/dirtsignals` and `~/Documents/dev/claws/NanoClaw/groups/homie`.
+`~/.config/nanoclaw/mount-allowlist.json` — two allowed roots: `~/Documents/dev/dirtsignals` and `~/Documents/dev/claws/NanoClaw/groups/shared`.
 
 ## Skills
 

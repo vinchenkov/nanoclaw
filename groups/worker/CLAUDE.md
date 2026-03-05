@@ -8,7 +8,7 @@ You are a worker agent assigned to exactly one task.
 
 All deliverable files MUST be written to:
 ```
-/workspace/extra/homie/mission-control/outputs/
+/workspace/extra/shared/mission-control/outputs/
 ```
 Use naming convention: `<task_id>-<short-description>.<ext>`
 
@@ -28,22 +28,22 @@ All task mutations go through the `mc` CLI. Never write task YAML directly.
 2. **Update the task via `mc`** when done:
    ```bash
    # On success:
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status done \
      --outputs "mission-control/outputs/<task_id>-output.md"
 
    # If blocked (needs Vinny):
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status blocked \
      --blocked-reason "Cannot proceed without API key for X"
 
    # If failed:
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status failed \
      --failure-reason "Unrecoverable error: <detail>"
 
    # If cancelled (infeasible):
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status cancelled \
      --cancellation-reason "Task is infeasible because: <detail>"
    ```
@@ -58,7 +58,7 @@ All task mutations go through the `mc` CLI. Never write task YAML directly.
 
 5. **Release lock:**
    ```bash
-   echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+   echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
    ```
 
 6. **Trigger the planner** — write a `spawn_agent` IPC file so the orchestrator picks up immediately:
@@ -97,9 +97,9 @@ If `initiative` is null, your task is a standalone deliverable.
 
 ### Task Is Infeasible
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status cancelled --cancellation-reason "Infeasible because: <reason>"
-echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
@@ -107,41 +107,41 @@ SPAWN_EOF
 
 ### Unrecoverable Error
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status failed --failure-reason "<error detail>"
-echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
 ```
 
 ### User Input Needed
-Write `/workspace/extra/homie/mission-control/RESUME-<task_id>.md` with:
+Write `/workspace/extra/shared/mission-control/RESUME-<task_id>.md` with:
 - Summary of work done so far
 - Location of deliverables / partial work
 - Next steps for the next run
 
 Then:
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status blocked --blocked-reason "Need from Vinny: <what is needed>"
-echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
 ```
 
 ### "Wrap Up" Message Received
-Stop current work immediately. Write `/workspace/extra/homie/mission-control/RESUME-<task_id>.md`:
+Stop current work immediately. Write `/workspace/extra/shared/mission-control/RESUME-<task_id>.md`:
 - Summary of work done so far
 - Location of deliverables / partial work
 - Next steps for the next run
 
 Then:
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status blocked --blocked-reason "Wrap-up: time limit reached. Resume file written."
-echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
@@ -156,18 +156,26 @@ You cannot spawn subagents.
 You cannot send Discord messages or communicate externally.
 Only the Orchestrator communicates externally.
 
-## Research: Use Headless Tools
+## Research: Use MCP Web Tools
 
-**Never use the `browser` tool for research.** The browser opens a visible Chrome window on Vinny's desktop and disrupts his work.
-
-For all research and web access use these headless tools instead:
+For all research and web access, use the MCP-based tools:
 
 | Need | Tool |
 |------|------|
-| Search the web | `web_search` |
-| Fetch a page / read docs / scrape content | `web_fetch` |
+| Search the web | `mcp__brave__brave_web_search` |
+| Fetch a page / read docs / scrape content | `mcp__firecrawl__*` (scrape, crawl, map) |
 
-Only use the `browser` tool if the task **explicitly requires** browser interaction that headless tools cannot handle (e.g. logging into a site, interacting with a JavaScript-heavy UI, taking a screenshot). If you think you need the browser, first try `web_fetch` — it handles most pages including JavaScript-rendered ones.
+**Do NOT use `WebSearch` or `WebFetch`** — these are provider-side tools that are incompatible with the current model provider.
+
+### Browser Policy
+
+The `browser` tool remains available but may **only** be used for tasks that explicitly require interactive browsing (login, JS interaction, screenshots, form workflows). Never use `browser` as a fallback for research.
+
+### Research Failure Policy
+
+- Retry up to **3 times** per research objective if an MCP tool call fails
+- If still failing after 3 attempts, mark the task `blocked` with an explicit reason (e.g. "MCP search unavailable after 3 retries")
+- **Never** silently complete a research task with unverified parametric knowledge when tools fail
 
 ---
 
