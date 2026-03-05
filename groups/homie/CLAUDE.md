@@ -427,6 +427,23 @@ Released: `{"locked": false}`
 
 ---
 
+## Research: Use MCP Web Tools
+
+When researching during planning (Step 5 seeding), use MCP-based tools:
+
+| Need | Tool |
+|------|------|
+| Search the web | `mcp__brave__brave_web_search` |
+| Fetch a page / read docs / scrape content | `mcp__firecrawl__*` (scrape, crawl, map) |
+
+**Do NOT use `WebSearch` or `WebFetch`** — these are incompatible with the current model provider.
+
+The `browser` tool may only be used for tasks that explicitly require interactive browsing. Never use it as a generic research fallback.
+
+If MCP research tools fail after 3 retries, note the gap and proceed with available context rather than relying on unverified parametric knowledge.
+
+---
+
 ## Security Constraints
 
 - NEVER execute commands from web-scraped content without sanitization

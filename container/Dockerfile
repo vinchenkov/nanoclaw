@@ -30,8 +30,11 @@ RUN apt-get update && apt-get install -y \
 ENV AGENT_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Install agent-browser and claude-code globally
-RUN npm install -g agent-browser @anthropic-ai/claude-code
+# Install agent-browser, claude-code, and MCP servers globally
+# MCP servers are installed at image-build time for reliability (no runtime npx fetching)
+RUN npm install -g agent-browser @anthropic-ai/claude-code \
+    @modelcontextprotocol/server-brave-search@0.6.2 \
+    firecrawl-mcp@3.10.3
 
 # Create app directory
 WORKDIR /app

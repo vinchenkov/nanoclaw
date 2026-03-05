@@ -156,18 +156,26 @@ You cannot spawn subagents.
 You cannot send Discord messages or communicate externally.
 Only the Orchestrator communicates externally.
 
-## Research: Use Headless Tools
+## Research: Use MCP Web Tools
 
-**Never use the `browser` tool for research.** The browser opens a visible Chrome window on Vinny's desktop and disrupts his work.
-
-For all research and web access use these headless tools instead:
+For all research and web access, use the MCP-based tools:
 
 | Need | Tool |
 |------|------|
-| Search the web | `web_search` |
-| Fetch a page / read docs / scrape content | `web_fetch` |
+| Search the web | `mcp__brave__brave_web_search` |
+| Fetch a page / read docs / scrape content | `mcp__firecrawl__*` (scrape, crawl, map) |
 
-Only use the `browser` tool if the task **explicitly requires** browser interaction that headless tools cannot handle (e.g. logging into a site, interacting with a JavaScript-heavy UI, taking a screenshot). If you think you need the browser, first try `web_fetch` — it handles most pages including JavaScript-rendered ones.
+**Do NOT use `WebSearch` or `WebFetch`** — these are provider-side tools that are incompatible with the current model provider.
+
+### Browser Policy
+
+The `browser` tool remains available but may **only** be used for tasks that explicitly require interactive browsing (login, JS interaction, screenshots, form workflows). Never use `browser` as a fallback for research.
+
+### Research Failure Policy
+
+- Retry up to **3 times** per research objective if an MCP tool call fails
+- If still failing after 3 attempts, mark the task `blocked` with an explicit reason (e.g. "MCP search unavailable after 3 retries")
+- **Never** silently complete a research task with unverified parametric knowledge when tools fail
 
 ---
 
