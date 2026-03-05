@@ -141,6 +141,49 @@ function createSchema(database: Database.Database): void {
   }
 }
 
+export interface SeedTask {
+  id: string;
+  group_folder: string;
+  chat_jid: string;
+  prompt: string;
+  schedule_type: string;
+  schedule_value: string;
+  context_mode?: string;
+}
+
+/**
+ * Ensure required scheduled tasks exist in the database.
+ * Uses INSERT OR IGNORE so manually edited rows are never overwritten.
+ * Pass `replaces` to migrate from an old task id (updates in place).
+ */
+export function seedScheduledTasks(
+  tasks: (SeedTask & { replaces?: string })[],
+): void {
+  const insert = db.prepare(`
+    INSERT OR IGNORE INTO scheduled_tasks (id, group_folder, chat_jid, prompt, schedule_type, schedule_value, context_mode, next_run, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), 'active', datetime('now'))
+  `);
+  const migrate = db.prepare(
+    `UPDATE scheduled_tasks SET id = ?, schedule_value = ? WHERE id = ?`,
+  );
+
+  for (const t of tasks) {
+    if (t.replaces) {
+      const changed = migrate.run(t.id, t.schedule_value, t.replaces);
+      if (changed.changes > 0) continue;
+    }
+    insert.run(
+      t.id,
+      t.group_folder,
+      t.chat_jid,
+      t.prompt,
+      t.schedule_type,
+      t.schedule_value,
+      t.context_mode || 'isolated',
+    );
+  }
+}
+
 export function initDatabase(): void {
   const dbPath = path.join(STORE_DIR, 'messages.db');
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });

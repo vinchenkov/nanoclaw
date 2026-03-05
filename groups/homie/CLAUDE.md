@@ -167,7 +167,7 @@ node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie <resourc
 
 ## Tick Loop
 
-The orchestrator runs **24/7** with a **15-minute heartbeat interval**.
+The orchestrator runs **24/7** with a **5-minute heartbeat interval**.
 
 ---
 
@@ -175,7 +175,7 @@ The orchestrator runs **24/7** with a **15-minute heartbeat interval**.
 
 Get the current time in `America/Los_Angeles`.
 
-If the time is **08:00–08:15** and no `daily.briefing` event exists in today's activity log:
+If the time is **08:00–08:05** and no `daily.briefing` event exists in today's activity log:
 
 1. Compile Daily Briefing (see [Daily Briefing](#daily-briefing) section below)
 2. Write briefing to `/workspace/group/briefings/YYYY-MM-DD.md`

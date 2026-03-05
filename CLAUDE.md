@@ -10,7 +10,7 @@ Personal Claude assistant. See [README.md](README.md) for philosophy and setup. 
 
 Single Node.js process with skill-based channel system. Channels (WhatsApp, Telegram, Slack, Discord, Gmail) are skills that self-register at startup. Messages route to Claude Agent SDK running in containers (Linux VMs). Each group has isolated filesystem and memory.
 
-**This install:** Assistant name is **Homie**. Channel is Discord (bot: Homie#5609, channel `1468824513654423697`, guild `1468824512756973705`). Model provider is MiniMax via `ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic`. Two groups: `homie` (orchestrator, is_main) and `worker` (task execution). Orchestrator runs on a 15-minute heartbeat scheduler.
+**This install:** Assistant name is **Homie**. Channel is Discord (bot: Homie#5609, channel `1468824513654423697`, guild `1468824512756973705`). Model provider is MiniMax via `ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic`. Two groups: `homie` (orchestrator, is_main) and `worker` (task execution). Orchestrator runs on a 5-minute heartbeat scheduler.
 
 ## Development Commands
 
@@ -166,7 +166,7 @@ node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie <resourc
 
 ### Orchestrator heartbeat
 ```
-id: heartbeat-15min  |  interval: 900000ms  |  context_mode: isolated
+id: heartbeat-5min  |  interval: 300000ms  |  context_mode: isolated
 ```
 
 ### Mount allowlist

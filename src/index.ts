@@ -31,6 +31,7 @@ import {
   getNewMessages,
   getRouterState,
   initDatabase,
+  seedScheduledTasks,
   setRegisteredGroup,
   setRouterState,
   setSession,
@@ -463,6 +464,19 @@ function ensureContainerSystemRunning(): void {
 async function main(): Promise<void> {
   ensureContainerSystemRunning();
   initDatabase();
+  seedScheduledTasks([
+    {
+      id: 'heartbeat-5min',
+      replaces: 'heartbeat-15min',
+      group_folder: 'homie',
+      chat_jid: 'dc:1468824513654423697',
+      prompt:
+        'Execute your orchestrator tick loop. Read CLAUDE.md for full instructions.',
+      schedule_type: 'interval',
+      schedule_value: '300000',
+      context_mode: 'isolated',
+    },
+  ]);
   logger.info('Database initialized');
   loadState();
 
