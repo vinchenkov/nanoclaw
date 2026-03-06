@@ -8,7 +8,7 @@ You are a worker agent assigned to exactly one task.
 
 All deliverable files MUST be written to:
 ```
-/workspace/extra/homie/mission-control/outputs/
+/workspace/extra/shared/mission-control/outputs/
 ```
 Use naming convention: `<task_id>-<short-description>.<ext>`
 
@@ -28,22 +28,22 @@ All task mutations go through the `mc` CLI. Never write task YAML directly.
 2. **Update the task via `mc`** when done:
    ```bash
    # On success:
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status done \
      --outputs "mission-control/outputs/<task_id>-output.md"
 
    # If blocked (needs Vinny):
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status blocked \
      --blocked-reason "Cannot proceed without API key for X"
 
    # If failed:
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status failed \
      --failure-reason "Unrecoverable error: <detail>"
 
    # If cancelled (infeasible):
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status cancelled \
      --cancellation-reason "Task is infeasible because: <detail>"
    ```
@@ -58,7 +58,7 @@ All task mutations go through the `mc` CLI. Never write task YAML directly.
 
 5. **Release lock:**
    ```bash
-   echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+   echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
    ```
 
 6. **Trigger the planner** — write a `spawn_agent` IPC file so the orchestrator picks up immediately:
@@ -97,9 +97,9 @@ If `initiative` is null, your task is a standalone deliverable.
 
 ### Task Is Infeasible
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status cancelled --cancellation-reason "Infeasible because: <reason>"
-echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
@@ -107,41 +107,41 @@ SPAWN_EOF
 
 ### Unrecoverable Error
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status failed --failure-reason "<error detail>"
-echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
 ```
 
 ### User Input Needed
-Write `/workspace/extra/homie/mission-control/RESUME-<task_id>.md` with:
+Write `/workspace/extra/shared/mission-control/RESUME-<task_id>.md` with:
 - Summary of work done so far
 - Location of deliverables / partial work
 - Next steps for the next run
 
 Then:
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status blocked --blocked-reason "Need from Vinny: <what is needed>"
-echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
 ```
 
 ### "Wrap Up" Message Received
-Stop current work immediately. Write `/workspace/extra/homie/mission-control/RESUME-<task_id>.md`:
+Stop current work immediately. Write `/workspace/extra/shared/mission-control/RESUME-<task_id>.md`:
 - Summary of work done so far
 - Location of deliverables / partial work
 - Next steps for the next run
 
 Then:
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status blocked --blocked-reason "Wrap-up: time limit reached. Resume file written."
-echo '{"locked": false}' > /workspace/extra/homie/mission-control/lock.json
+echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF

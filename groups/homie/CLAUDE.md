@@ -64,10 +64,10 @@ Homie should balance the research and due dilligence required for seeding genuin
 
 | Path (inside container) | Role |
 |-------------------------|------|
-| `/workspace/extra/homie/mission-control/tasks/*.md` | YAML frontmatter — canonical task state |
-| `/workspace/extra/homie/mission-control/initiatives/*.md` | YAML frontmatter — canonical initiative state |
-| `/workspace/extra/homie/mission-control/lock.json` | Single-worker execution lock |
-| `/workspace/extra/homie/mission-control/activity.log.ndjson` | Append-only audit trail |
+| `/workspace/extra/shared/mission-control/tasks/*.md` | YAML frontmatter — canonical task state |
+| `/workspace/extra/shared/mission-control/initiatives/*.md` | YAML frontmatter — canonical initiative state |
+| `/workspace/extra/shared/mission-control/lock.json` | Single-worker execution lock |
+| `/workspace/extra/shared/mission-control/activity.log.ndjson` | Append-only audit trail |
 | `/workspace/global/CLAUDE.md` | Vinny's objectives — drives task and initiative prioritization / seeding |
 
 ### Agent Overview Files
@@ -85,7 +85,7 @@ For each workspace below, an agent overview file will be maintained at the entry
 The workspaces below describe the physical locations of deliverables representing the main interests of Vinny, as described in `/workspace/global/CLAUDE.md`.
 
 **When seeding tasks Homie should**:
-1. Review the canonical state of Mission Control: tasks at `/workspace/extra/homie/mission-control/tasks/` and initiatives at `/workspace/extra/homie/mission-control/initiatives/`
+1. Review the canonical state of Mission Control: tasks at `/workspace/extra/shared/mission-control/tasks/` and initiatives at `/workspace/extra/shared/mission-control/initiatives/`
 2. Skim through the workspaces outlined below
 3. Use the `mc` CLI for all task and initiative creation (never write files directly)
 
@@ -107,7 +107,7 @@ When assessing a repo, look at: recent commits, open TODOs in code, README state
 
 All non-git deliverables produced by workers land in:
 ```
-/workspace/extra/homie/mission-control/outputs/
+/workspace/extra/shared/mission-control/outputs/
 ```
 When writing task descriptions, always reference this path for outputs — never `/workspace/group/`. Workers do not share the planner's `/workspace/group` mount, so paths there are invisible to verification.
 
@@ -150,7 +150,7 @@ A standalone `T-YYYYMMDD-XXXX` task is appropriate only for one-off work that do
 All task and initiative mutations **must** go through the `mc` CLI. Never write YAML frontmatter directly.
 
 ```bash
-node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie <resource> <command> [flags]
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared <resource> <command> [flags]
 ```
 
 ### Commands Reference
@@ -198,10 +198,10 @@ Continue to Step 2 regardless.
 
 Read all of the following before doing anything else:
 
-1. All `/workspace/extra/homie/mission-control/tasks/*.md` (parse YAML frontmatter)
-2. All `/workspace/extra/homie/mission-control/initiatives/*.md` (parse YAML frontmatter) — needed for initiative-aware prioritization and seeding
-3. `/workspace/extra/homie/mission-control/lock.json`
-4. Last 50 lines of `/workspace/extra/homie/mission-control/activity.log.ndjson`
+1. All `/workspace/extra/shared/mission-control/tasks/*.md` (parse YAML frontmatter)
+2. All `/workspace/extra/shared/mission-control/initiatives/*.md` (parse YAML frontmatter) — needed for initiative-aware prioritization and seeding
+3. `/workspace/extra/shared/mission-control/lock.json`
+4. Last 50 lines of `/workspace/extra/shared/mission-control/activity.log.ndjson`
 5. `/workspace/global/CLAUDE.md` (Vinny's objectives — required for task prioritization and seeding)
 
 ---
@@ -268,17 +268,17 @@ Find the next task to dispatch:
 1. Read `/workspace/global/CLAUDE.md` and all `initiatives/*.md`
 2. **If an `active` initiative exists with no `ready` tasks:** seed 1–2 tasks that advance that initiative's goal. Use `mc`:
    ```bash
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task create \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task create \
      --title "..." --description "..." --initiative <I-ID> --worker-type research --priority P1
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task-id> --status ready
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task-id> --status ready
    ```
 3. **If no active initiative exists for a relevant objective:** create one first, then seed tasks:
    ```bash
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie initiative create \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared initiative create \
      --title "..." --goal "..." --objective projectcal --timeframe "2 weeks"
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task create \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task create \
      --title "..." --description "..." --initiative <I-ID> --worker-type research --priority P1
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task-id> --status ready
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task-id> --status ready
    ```
 4. **If no relevant initiative is needed:** fall back to seeding a standalone task (`T-YYYYMMDD-XXXX`) with `origin: autonomous`
 5. Pick the newly created task and continue to Step 6
@@ -297,7 +297,7 @@ Execute these steps **in exact order**:
 
 1. **Update the task file:**
    ```bash
-   node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie task update <task_id> \
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
      --status in_progress
    ```
 
@@ -338,15 +338,9 @@ Execute these steps **in exact order**:
 
 The `prompt` written in the IPC dispatch JSON should be concise and direct.
 
-Key reminders for the briefing:
-- Workers read `/workspace/extra/homie/workers/CLAUDE.md` for full execution instructions
-- Workers use `node /workspace/extra/homie/bin/mc.ts --base-dir /workspace/extra/homie` to read and manage tasks and initiatives
-- Workers write `{"locked": false}` directly to `/workspace/extra/homie/mission-control/lock.json` to release the lock upon completion
-- Workers never call `mc lock` commands — lock acquisition is Homie's job
-
 Example prompt:
 ```
-You are a worker agent. Your task ID is <TASK_ID>. Read /workspace/extra/homie/workers/CLAUDE.md for full instructions, then read the assigned the assigned task /workspace/extra/homie/mission-control/tasks/<TASK_ID>.md. If it is associated with an initiative, you should also read that before starting execution.
+You are a worker agent. Your task ID is <TASK_ID>.
 ```
 
 ---
@@ -384,7 +378,7 @@ Discord summary: one short paragraph covering highlights + blockers + top recomm
 
 ## Activity Log Format
 
-Append-only NDJSON at `/workspace/extra/homie/mission-control/activity.log.ndjson`. Each entry on its own line:
+Append-only NDJSON at `/workspace/extra/shared/mission-control/activity.log.ndjson`. Each entry on its own line:
 
 ```json
 {"ts":"<ISO8601>","actor":"<Homie|task_id>","event":"<event_type>","task_id":"<id_or_omit>","detail":"..."}
