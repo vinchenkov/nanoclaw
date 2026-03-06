@@ -124,7 +124,9 @@ function createSchema(database: Database.Database): void {
   // Add sdk column to sessions table if it doesn't exist (migration for existing DBs)
   // Existing rows become sdk='claude' via the DEFAULT, and the PK changes to (group_folder, sdk).
   try {
-    database.exec(`ALTER TABLE sessions ADD COLUMN sdk TEXT NOT NULL DEFAULT 'claude'`);
+    database.exec(
+      `ALTER TABLE sessions ADD COLUMN sdk TEXT NOT NULL DEFAULT 'claude'`,
+    );
     // Recreate table with composite primary key (SQLite doesn't support ALTER PK)
     database.exec(`
       CREATE TABLE IF NOT EXISTS sessions_new (
@@ -569,20 +571,31 @@ export function setRouterState(key: string, value: string): void {
 
 // --- Session accessors ---
 
-export function getSession(groupFolder: string, sdk: 'claude' | 'codex' = 'claude'): string | undefined {
+export function getSession(
+  groupFolder: string,
+  sdk: 'claude' | 'codex' = 'claude',
+): string | undefined {
   const row = db
-    .prepare('SELECT session_id FROM sessions WHERE group_folder = ? AND sdk = ?')
+    .prepare(
+      'SELECT session_id FROM sessions WHERE group_folder = ? AND sdk = ?',
+    )
     .get(groupFolder, sdk) as { session_id: string } | undefined;
   return row?.session_id;
 }
 
-export function setSession(groupFolder: string, sessionId: string, sdk: 'claude' | 'codex' = 'claude'): void {
+export function setSession(
+  groupFolder: string,
+  sessionId: string,
+  sdk: 'claude' | 'codex' = 'claude',
+): void {
   db.prepare(
     'INSERT OR REPLACE INTO sessions (group_folder, sdk, session_id) VALUES (?, ?, ?)',
   ).run(groupFolder, sdk, sessionId);
 }
 
-export function getAllSessions(sdk: 'claude' | 'codex' = 'claude'): Record<string, string> {
+export function getAllSessions(
+  sdk: 'claude' | 'codex' = 'claude',
+): Record<string, string> {
   const rows = db
     .prepare('SELECT group_folder, session_id FROM sessions WHERE sdk = ?')
     .all(sdk) as Array<{ group_folder: string; session_id: string }>;

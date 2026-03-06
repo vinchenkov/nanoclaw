@@ -74,7 +74,9 @@ export async function refreshTokenIfNeeded(): Promise<void> {
   }
 
   if (!refreshToken) {
-    logger.warn('ChatGPT access token expiring but no CHATGPT_REFRESH_TOKEN available');
+    logger.warn(
+      'ChatGPT access token expiring but no CHATGPT_REFRESH_TOKEN available',
+    );
     return;
   }
 

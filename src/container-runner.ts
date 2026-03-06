@@ -132,7 +132,12 @@ function buildVolumeMounts(
   });
 
   // Per-group Codex sessions directory (parallel to .claude/)
-  const codexSessionsDir = path.join(DATA_DIR, 'sessions', group.folder, '.codex');
+  const codexSessionsDir = path.join(
+    DATA_DIR,
+    'sessions',
+    group.folder,
+    '.codex',
+  );
   fs.mkdirSync(path.join(codexSessionsDir, 'sessions'), { recursive: true });
   mounts.push({
     hostPath: codexSessionsDir,
@@ -294,7 +299,10 @@ export async function runContainerAgent(
       const { refreshTokenIfNeeded } = await import('./chatgpt-token.js');
       await refreshTokenIfNeeded();
     } catch (err) {
-      logger.warn({ err }, 'ChatGPT token refresh failed, continuing with existing token');
+      logger.warn(
+        { err },
+        'ChatGPT token refresh failed, continuing with existing token',
+      );
     }
   }
 
