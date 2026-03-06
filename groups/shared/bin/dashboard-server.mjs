@@ -28,8 +28,8 @@ function parseArgs(argv) {
 function resolveRoot(baseDirFlag) {
   if (baseDirFlag) return resolve(baseDirFlag);
 
-  const homieRoot = resolve(__dirname, '..');
-  if (existsSync(join(homieRoot, 'mission-control'))) return homieRoot;
+  const sharedRoot = resolve(__dirname, '..');
+  if (existsSync(join(sharedRoot, 'mission-control'))) return sharedRoot;
 
   const cwd = process.cwd();
   if (existsSync(join(cwd, 'mission-control'))) return cwd;

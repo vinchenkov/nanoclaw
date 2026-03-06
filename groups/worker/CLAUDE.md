@@ -116,7 +116,7 @@ SPAWN_EOF
 ```
 
 ### User Input Needed
-Write `/workspace/extra/shared/mission-control/RESUME-<task_id>.md` with:
+Write `/workspace/extra/shared/mission-control/resume/RESUME-<task_id>.md` with:
 - Summary of work done so far
 - Location of deliverables / partial work
 - Next steps for the next run
@@ -132,7 +132,7 @@ SPAWN_EOF
 ```
 
 ### "Wrap Up" Message Received
-Stop current work immediately. Write `/workspace/extra/shared/mission-control/RESUME-<task_id>.md`:
+Stop current work immediately. Write `/workspace/extra/shared/mission-control/resume/RESUME-<task_id>.md`:
 - Summary of work done so far
 - Location of deliverables / partial work
 - Next steps for the next run
