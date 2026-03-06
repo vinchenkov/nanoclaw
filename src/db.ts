@@ -70,8 +70,10 @@ function createSchema(database: Database.Database): void {
       value TEXT NOT NULL
     );
     CREATE TABLE IF NOT EXISTS sessions (
-      group_folder TEXT PRIMARY KEY,
-      session_id TEXT NOT NULL
+      group_folder TEXT NOT NULL,
+      sdk TEXT NOT NULL DEFAULT 'claude',
+      session_id TEXT NOT NULL,
+      PRIMARY KEY (group_folder, sdk)
     );
     CREATE TABLE IF NOT EXISTS registered_groups (
       jid TEXT PRIMARY KEY,
@@ -117,6 +119,27 @@ function createSchema(database: Database.Database): void {
     );
   } catch {
     /* column already exists */
+  }
+
+  // Add sdk column to sessions table if it doesn't exist (migration for existing DBs)
+  // Existing rows become sdk='claude' via the DEFAULT, and the PK changes to (group_folder, sdk).
+  try {
+    database.exec(`ALTER TABLE sessions ADD COLUMN sdk TEXT NOT NULL DEFAULT 'claude'`);
+    // Recreate table with composite primary key (SQLite doesn't support ALTER PK)
+    database.exec(`
+      CREATE TABLE IF NOT EXISTS sessions_new (
+        group_folder TEXT NOT NULL,
+        sdk TEXT NOT NULL DEFAULT 'claude',
+        session_id TEXT NOT NULL,
+        PRIMARY KEY (group_folder, sdk)
+      );
+      INSERT OR IGNORE INTO sessions_new (group_folder, sdk, session_id)
+        SELECT group_folder, sdk, session_id FROM sessions;
+      DROP TABLE sessions;
+      ALTER TABLE sessions_new RENAME TO sessions;
+    `);
+  } catch {
+    /* column already exists or table already has composite PK */
   }
 
   // Add channel and is_group columns if they don't exist (migration for existing DBs)
@@ -546,23 +569,23 @@ export function setRouterState(key: string, value: string): void {
 
 // --- Session accessors ---
 
-export function getSession(groupFolder: string): string | undefined {
+export function getSession(groupFolder: string, sdk: 'claude' | 'codex' = 'claude'): string | undefined {
   const row = db
-    .prepare('SELECT session_id FROM sessions WHERE group_folder = ?')
-    .get(groupFolder) as { session_id: string } | undefined;
+    .prepare('SELECT session_id FROM sessions WHERE group_folder = ? AND sdk = ?')
+    .get(groupFolder, sdk) as { session_id: string } | undefined;
   return row?.session_id;
 }
 
-export function setSession(groupFolder: string, sessionId: string): void {
+export function setSession(groupFolder: string, sessionId: string, sdk: 'claude' | 'codex' = 'claude'): void {
   db.prepare(
-    'INSERT OR REPLACE INTO sessions (group_folder, session_id) VALUES (?, ?)',
-  ).run(groupFolder, sessionId);
+    'INSERT OR REPLACE INTO sessions (group_folder, sdk, session_id) VALUES (?, ?, ?)',
+  ).run(groupFolder, sdk, sessionId);
 }
 
-export function getAllSessions(): Record<string, string> {
+export function getAllSessions(sdk: 'claude' | 'codex' = 'claude'): Record<string, string> {
   const rows = db
-    .prepare('SELECT group_folder, session_id FROM sessions')
-    .all() as Array<{ group_folder: string; session_id: string }>;
+    .prepare('SELECT group_folder, session_id FROM sessions WHERE sdk = ?')
+    .all(sdk) as Array<{ group_folder: string; session_id: string }>;
   const result: Record<string, string> = {};
   for (const row of rows) {
     result[row.group_folder] = row.session_id;
@@ -699,14 +722,14 @@ function migrateJsonState(): void {
     }
   }
 
-  // Migrate sessions.json
+  // Migrate sessions.json (legacy sessions are all Claude SDK)
   const sessions = migrateFile('sessions.json') as Record<
     string,
     string
   > | null;
   if (sessions) {
     for (const [folder, sessionId] of Object.entries(sessions)) {
-      setSession(folder, sessionId);
+      setSession(folder, sessionId, 'claude');
     }
   }
 

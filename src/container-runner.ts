@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 
 import {
+  AGENT_SDK,
   CONTAINER_IMAGE,
   CONTAINER_MAX_OUTPUT_SIZE,
   CONTAINER_TIMEOUT,
@@ -39,6 +40,7 @@ export interface ContainerInput {
   isScheduledTask?: boolean;
   assistantName?: string;
   secrets?: Record<string, string>;
+  agentSdk?: 'claude' | 'codex';
 }
 
 export interface ContainerOutput {
@@ -129,6 +131,15 @@ function buildVolumeMounts(
     readonly: false,
   });
 
+  // Per-group Codex sessions directory (parallel to .claude/)
+  const codexSessionsDir = path.join(DATA_DIR, 'sessions', group.folder, '.codex');
+  fs.mkdirSync(path.join(codexSessionsDir, 'sessions'), { recursive: true });
+  mounts.push({
+    hostPath: codexSessionsDir,
+    containerPath: '/home/node/.codex',
+    readonly: false,
+  });
+
   // Per-group IPC namespace: each group gets its own IPC directory
   // This prevents cross-group privilege escalation via IPC
   const groupIpcDir = resolveGroupIpcPath(group.folder);
@@ -184,10 +195,17 @@ function buildVolumeMounts(
  */
 function readSecrets(): Record<string, string> {
   return readEnvFile([
+    // Claude SDK
     'CLAUDE_CODE_OAUTH_TOKEN',
     'ANTHROPIC_API_KEY',
     'ANTHROPIC_BASE_URL',
     'ANTHROPIC_AUTH_TOKEN',
+    // Codex SDK
+    'CHATGPT_ACCESS_TOKEN',
+    'CHATGPT_REFRESH_TOKEN',
+    'CHATGPT_MODEL',
+    'OPENAI_API_KEY',
+    // Shared
     'BRAVE_API_KEY',
     'FIRECRAWL_API_KEY',
   ]);
@@ -266,6 +284,19 @@ export async function runContainerAgent(
 
   const logsDir = path.join(groupDir, 'logs');
   fs.mkdirSync(logsDir, { recursive: true });
+
+  // Set the active SDK so the container dispatcher knows which runner to use
+  input.agentSdk = AGENT_SDK;
+
+  // Refresh ChatGPT OAuth token if needed before reading secrets
+  if (AGENT_SDK === 'codex') {
+    try {
+      const { refreshTokenIfNeeded } = await import('./chatgpt-token.js');
+      await refreshTokenIfNeeded();
+    } catch (err) {
+      logger.warn({ err }, 'ChatGPT token refresh failed, continuing with existing token');
+    }
+  }
 
   return new Promise((resolve) => {
     const container = spawn(CONTAINER_RUNTIME_BIN, containerArgs, {

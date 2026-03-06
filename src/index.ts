@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import {
+  AGENT_SDK,
   ASSISTANT_NAME,
   IDLE_TIMEOUT,
   POLL_INTERVAL,
@@ -73,7 +74,7 @@ function loadState(): void {
     logger.warn('Corrupted last_agent_timestamp in DB, resetting');
     lastAgentTimestamp = {};
   }
-  sessions = getAllSessions();
+  sessions = getAllSessions(AGENT_SDK);
   registeredGroups = getAllRegisteredGroups();
   logger.info(
     { groupCount: Object.keys(registeredGroups).length },
@@ -295,7 +296,7 @@ async function runAgent(
     ? async (output: ContainerOutput) => {
         if (output.newSessionId) {
           sessions[group.folder] = output.newSessionId;
-          setSession(group.folder, output.newSessionId);
+          setSession(group.folder, output.newSessionId, AGENT_SDK);
         }
         await onOutput(output);
       }
@@ -319,7 +320,7 @@ async function runAgent(
 
     if (output.newSessionId) {
       sessions[group.folder] = output.newSessionId;
-      setSession(group.folder, output.newSessionId);
+      setSession(group.folder, output.newSessionId, AGENT_SDK);
     }
 
     if (output.status === 'error') {
