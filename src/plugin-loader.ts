@@ -27,7 +27,13 @@ function resolveHostPath(pluginDir: string, entry: string): string | null {
   const srcJs = path.join(pluginDir, 'host.js');
   if (fs.existsSync(srcJs)) return srcJs;
 
-  const distJs = path.resolve(process.cwd(), 'dist', 'plugins', entry, 'host.js');
+  const distJs = path.resolve(
+    process.cwd(),
+    'dist',
+    'plugins',
+    entry,
+    'host.js',
+  );
   if (fs.existsSync(distJs)) return distJs;
 
   const srcTs = path.join(pluginDir, 'host.ts');
@@ -56,7 +62,10 @@ export async function loadPlugins(): Promise<void> {
 
     const hostPath = resolveHostPath(pluginDir, entry);
     if (!hostPath) {
-      logger.debug({ plugin: entry }, 'Plugin directory has no host module, skipping');
+      logger.debug(
+        { plugin: entry },
+        'Plugin directory has no host module, skipping',
+      );
       continue;
     }
 

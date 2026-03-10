@@ -166,9 +166,20 @@ function buildVolumeMounts(
   // Copy active plugin's container provider into the agent-runner-src directory
   const plugin = getActivePlugin();
   if (plugin) {
-    const pluginProviderSrc = path.join(projectRoot, 'plugins', plugin.name, plugin.containerProvider);
-    if (fs.existsSync(pluginProviderSrc) && fs.existsSync(groupAgentRunnerDir)) {
-      const providerDst = path.join(groupAgentRunnerDir, plugin.containerProvider);
+    const pluginProviderSrc = path.join(
+      projectRoot,
+      'plugins',
+      plugin.name,
+      plugin.containerProvider,
+    );
+    if (
+      fs.existsSync(pluginProviderSrc) &&
+      fs.existsSync(groupAgentRunnerDir)
+    ) {
+      const providerDst = path.join(
+        groupAgentRunnerDir,
+        plugin.containerProvider,
+      );
       fs.copyFileSync(pluginProviderSrc, providerDst);
     }
   }
