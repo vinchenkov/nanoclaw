@@ -51,6 +51,7 @@ import {
 import { startSchedulerLoop } from './task-scheduler.js';
 import { Channel, NewMessage, RegisteredGroup } from './types.js';
 import { logger } from './logger.js';
+import { loadPlugins } from './plugin-loader.js';
 
 // Re-export for backwards compatibility during refactor
 export { escapeXml, formatMessages } from './router.js';
@@ -478,6 +479,7 @@ async function main(): Promise<void> {
     },
   ]);
   logger.info('Database initialized');
+  await loadPlugins();
   loadState();
 
   // Graceful shutdown handlers

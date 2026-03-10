@@ -28,6 +28,7 @@ interface ContainerInput {
   isScheduledTask?: boolean;
   assistantName?: string;
   secrets?: Record<string, string>;
+  provider?: string;
 }
 
 interface ContainerOutput {
@@ -521,6 +522,14 @@ async function main(): Promise<void> {
       error: `Failed to parse input: ${err instanceof Error ? err.message : String(err)}`
     });
     process.exit(1);
+  }
+
+  // Provider routing: dispatch to plugin provider if configured
+  if (containerInput.provider && containerInput.provider !== 'claude') {
+    log(`Using ${containerInput.provider} provider`);
+    const mod = await import(`./provider-${containerInput.provider}.js`);
+    await mod.runProvider(containerInput);
+    return;
   }
 
   // Build SDK env: merge secrets into process.env for the SDK only.

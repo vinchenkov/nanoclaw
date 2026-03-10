@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^11.8.1",
+    "codex-oauth": "file:packages/codex-oauth",
     "cron-parser": "^5.5.0",
     "discord.js": "^14.18.0",
     "pino": "^9.6.0",

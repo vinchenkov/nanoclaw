@@ -1,0 +1,12 @@
+{"ts":"2026-03-10T00:51:05.421Z","actor":"mc","event":"initiative.created","initiative_id":"I-CEQA-OUTBOUND-LEAD-GENERATION","detail":"CEQA Outbound Lead Generation"}
+{"ts":"2026-03-10T00:51:13.270Z","actor":"mc","event":"task.created","task_id":"I-001-ANALYZE-CEQA-CUSTOMER-SEGMENTS","detail":"Analyze CEQA customer segments"}
+{"ts":"2026-03-10T00:51:19.063Z","actor":"mc","event":"task.created","task_id":"I-002-IDENTIFY-20-OUTBOUND-LEADS","detail":"Identify 20 outbound leads"}
+{"ts":"2026-03-10T00:51:24.092Z","actor":"mc","event":"task.status_changed","task_id":"I-001-ANALYZE-CEQA-CUSTOMER-SEGMENTS","detail":"backlog → ready"}
+{"ts":"2026-03-10T00:51:28.313Z","actor":"mc","event":"task.status_changed","task_id":"I-001-ANALYZE-CEQA-CUSTOMER-SEGMENTS","detail":"ready → in_progress"}
+{"ts":"2026-03-10T00:53:36.111Z","actor":"mc","event":"task.status_changed","task_id":"I-001-ANALYZE-CEQA-CUSTOMER-SEGMENTS","detail":"in_progress → done"}
+{"ts":"2026-03-10T00:54:27.685Z","actor":"mc","event":"task.status_changed","task_id":"I-001-ANALYZE-CEQA-CUSTOMER-SEGMENTS","detail":"done → verified"}
+{"ts":"2026-03-10T00:54:32.257Z","actor":"mc","event":"task.status_changed","task_id":"I-002-IDENTIFY-20-OUTBOUND-LEADS","detail":"backlog → ready"}
+{"ts":"2026-03-10T00:54:39.081Z","actor":"mc","event":"task.status_changed","task_id":"I-002-IDENTIFY-20-OUTBOUND-LEADS","detail":"ready → in_progress"}
+{"ts":"2026-03-10T00:54:00.000Z","actor":"Homie","event":"task.status_changed","task_id":"I-001-ANALYZE-CEQA-CUSTOMER-SEGMENTS","detail":"done → verified"}
+{"ts":"2026-03-10T00:54:00.000Z","actor":"Homie","event":"task.status_changed","task_id":"I-002-IDENTIFY-20-OUTBOUND-LEADS","detail":"backlog → ready"}
+{"ts":"2026-03-10T00:54:00.000Z","actor":"Homie","event":"worker.spawned","task_id":"I-002-IDENTIFY-20-OUTBOUND-LEADS","detail":"Dispatched worker via IPC for task I-002-IDENTIFY-20-OUTBOUND-LEADS (Identify 20 outbound leads)"}

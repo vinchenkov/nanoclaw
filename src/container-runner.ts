@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 
 import {
+  AGENT_PROVIDER,
   CONTAINER_IMAGE,
   CONTAINER_MAX_OUTPUT_SIZE,
   CONTAINER_TIMEOUT,
@@ -24,6 +25,7 @@ import {
   stopContainer,
 } from './container-runtime.js';
 import { validateAdditionalMounts } from './mount-security.js';
+import { getActivePlugin } from './plugin-loader.js';
 import { RegisteredGroup } from './types.js';
 
 // Sentinel markers for robust output parsing (must match agent-runner)
@@ -39,6 +41,7 @@ export interface ContainerInput {
   isScheduledTask?: boolean;
   assistantName?: string;
   secrets?: Record<string, string>;
+  provider?: string;
 }
 
 export interface ContainerOutput {
@@ -159,6 +162,17 @@ function buildVolumeMounts(
   if (fs.existsSync(agentRunnerSrc)) {
     fs.cpSync(agentRunnerSrc, groupAgentRunnerDir, { recursive: true });
   }
+
+  // Copy active plugin's container provider into the agent-runner-src directory
+  const plugin = getActivePlugin();
+  if (plugin) {
+    const pluginProviderSrc = path.join(projectRoot, 'plugins', plugin.name, plugin.containerProvider);
+    if (fs.existsSync(pluginProviderSrc) && fs.existsSync(groupAgentRunnerDir)) {
+      const providerDst = path.join(groupAgentRunnerDir, plugin.containerProvider);
+      fs.copyFileSync(pluginProviderSrc, providerDst);
+    }
+  }
+
   mounts.push({
     hostPath: groupAgentRunnerDir,
     containerPath: '/app/src',
@@ -182,8 +196,8 @@ function buildVolumeMounts(
  * Read allowed secrets from .env for passing to the container via stdin.
  * Secrets are never written to disk or mounted as files.
  */
-function readSecrets(): Record<string, string> {
-  return readEnvFile([
+async function readSecrets(): Promise<Record<string, string>> {
+  const secrets = readEnvFile([
     'CLAUDE_CODE_OAUTH_TOKEN',
     'ANTHROPIC_API_KEY',
     'ANTHROPIC_BASE_URL',
@@ -191,6 +205,14 @@ function readSecrets(): Record<string, string> {
     'BRAVE_API_KEY',
     'FIRECRAWL_API_KEY',
   ]);
+
+  const plugin = getActivePlugin();
+  if (plugin) {
+    const providerSecrets = await plugin.getSecrets();
+    Object.assign(secrets, providerSecrets);
+  }
+
+  return secrets;
 }
 
 function buildContainerArgs(
@@ -267,6 +289,10 @@ export async function runContainerAgent(
   const logsDir = path.join(groupDir, 'logs');
   fs.mkdirSync(logsDir, { recursive: true });
 
+  // Read secrets before entering the Promise constructor (readSecrets is async)
+  input.secrets = await readSecrets();
+  input.provider = AGENT_PROVIDER;
+
   return new Promise((resolve) => {
     const container = spawn(CONTAINER_RUNTIME_BIN, containerArgs, {
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -280,7 +306,6 @@ export async function runContainerAgent(
     let stderrTruncated = false;
 
     // Pass secrets via stdin (never written to disk or mounted as files)
-    input.secrets = readSecrets();
     container.stdin.write(JSON.stringify(input));
     container.stdin.end();
     // Remove secrets from input so they don't appear in logs
