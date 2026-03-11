@@ -18,10 +18,9 @@ export const ASSISTANT_NAME =
 export const ASSISTANT_HAS_OWN_NUMBER =
   (process.env.ASSISTANT_HAS_OWN_NUMBER ||
     envConfig.ASSISTANT_HAS_OWN_NUMBER) === 'true';
-export const AGENT_SDK: 'claude' | 'codex' =
-  (process.env.AGENT_SDK || envConfig.AGENT_SDK || 'claude') as
-    | 'claude'
-    | 'codex';
+export const AGENT_SDK: 'claude' | 'codex' = (process.env.AGENT_SDK ||
+  envConfig.AGENT_SDK ||
+  'claude') as 'claude' | 'codex';
 export const CODEX_MODEL: string | undefined =
   process.env.CODEX_MODEL || envConfig.CODEX_MODEL || undefined;
 export const POLL_INTERVAL = 2000;

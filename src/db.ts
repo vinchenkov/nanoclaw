@@ -593,9 +593,7 @@ export function setSession(
 
 export function getAllSessions(sdk: string = 'claude'): Record<string, string> {
   const rows = db
-    .prepare(
-      'SELECT group_folder, session_id FROM sessions WHERE sdk = ?',
-    )
+    .prepare('SELECT group_folder, session_id FROM sessions WHERE sdk = ?')
     .all(sdk) as Array<{ group_folder: string; session_id: string }>;
   const result: Record<string, string> = {};
   for (const row of rows) {

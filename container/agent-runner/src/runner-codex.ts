@@ -31,52 +31,132 @@ function buildMcpConfig(
   containerInput: ContainerInput,
   mcpServerPath: string,
 ): Record<string, unknown> {
-  return {
+  // Codex config.toml format: flat keys under [mcp_servers.<name>]
+  //   command = "..."
+  //   args = [...]
+  //   env = { KEY = "..." }
+  // No nested "transport" wrapper.
+  const servers: Record<string, unknown> = {
     nanoclaw: {
-      transport: {
-        command: 'node',
-        args: [mcpServerPath],
-        env: {
-          NANOCLAW_CHAT_JID: containerInput.chatJid,
-          NANOCLAW_GROUP_FOLDER: containerInput.groupFolder,
-          NANOCLAW_IS_MAIN: containerInput.isMain ? '1' : '0',
-        },
+      command: 'node',
+      args: [mcpServerPath],
+      env: {
+        NANOCLAW_CHAT_JID: containerInput.chatJid,
+        NANOCLAW_GROUP_FOLDER: containerInput.groupFolder,
+        NANOCLAW_IS_MAIN: containerInput.isMain ? '1' : '0',
       },
-      enabled: true,
-    },
-    brave: {
-      transport: {
-        command: 'mcp-server-brave-search',
-        args: [],
-        env: {
-          BRAVE_API_KEY: containerInput.secrets?.BRAVE_API_KEY || '',
-        },
-      },
-      enabled: !!(containerInput.secrets?.BRAVE_API_KEY),
-    },
-    firecrawl: {
-      transport: {
-        command: 'firecrawl-mcp',
-        args: [],
-        env: {
-          FIRECRAWL_API_KEY: containerInput.secrets?.FIRECRAWL_API_KEY || '',
-        },
-      },
-      enabled: !!(containerInput.secrets?.FIRECRAWL_API_KEY),
     },
   };
+
+  if (containerInput.secrets?.BRAVE_API_KEY) {
+    servers.brave = {
+      command: 'mcp-server-brave-search',
+      args: [],
+      env: {
+        BRAVE_API_KEY: containerInput.secrets.BRAVE_API_KEY,
+      },
+    };
+  }
+
+  if (containerInput.secrets?.FIRECRAWL_API_KEY) {
+    servers.firecrawl = {
+      command: 'firecrawl-mcp',
+      args: [],
+      env: {
+        FIRECRAWL_API_KEY: containerInput.secrets.FIRECRAWL_API_KEY,
+      },
+    };
+  }
+
+  return servers;
 }
 
 /**
- * Load global CLAUDE.md for system context.
- * Returns the content or undefined if not found.
+ * Ensure AGENTS.md is the canonical file and CLAUDE.md symlinks to it.
+ * If a CLAUDE.md exists as a real file, it is renamed to AGENTS.md and
+ * replaced with a symlink. If AGENTS.md doesn't exist yet, CLAUDE.md is
+ * moved to create it. This runs before Codex starts so both runtimes
+ * see consistent content.
  */
-function loadGlobalContext(): string | undefined {
-  const globalClaudeMdPath = '/workspace/global/CLAUDE.md';
-  if (fs.existsSync(globalClaudeMdPath)) {
-    return fs.readFileSync(globalClaudeMdPath, 'utf-8');
+function ensureCanonicalAgentsMd(dir: string): void {
+  const claudeMd = path.join(dir, 'CLAUDE.md');
+  const agentsMd = path.join(dir, 'AGENTS.md');
+
+  const claudeExists = (() => {
+    try { return fs.lstatSync(claudeMd); } catch { return null; }
+  })();
+  const agentsExists = (() => {
+    try { return fs.lstatSync(agentsMd); } catch { return null; }
+  })();
+
+  // Nothing to do if neither file exists
+  if (!claudeExists && !agentsExists) return;
+
+  // CLAUDE.md is already a symlink pointing to AGENTS.md — correct state
+  if (claudeExists?.isSymbolicLink()) {
+    try {
+      if (fs.readlinkSync(claudeMd) === 'AGENTS.md') return;
+    } catch { /* fall through to fix */ }
   }
-  return undefined;
+
+  // If AGENTS.md doesn't exist yet, move CLAUDE.md -> AGENTS.md
+  if (!agentsExists && claudeExists && !claudeExists.isSymbolicLink()) {
+    fs.renameSync(claudeMd, agentsMd);
+  } else if (!agentsExists && claudeExists?.isSymbolicLink()) {
+    // CLAUDE.md is a symlink pointing somewhere wrong and no AGENTS.md exists
+    // Read through the symlink to get content, write as AGENTS.md
+    try {
+      const content = fs.readFileSync(claudeMd, 'utf-8');
+      fs.unlinkSync(claudeMd);
+      fs.writeFileSync(agentsMd, content);
+    } catch {
+      return; // broken symlink with no resolution — skip
+    }
+  } else if (agentsExists && claudeExists && !claudeExists.isSymbolicLink()) {
+    // Both exist as real files — AGENTS.md wins, remove the real CLAUDE.md
+    fs.unlinkSync(claudeMd);
+  } else if (agentsExists && claudeExists?.isSymbolicLink()) {
+    // CLAUDE.md is a symlink but pointing wrong — remove it
+    fs.unlinkSync(claudeMd);
+  }
+
+  // Create CLAUDE.md -> AGENTS.md symlink
+  if (!(() => { try { return fs.lstatSync(claudeMd); } catch { return null; } })()) {
+    fs.symlinkSync('AGENTS.md', claudeMd);
+  }
+}
+
+/**
+ * Discover additional directories mounted at /workspace/extra/* and
+ * /workspace/global. For each directory (including the working directory),
+ * ensure an AGENTS.md -> CLAUDE.md symlink exists so Codex CLI auto-imports
+ * the instructions natively.
+ */
+function discoverAdditionalDirs(): string[] {
+  const dirs: string[] = [];
+
+  // Symlink in the working directory (per-group context)
+  ensureCanonicalAgentsMd('/workspace/group');
+
+  // Global directory
+  if (fs.existsSync('/workspace/global')) {
+    ensureCanonicalAgentsMd('/workspace/global');
+    dirs.push('/workspace/global');
+  }
+
+  // Extra mounts (e.g. shared workspace, SaaS projects)
+  const extraBase = '/workspace/extra';
+  if (fs.existsSync(extraBase)) {
+    for (const entry of fs.readdirSync(extraBase)) {
+      const fullPath = path.join(extraBase, entry);
+      if (fs.statSync(fullPath).isDirectory()) {
+        ensureCanonicalAgentsMd(fullPath);
+        dirs.push(fullPath);
+      }
+    }
+  }
+
+  return dirs;
 }
 
 /**
@@ -134,14 +214,17 @@ export async function runCodexAgent(
 
   log(`Codex MCP servers: ${Object.keys(mcpServers).join(', ')}`);
 
-  // Load global context (same as Claude runner loading global CLAUDE.md)
-  const globalContext = loadGlobalContext();
-  if (globalContext) {
-    log('Loaded global CLAUDE.md context');
+  // Discover additional directories for AGENTS.md auto-import
+  const additionalDirs = discoverAdditionalDirs();
+  if (additionalDirs.length > 0) {
+    log(`Additional directories: ${additionalDirs.join(', ')}`);
   }
 
   const threadOptions = {
     workingDirectory: '/workspace/group',
+    skipGitRepoCheck: true,
+    additionalDirectories:
+      additionalDirs.length > 0 ? additionalDirs : undefined,
   };
 
   const codex = new Codex({
@@ -161,12 +244,6 @@ export async function runCodexAgent(
   let prompt = containerInput.prompt;
   if (containerInput.isScheduledTask) {
     prompt = `[SCHEDULED TASK - The following message was sent automatically and is not coming directly from the user or group.]\n\n${prompt}`;
-  }
-
-  // Prepend global context to the first prompt (Codex SDK doesn't have a
-  // separate systemPrompt option like Claude, so we inject it here)
-  if (globalContext) {
-    prompt = `[SYSTEM CONTEXT]\n${globalContext}\n[END SYSTEM CONTEXT]\n\n${prompt}`;
   }
 
   const pending = drainIpcInput();
