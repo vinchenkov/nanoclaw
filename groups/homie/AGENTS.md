@@ -68,7 +68,7 @@ Homie should balance the research and due dilligence required for seeding genuin
 | `/workspace/extra/shared/mission-control/initiatives/*.md` | YAML frontmatter — canonical initiative state |
 | `node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock status` | Canonical way to read the single-worker execution lock |
 | `/workspace/extra/shared/mission-control/activity.log.ndjson` | Append-only audit trail |
-| `/workspace/global/CLAUDE.md` | Vinny's objectives — drives task and initiative prioritization / seeding |
+| Auto-imported global memory, do not re-read (`/workspace/global/`) | Vinny's objectives — drives task and initiative prioritization / seeding |
 
 ### Agent Overview Files
 
@@ -82,7 +82,7 @@ For each workspace below, an agent overview file will be maintained at the entry
 
 **If an agent makes a change that would outdate the associated AGENTS.md file, it should update it.**
 
-The workspaces below describe the physical locations of deliverables representing the main interests of Vinny, as described in `/workspace/global/CLAUDE.md`.
+The workspaces below describe the physical locations of deliverables representing the main interests of Vinny.
 
 **When seeding tasks Homie should**:
 1. Review the canonical state of Mission Control: tasks at `/workspace/extra/shared/mission-control/tasks/` and initiatives at `/workspace/extra/shared/mission-control/initiatives/`
@@ -156,7 +156,7 @@ node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared <resou
 ### Commands Reference
 
 **task**: `create`, `get`, `list`, `update`
-- `task create --title "..." --description "..." [--worker-type coding] [--priority P1] [--initiative I-...]`
+- `task create --title "..." --description "..." [--acceptance-criterion "..."] [--worker-type coding] [--priority P1] [--initiative I-...]`
 - `task get <ID>`
 - `task list [--status ready] [--initiative I-...]`
 - `task update <ID> --status <status> [--outputs "path1,path2"] [--blocked-reason "..."]`
@@ -171,6 +171,31 @@ node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared <resou
 - `lock release`
 - `lock status`
 - `lock update --wrap-up-sent true`
+
+### Task Authoring Contract
+
+When Homie creates a task, the task fields must be authored separately and intentionally:
+
+- `title`: short, action-oriented task name
+- `description`: the work to perform, scope boundaries, and exact output location under `/workspace/extra/shared/mission-control/outputs/`
+- `acceptance_criteria`: the explicit checklist that defines done; pass these with repeated `--acceptance-criterion "..."` flags
+- `initiative`: parent initiative ID when the work belongs to a strategic outcome
+- `outputs`: not set at creation time; workers fill this in on completion
+
+Example:
+
+```bash
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task create \
+  --title "Audit ProjectCal acquisition and conversion funnel" \
+  --description "Review the current ProjectCal product and marketing funnel across landing page, signup, onboarding, pricing, contact/demo flows, and billing touchpoints. Write the audit to /workspace/extra/shared/mission-control/outputs/projectcal-funnel-audit.md." \
+  --acceptance-criterion "Documents the current funnel from first visit through paid conversion" \
+  --acceptance-criterion "Identifies at least 5 concrete UX, messaging, or implementation issues with severity and rationale" \
+  --acceptance-criterion "Recommends the top 3 fixes with expected leverage on traction or revenue" \
+  --acceptance-criterion "Includes repo or file references needed for follow-up implementation work" \
+  --initiative I-PROJECTCAL-FIRST-CUSTOMER-CONVERSION \
+  --worker-type research \
+  --priority P1
+```
 
 ---
 
@@ -203,7 +228,6 @@ Read all of the following before doing anything else:
 2. All `/workspace/extra/shared/mission-control/initiatives/*.md` (parse YAML frontmatter) — needed for initiative-aware prioritization and seeding
 3. `node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock status`
 4. Last 50 lines of `/workspace/extra/shared/mission-control/activity.log.ndjson`
-5. `/workspace/global/CLAUDE.md` (Vinny's objectives — required for task prioritization and seeding)
 
 ---
 
@@ -247,9 +271,9 @@ Proceed to Step 5.
 
 ---
 
-### Step 5 — Select Next Task
+### Step 5 — Seed Work
 
-Find the next task to dispatch:
+Find the next initiative to create / the next task to dispatch:
 
 1. Status must be `ready`
 2. `blocked_by` must be empty
@@ -259,18 +283,24 @@ Find the next task to dispatch:
    - Tasks under an **`active` initiative** keep their assigned priority
    - Tasks under a **`paused` initiative** are treated as **P3** regardless of their assigned priority
    - **Standalone tasks** (no initiative) sort after initiative tasks at the same effective priority
-6. Within the same effective priority tier, prefer tasks aligned to Vinny's objectives (from `/workspace/global/CLAUDE.md`):
+6. Within the same effective priority tier, prefer tasks aligned to Vinny's objectives:
    - **CEQA SaaS (ProjectCal):** revenue, traction, go-to-market, customer identification, lead generation
    - **AI Writing blog:** research topics, essay outlines, source gathering, essay enhancement — never ghostwrite
    - **North Star (OpenAI/Anthropic):** hiring signals, skill gaps, technical growth, strategic positioning
 
 **If no `ready` tasks exist — Initiative-First Seeding:**
 
-1. Read `/workspace/global/CLAUDE.md` and all `initiatives/*.md`
-2. **If an `active` initiative exists with no `ready` tasks:** seed 1–2 tasks that advance that initiative's goal. Use `mc`:
+1. Use Vinny's visions/interests and the canonical state from mission-control.
+2. **If an `active` initiative exists with no `ready` tasks:** seed multiple tasks that advance that initiative's goal. Use `mc`:
    ```bash
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task create \
-     --title "..." --description "..." --initiative <I-ID> --worker-type research --priority P1
+     --title "..." \
+     --description "..." \
+     --acceptance-criterion "..." \
+     --acceptance-criterion "..." \
+     --initiative <I-ID> \
+     --worker-type research \
+     --priority P1
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task-id> --status ready
    ```
 3. **If no active initiative exists for a relevant objective:** create one first, then seed tasks:
@@ -278,7 +308,13 @@ Find the next task to dispatch:
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared initiative create \
      --title "..." --goal "..." --objective projectcal --timeframe "2 weeks"
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task create \
-     --title "..." --description "..." --initiative <I-ID> --worker-type research --priority P1
+     --title "..." \
+     --description "..." \
+     --acceptance-criterion "..." \
+     --acceptance-criterion "..." \
+     --initiative <I-ID> \
+     --worker-type research \
+     --priority P1
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task-id> --status ready
    ```
 4. **If no relevant initiative is needed:** fall back to seeding a standalone task (`T-YYYYMMDD-XXXX`) with `origin: autonomous`

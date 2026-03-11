@@ -12,7 +12,6 @@ rm -rf "$BASE/groups/homie/briefings/"
 rm -rf "$BASE/groups/homie/logs/"
 rm -rf "$BASE/groups/worker/logs/"
 rm -rf "$BASE/groups/shared/logs/"
-rm -rf "/Users/vinchenkov/Documents/dev/claws/NanoClaw/data/sessions/"
 
 mkdir "/Users/vinchenkov/Documents/dev/claws/NanoClaw/groups/shared/mission-control/"
 

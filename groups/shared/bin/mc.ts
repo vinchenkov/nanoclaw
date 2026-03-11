@@ -16,6 +16,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  rmSync,
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
@@ -171,6 +172,9 @@ interface CreateInitiativeParams {
   body?: string;
 }
 
+type FlagValue = string | string[];
+type ParsedFlags = Record<string, FlagValue>;
+
 // ============================================================================
 // Status transitions
 // ============================================================================
@@ -202,6 +206,65 @@ function resolveWorkspaceRoot(baseDir?: string): string {
   const cwd = process.cwd();
   if (existsSync(join(cwd, "mission-control"))) return cwd;
   return cwd;
+}
+
+function sleepMs(ms: number): void {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function lockDirPath(name: string, root: string): string {
+  return join(root, "mission-control", ".mc-locks", name);
+}
+
+function withFileLock<T>(name: string, root: string, fn: () => T): T {
+  const startedAt = Date.now();
+  const timeoutMs = 5000;
+  const staleMs = 60000;
+  const dir = lockDirPath(name, root);
+  mkdirSync(join(root, "mission-control", ".mc-locks"), { recursive: true });
+
+  while (true) {
+    try {
+      mkdirSync(dir, { recursive: false });
+      break;
+    } catch (error) {
+      const code =
+        error instanceof Error && "code" in error ? String((error as { code?: string }).code) : "";
+      if (code !== "EEXIST") throw error;
+
+      const ownerPath = join(dir, "owner.json");
+      if (existsSync(ownerPath)) {
+        try {
+          const owner = JSON.parse(readFileSync(ownerPath, "utf8")) as { created_at?: number };
+          if (typeof owner.created_at === "number" && Date.now() - owner.created_at > staleMs) {
+            rmSync(dir, { recursive: true, force: true });
+            continue;
+          }
+        } catch {
+          rmSync(dir, { recursive: true, force: true });
+          continue;
+        }
+      }
+
+      if (Date.now() - startedAt > timeoutMs) {
+        throw new Error(`Timed out waiting for Mission Control lock: ${name}`);
+      }
+
+      sleepMs(50);
+    }
+  }
+
+  writeFileSync(
+    join(dir, "owner.json"),
+    JSON.stringify({ pid: process.pid, created_at: Date.now() }),
+    "utf8"
+  );
+
+  try {
+    return fn();
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 // ============================================================================
@@ -272,6 +335,66 @@ function parseBodyAcceptanceCriteria(section: string): AcceptanceCriterion[] {
     .map((line) => line.match(/^- \[(x| )\] (.+)$/i))
     .filter((m): m is RegExpMatchArray => Boolean(m))
     .map((m) => ({ description: m[2].trim(), done: m[1].toLowerCase() === "x" }));
+}
+
+function normalizeAcceptanceCriteria(
+  value: string | undefined,
+  source: string
+): AcceptanceCriterion[] {
+  if (!value) return [];
+
+  if (source === "json") {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(value);
+    } catch {
+      throw new Error("invalid --acceptance-criteria-json: expected JSON array");
+    }
+
+    if (!Array.isArray(parsed)) {
+      throw new Error("invalid --acceptance-criteria-json: expected JSON array");
+    }
+
+    return parsed.map((item) => {
+      if (typeof item === "string") {
+        const description = item.trim();
+        if (!description) {
+          throw new Error("acceptance criteria cannot be empty");
+        }
+        return { description, done: false };
+      }
+
+      if (typeof item === "object" && item !== null) {
+        const description =
+          "description" in item && typeof item.description === "string"
+            ? item.description.trim()
+            : "label" in item && typeof item.label === "string"
+              ? item.label.trim()
+              : "";
+        if (!description) {
+          throw new Error("acceptance criteria objects require a description");
+        }
+        const done = "done" in item ? Boolean(item.done) : false;
+        return { description, done };
+      }
+
+      throw new Error("acceptance criteria entries must be strings or objects");
+    });
+  }
+
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((description) => ({ description, done: false }));
+}
+
+function validateTaskAuthoring(description: string, acceptanceCriteria: AcceptanceCriterion[]): void {
+  if (acceptanceCriteria.length === 0) {
+    throw new Error(
+      "Task requires at least one structured acceptance_criteria. Use --acceptance-criterion or --acceptance-criteria-json."
+    );
+  }
 }
 
 function parseTaskFile(path: string): Task {
@@ -460,63 +583,65 @@ function createTask(
   params: CreateTaskParams,
   root: string
 ): { task: Task; file: string } {
-  const tasks = readTasks(root);
-  const now = new Date().toISOString();
+  return withFileLock("task-create", root, () => {
+    const tasks = readTasks(root);
+    const now = new Date().toISOString();
 
-  const id = params.initiative
-    ? initiativeTaskId(nextInitiativeTaskSeq(tasks), params.title)
-    : nextStandaloneTaskId(tasks);
+    const id = params.initiative
+      ? initiativeTaskId(nextInitiativeTaskSeq(tasks), params.title)
+      : nextStandaloneTaskId(tasks);
 
-  const task: Task = {
-    id,
-    title: params.title,
-    status: "backlog",
-    priority: params.priority,
-    worker_type: params.worker_type,
-    origin: params.origin ?? "autonomous",
-    initiative: params.initiative ?? null,
-    description: params.description,
-    acceptance_criteria: params.acceptance_criteria ?? [],
-    outputs: [],
-    project: params.project ?? null,
-    depends_on: params.depends_on ?? [],
-    retry_count: 0,
-    blocked_reason: null,
-    failure_reason: null,
-    cancellation_reason: null,
-    created_at: now,
-    started_at: null,
-    completed_at: null,
-    updated_at: now,
-    due: params.due ?? null,
-  };
+    const task: Task = {
+      id,
+      title: params.title,
+      status: "backlog",
+      priority: params.priority,
+      worker_type: params.worker_type,
+      origin: params.origin ?? "autonomous",
+      initiative: params.initiative ?? null,
+      description: params.description,
+      acceptance_criteria: params.acceptance_criteria ?? [],
+      outputs: [],
+      project: params.project ?? null,
+      depends_on: params.depends_on ?? [],
+      retry_count: 0,
+      blocked_reason: null,
+      failure_reason: null,
+      cancellation_reason: null,
+      created_at: now,
+      started_at: null,
+      completed_at: null,
+      updated_at: now,
+      due: params.due ?? null,
+    };
 
-  const dir = join(root, "mission-control", "tasks");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(taskFilePath(id, root), renderNewTaskFile(task), "utf8");
+    const dir = join(root, "mission-control", "tasks");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(taskFilePath(id, root), renderNewTaskFile(task), { encoding: "utf8", flag: "wx" });
 
-  // Link task into parent initiative
-  if (params.initiative) {
-    try {
-      const initiative = readInitiative(params.initiative, root);
-      if (!initiative.tasks.includes(id)) {
-        const raw = readFileSync(initiativeFilePath(initiative.id, root), "utf8");
-        const { body } = parseFrontmatter(raw);
-        initiative.tasks.push(id);
-        initiative.updated_at = now;
-        writeInitiativeFile(initiative, body, root);
+    // Link task into parent initiative
+    if (params.initiative) {
+      try {
+        const initiative = readInitiative(params.initiative, root);
+        if (!initiative.tasks.includes(id)) {
+          const raw = readFileSync(initiativeFilePath(initiative.id, root), "utf8");
+          const { body } = parseFrontmatter(raw);
+          initiative.tasks.push(id);
+          initiative.updated_at = now;
+          writeInitiativeFile(initiative, body, root);
+        }
+      } catch {
+        // Initiative not found — task is still created
       }
-    } catch {
-      // Initiative not found — task is still created
     }
-  }
 
-  appendActivityLog(
-    { ts: now, actor: "mc", event: "task.created", task_id: id, detail: task.title },
-    root
-  );
+    appendActivityLog(
+      { ts: now, actor: "mc", event: "task.created", task_id: id, detail: task.title },
+      root
+    );
 
-  return { task, file: `tasks/${id}.md` };
+    return { task, file: `tasks/${id}.md` };
+  });
 }
 
 function applyTaskPatch(task: Task, patch: UpdateTaskParams): Task {
@@ -916,25 +1041,44 @@ function patchLock(patch: LockPatchParams, root: string): LockedState {
 // Arg parsing
 // ============================================================================
 
-function parseFlags(args: string[]): { positional: string[]; flags: Record<string, string> } {
-  const flags: Record<string, string> = {};
+function parseFlags(args: string[]): { positional: string[]; flags: ParsedFlags } {
+  const flags: ParsedFlags = {};
   const positional: string[] = [];
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg.startsWith("--")) {
       const key = arg.slice(2);
       const next = args[i + 1];
+      const value = next && !next.startsWith("--") ? next : "true";
       if (next && !next.startsWith("--")) {
-        flags[key] = next;
         i++;
+      }
+
+      const current = flags[key];
+      if (current === undefined) {
+        flags[key] = value;
+      } else if (Array.isArray(current)) {
+        current.push(value);
       } else {
-        flags[key] = "true";
+        flags[key] = [current, value];
       }
     } else {
       positional.push(arg);
     }
   }
   return { positional, flags };
+}
+
+function getFlag(flags: ParsedFlags, key: string): string | undefined {
+  const value = flags[key];
+  if (value === undefined) return undefined;
+  return Array.isArray(value) ? value[value.length - 1] : value;
+}
+
+function getFlagList(flags: ParsedFlags, key: string): string[] {
+  const value = flags[key];
+  if (value === undefined) return [];
+  return Array.isArray(value) ? value : [value];
 }
 
 function out(data: unknown): never {
@@ -980,19 +1124,36 @@ if (resource === "task") {
   if (!command) fail("Usage: mc task <create|get|list|update>");
 
   if (command === "create") {
-    const title = flags.title;
-    const description = flags.description;
+    const title = getFlag(flags, "title");
+    const description = getFlag(flags, "description");
     if (!title) fail("--title is required");
     if (!description) fail("--description is required");
 
-    const workerType = (flags["worker-type"] ?? "ops") as WorkerType;
+    const workerType = (getFlag(flags, "worker-type") ?? "ops") as WorkerType;
     if (!["coding", "research", "writing", "long", "ops", "admin"].includes(workerType)) {
       fail(`invalid --worker-type: ${workerType}`);
     }
 
-    const priority = (flags.priority ?? "P2") as Priority;
+    const priority = (getFlag(flags, "priority") ?? "P2") as Priority;
     if (!["P0", "P1", "P2", "P3"].includes(priority)) {
       fail(`invalid --priority: ${priority}`);
+    }
+
+    const criteriaFlags = getFlagList(flags, "acceptance-criterion");
+    const criteriaJson = getFlag(flags, "acceptance-criteria-json");
+    if (criteriaFlags.length > 0 && criteriaJson !== undefined) {
+      fail("use either --acceptance-criterion or --acceptance-criteria-json, not both");
+    }
+
+    let acceptanceCriteria: AcceptanceCriterion[] = [];
+    try {
+      acceptanceCriteria =
+        criteriaJson !== undefined
+          ? normalizeAcceptanceCriteria(criteriaJson, "json")
+          : normalizeAcceptanceCriteria(criteriaFlags.join("\n"), "lines");
+      validateTaskAuthoring(description, acceptanceCriteria);
+    } catch (e) {
+      fail(e instanceof Error ? e.message : String(e));
     }
 
     try {
@@ -1002,13 +1163,14 @@ if (resource === "task") {
           description,
           worker_type: workerType,
           priority,
-          origin: (flags.origin ?? "autonomous") as "user" | "autonomous",
-          initiative: flags.initiative ?? null,
-          project: flags.project ?? null,
-          depends_on: flags["depends-on"]
-            ? flags["depends-on"].split(",").map((s) => s.trim()).filter(Boolean)
+          origin: ((getFlag(flags, "origin") ?? "autonomous") as "user" | "autonomous"),
+          initiative: getFlag(flags, "initiative") ?? null,
+          project: getFlag(flags, "project") ?? null,
+          depends_on: getFlag(flags, "depends-on")
+            ? (getFlag(flags, "depends-on") as string).split(",").map((s) => s.trim()).filter(Boolean)
             : [],
-          due: flags.due ?? null,
+          acceptance_criteria: acceptanceCriteria,
+          due: getFlag(flags, "due") ?? null,
         },
         ROOT
       );
@@ -1019,7 +1181,7 @@ if (resource === "task") {
   }
 
   if (command === "get") {
-    const id = positional[0] ?? flags.id;
+    const id = positional[0] ?? getFlag(flags, "id");
     if (!id) fail("task ID required (positional or --id)");
     try {
       out(readTask(id, ROOT));
@@ -1030,8 +1192,10 @@ if (resource === "task") {
 
   if (command === "list") {
     let tasks = readTasks(ROOT);
-    if (flags.initiative) tasks = tasks.filter((t) => t.initiative === flags.initiative);
-    if (flags.status) tasks = tasks.filter((t) => t.status === flags.status);
+    const initiative = getFlag(flags, "initiative");
+    const status = getFlag(flags, "status");
+    if (initiative) tasks = tasks.filter((t) => t.initiative === initiative);
+    if (status) tasks = tasks.filter((t) => t.status === status);
     out(
       tasks.map((t) => ({
         id: t.id,
@@ -1045,24 +1209,24 @@ if (resource === "task") {
   }
 
   if (command === "update") {
-    const id = positional[0] ?? flags.id;
+    const id = positional[0] ?? getFlag(flags, "id");
     if (!id) fail("task ID required (positional or --id)");
 
     const patch: UpdateTaskParams = {};
-    if (flags.status) patch.status = flags.status as TaskStatus;
-    if (flags.priority) patch.priority = flags.priority as Priority;
-    if (flags.outputs !== undefined)
-      patch.outputs = flags.outputs.split(",").map((s) => s.trim()).filter(Boolean);
-    if (flags["blocked-reason"] !== undefined)
-      patch.blocked_reason = flags["blocked-reason"] || null;
-    if (flags["failure-reason"] !== undefined)
-      patch.failure_reason = flags["failure-reason"] || null;
-    if (flags["cancellation-reason"] !== undefined)
-      patch.cancellation_reason = flags["cancellation-reason"] || null;
-    if (flags["depends-on"] !== undefined)
-      patch.depends_on = flags["depends-on"].split(",").map((s) => s.trim()).filter(Boolean);
-    if (flags["blocked-by"] !== undefined)
-      patch.blocked_by = flags["blocked-by"].split(",").map((s) => s.trim()).filter(Boolean);
+    if (getFlag(flags, "status")) patch.status = getFlag(flags, "status") as TaskStatus;
+    if (getFlag(flags, "priority")) patch.priority = getFlag(flags, "priority") as Priority;
+    if (getFlag(flags, "outputs") !== undefined)
+      patch.outputs = (getFlag(flags, "outputs") as string).split(",").map((s) => s.trim()).filter(Boolean);
+    if (getFlag(flags, "blocked-reason") !== undefined)
+      patch.blocked_reason = getFlag(flags, "blocked-reason") || null;
+    if (getFlag(flags, "failure-reason") !== undefined)
+      patch.failure_reason = getFlag(flags, "failure-reason") || null;
+    if (getFlag(flags, "cancellation-reason") !== undefined)
+      patch.cancellation_reason = getFlag(flags, "cancellation-reason") || null;
+    if (getFlag(flags, "depends-on") !== undefined)
+      patch.depends_on = (getFlag(flags, "depends-on") as string).split(",").map((s) => s.trim()).filter(Boolean);
+    if (getFlag(flags, "blocked-by") !== undefined)
+      patch.blocked_by = (getFlag(flags, "blocked-by") as string).split(",").map((s) => s.trim()).filter(Boolean);
 
     // Enforce output path convention
     if (patch.outputs && patch.status === "done") {
@@ -1097,9 +1261,9 @@ else if (resource === "initiative") {
   if (!command) fail("Usage: mc initiative <create|get|list|update>");
 
   if (command === "create") {
-    const title = flags.title;
-    const goal = flags.goal;
-    const objective = flags.objective as Objective;
+    const title = getFlag(flags, "title");
+    const goal = getFlag(flags, "goal");
+    const objective = getFlag(flags, "objective") as Objective | undefined;
     if (!title) fail("--title is required");
     if (!goal) fail("--goal is required");
     if (!objective) fail("--objective is required");
@@ -1113,8 +1277,8 @@ else if (resource === "initiative") {
           title,
           goal,
           objective,
-          timeframe: flags.timeframe ?? "",
-          status: (flags.status ?? "active") as InitiativeStatus,
+          timeframe: getFlag(flags, "timeframe") ?? "",
+          status: (getFlag(flags, "status") ?? "active") as InitiativeStatus,
         },
         ROOT
       );
@@ -1125,7 +1289,7 @@ else if (resource === "initiative") {
   }
 
   if (command === "get") {
-    const id = positional[0] ?? flags.id;
+    const id = positional[0] ?? getFlag(flags, "id");
     if (!id) fail("initiative ID required (positional or --id)");
     try {
       out(readInitiative(id, ROOT));
@@ -1136,7 +1300,8 @@ else if (resource === "initiative") {
 
   if (command === "list") {
     let initiatives = readInitiatives(ROOT);
-    if (flags.status) initiatives = initiatives.filter((i) => i.status === flags.status);
+    const status = getFlag(flags, "status");
+    if (status) initiatives = initiatives.filter((i) => i.status === status);
     out(
       initiatives.map((i) => ({
         id: i.id,
@@ -1150,12 +1315,13 @@ else if (resource === "initiative") {
   }
 
   if (command === "update") {
-    const id = positional[0] ?? flags.id;
+    const id = positional[0] ?? getFlag(flags, "id");
     if (!id) fail("initiative ID required (positional or --id)");
-    if (!flags.status) fail("--status is required");
+    const status = getFlag(flags, "status");
+    if (!status) fail("--status is required");
 
     try {
-      const updated = updateInitiativeStatus(id, flags.status as InitiativeStatus, ROOT);
+      const updated = updateInitiativeStatus(id, status as InitiativeStatus, ROOT);
       out({ ok: true, id: updated.id, status: updated.status });
     } catch (e) {
       fail(e instanceof Error ? e.message : String(e));
@@ -1183,8 +1349,8 @@ else if (resource === "lock") {
   }
 
   if (command === "acquire") {
-    const taskId = flags["task-id"];
-    const workerType = flags["worker-type"] as WorkerType | undefined;
+    const taskId = getFlag(flags, "task-id");
+    const workerType = getFlag(flags, "worker-type") as WorkerType | undefined;
     if (!taskId) fail("--task-id is required");
     if (!workerType) fail("--worker-type is required");
     if (!["coding", "research", "writing", "long", "ops", "admin"].includes(workerType)) {
@@ -1196,10 +1362,10 @@ else if (resource === "lock") {
         {
           taskId,
           workerType,
-          model: flags.model ?? null,
-          subagentId: flags["subagent-id"] ?? null,
-          timeoutMinutes: parseNumberFlag(flags["timeout-minutes"], "--timeout-minutes"),
-          graceMinutes: parseNumberFlag(flags["grace-minutes"], "--grace-minutes"),
+          model: getFlag(flags, "model") ?? null,
+          subagentId: getFlag(flags, "subagent-id") ?? null,
+          timeoutMinutes: parseNumberFlag(getFlag(flags, "timeout-minutes"), "--timeout-minutes"),
+          graceMinutes: parseNumberFlag(getFlag(flags, "grace-minutes"), "--grace-minutes"),
         },
         ROOT
       );
@@ -1226,19 +1392,19 @@ else if (resource === "lock") {
 
   if (command === "update") {
     const patch: LockPatchParams = {};
-    if (flags["task-id"] !== undefined) patch.task_id = flags["task-id"];
-    if (flags.owner !== undefined) patch.owner = flags.owner;
-    if (flags.model !== undefined) patch.model = flags.model || null;
-    if (flags["subagent-id"] !== undefined) patch.subagent_id = flags["subagent-id"] || null;
-    if (flags["acquired-at"] !== undefined) patch.acquired_at = flags["acquired-at"];
-    if (flags["timeout-minutes"] !== undefined) {
-      patch.timeout_minutes = parseNumberFlag(flags["timeout-minutes"], "--timeout-minutes");
+    if (getFlag(flags, "task-id") !== undefined) patch.task_id = getFlag(flags, "task-id");
+    if (getFlag(flags, "owner") !== undefined) patch.owner = getFlag(flags, "owner");
+    if (getFlag(flags, "model") !== undefined) patch.model = getFlag(flags, "model") || null;
+    if (getFlag(flags, "subagent-id") !== undefined) patch.subagent_id = getFlag(flags, "subagent-id") || null;
+    if (getFlag(flags, "acquired-at") !== undefined) patch.acquired_at = getFlag(flags, "acquired-at");
+    if (getFlag(flags, "timeout-minutes") !== undefined) {
+      patch.timeout_minutes = parseNumberFlag(getFlag(flags, "timeout-minutes"), "--timeout-minutes");
     }
-    if (flags["grace-minutes"] !== undefined) {
-      patch.grace_minutes = parseNumberFlag(flags["grace-minutes"], "--grace-minutes");
+    if (getFlag(flags, "grace-minutes") !== undefined) {
+      patch.grace_minutes = parseNumberFlag(getFlag(flags, "grace-minutes"), "--grace-minutes");
     }
-    if (flags["wrap-up-sent"] !== undefined) {
-      patch.wrap_up_sent = parseBooleanFlag(flags["wrap-up-sent"], "--wrap-up-sent");
+    if (getFlag(flags, "wrap-up-sent") !== undefined) {
+      patch.wrap_up_sent = parseBooleanFlag(getFlag(flags, "wrap-up-sent"), "--wrap-up-sent");
     }
     if (Object.keys(patch).length === 0) {
       fail("At least one lock field must be provided to update");

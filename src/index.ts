@@ -472,8 +472,7 @@ async function main(): Promise<void> {
       replaces: 'heartbeat-15min',
       group_folder: 'homie',
       chat_jid: 'dc:1468824513654423697',
-      prompt:
-        'Execute your orchestrator tick loop. Read CLAUDE.md for full instructions.',
+      prompt: 'Execute your orchestrator tick loop.',
       schedule_type: 'interval',
       schedule_value: '300000',
       context_mode: 'isolated',

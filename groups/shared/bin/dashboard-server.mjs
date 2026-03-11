@@ -91,6 +91,7 @@ function parseTask(path) {
     worker_type: String(frontmatter.worker_type ?? 'ops'),
     initiative: frontmatter.initiative == null || frontmatter.initiative === '' ? null : String(frontmatter.initiative),
     description: frontmatter.description ? String(frontmatter.description) : '',
+    acceptance_criteria: Array.isArray(frontmatter.acceptance_criteria) ? frontmatter.acceptance_criteria : [],
     outputs: Array.isArray(frontmatter.outputs) ? frontmatter.outputs : [],
     depends_on: Array.isArray(frontmatter.depends_on) ? frontmatter.depends_on : [],
     retry_count: Number(frontmatter.retry_count ?? 0),
@@ -384,16 +385,55 @@ function dashboardHtml(baseDir, mcPath) {
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 6px;
-        padding: 8px 10px;
+        padding: 10px 11px;
         font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
       .task-card .task-title {
-        font-weight: 600;
-        margin-bottom: 3px;
+        font-weight: 700;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+      .task-card .task-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .task-card .task-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .task-card .task-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 7px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.25px;
+        text-transform: uppercase;
+      }
+      .task-card .task-badge.priority {
+        background: rgba(210,153,34,0.16);
+        color: #f3c86a;
+      }
+      .task-card .task-badge.status {
+        background: rgba(56,139,253,0.16);
+        color: #7cb7ff;
       }
       .task-card .task-meta {
         color: var(--muted);
         font-size: 11px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .task-card .task-worker {
+        text-transform: capitalize;
       }
 
       /* Initiatives view */
@@ -401,27 +441,45 @@ function dashboardHtml(baseDir, mcPath) {
       .initiatives-view.active { display: block; }
       .tasks-view.active { display: block; }
       .tasks-view { display: none; }
+      .initiatives-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .board.initiatives-board {
+        grid-template-columns: repeat(4, 1fr);
+      }
       .initiative-card {
-        background: var(--card);
+        background: var(--surface);
         border: 1px solid var(--border);
-        border-radius: var(--col-radius);
-        padding: 12px 14px;
-        margin-bottom: 8px;
+        border-radius: 6px;
+        padding: 11px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
       .initiative-card .init-title {
         font-weight: 700;
         font-size: 14px;
-        margin-bottom: 4px;
+        line-height: 1.35;
       }
       .initiative-card .init-meta {
         color: var(--muted);
-        font-size: 12px;
+        font-size: 11px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
       .initiative-card .init-goal {
         font-size: 13px;
-        margin-top: 6px;
         color: var(--text);
         opacity: 0.85;
+      }
+      .column-empty {
+        color: var(--muted);
+        font-size: 12px;
+        padding: 10px 2px 4px;
       }
 
       /* Activity feed */
@@ -544,6 +602,33 @@ function dashboardHtml(baseDir, mcPath) {
         font-family: ui-monospace, Menlo, Consolas, monospace;
         font-size: 12px;
       }
+      .criteria-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .criteria-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        background: var(--card);
+        border-radius: 6px;
+        padding: 9px 10px;
+      }
+      .criteria-check {
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--muted);
+        min-width: 14px;
+      }
+      .criteria-item.done .criteria-check {
+        color: var(--ok);
+      }
+      .criteria-text {
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--text);
+      }
       .badge {
         display: inline-block;
         padding: 2px 8px;
@@ -560,9 +645,11 @@ function dashboardHtml(baseDir, mcPath) {
 
       @media (max-width: 900px) {
         .board { grid-template-columns: 1fr 1fr; }
+        .board.initiatives-board { grid-template-columns: 1fr 1fr; }
       }
       @media (max-width: 500px) {
         .board { grid-template-columns: 1fr; }
+        .board.initiatives-board { grid-template-columns: 1fr; }
       }
     </style>
   </head>
@@ -613,7 +700,30 @@ function dashboardHtml(baseDir, mcPath) {
       </div>
     </div>
 
-    <div class="initiatives-view" id="initiatives-view"></div>
+    <div class="initiatives-view" id="initiatives-view">
+      <div class="initiatives-toolbar">
+        <span class="toolbar-label">Grouped by initiative lifecycle</span>
+      </div>
+
+      <div class="board initiatives-board">
+        <div class="column">
+          <div class="column-header" id="initiative-col-active">IN PROGRESS (0)</div>
+          <div class="column-body" id="initiative-col-active-body"></div>
+        </div>
+        <div class="column">
+          <div class="column-header" id="initiative-col-paused">PAUSED (0)</div>
+          <div class="column-body" id="initiative-col-paused-body"></div>
+        </div>
+        <div class="column">
+          <div class="column-header" id="initiative-col-complete">DONE (0)</div>
+          <div class="column-body" id="initiative-col-complete-body"></div>
+        </div>
+        <div class="column">
+          <div class="column-header" id="initiative-col-archived">ARCHIVED (0)</div>
+          <div class="column-body" id="initiative-col-archived-body"></div>
+        </div>
+      </div>
+    </div>
 
     <div class="activity-section">
       <div class="activity-header">Activity Feed</div>
@@ -649,6 +759,13 @@ function dashboardHtml(baseDir, mcPath) {
         done: 'DONE / VERIFIED',
       };
 
+      const INITIATIVE_COLUMN_LABELS = {
+        active: 'IN PROGRESS',
+        paused: 'PAUSED',
+        complete: 'DONE',
+        archived: 'ARCHIVED',
+      };
+
       async function fetchJson(path) {
         const response = await fetch(path, { cache: 'no-store' });
         if (!response.ok) throw new Error(path + ' -> ' + response.status);
@@ -672,10 +789,43 @@ function dashboardHtml(baseDir, mcPath) {
         return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       }
 
+      function escapeHtml(value) {
+        return String(value == null ? '' : value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
+
+      function renderEmptyState(label) {
+        return '<div class="column-empty">' + escapeHtml(label) + '</div>';
+      }
+
       function renderTaskCard(task) {
         return '<div class="task-card" data-type="task" data-id="' + task.id + '">' +
-          '<div class="task-title">' + task.title + '</div>' +
-          '<div class="task-meta">' + task.id + (task.priority ? ' &middot; ' + task.priority : '') + (task.initiative ? ' &middot; ' + task.initiative : '') + '</div>' +
+          '<div class="task-row">' +
+            '<div class="task-title">' + escapeHtml(task.title || task.id) + '</div>' +
+            '<div class="task-badges">' +
+              (task.priority ? '<span class="task-badge priority">' + escapeHtml(task.priority) + '</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<div class="task-meta">' +
+            (task.worker_type ? '<span class="task-worker">' + escapeHtml(task.worker_type) + '</span>' : '') +
+          '</div>' +
+        '</div>';
+      }
+
+      function renderInitiativeCard(init) {
+        const taskCount = init.tasks ? init.tasks.length : 0;
+        return '<div class="initiative-card" data-type="initiative" data-id="' + init.id + '">' +
+          '<div class="init-title">' + escapeHtml(init.title || init.id) + '</div>' +
+          '<div class="init-meta">' +
+            '<span>' + escapeHtml(init.objective || 'other') + '</span>' +
+            (init.timeframe ? '<span>' + escapeHtml(init.timeframe) + '</span>' : '') +
+            '<span>' + taskCount + ' task' + (taskCount === 1 ? '' : 's') + '</span>' +
+          '</div>' +
+          (init.goal ? '<div class="init-goal">' + escapeHtml(init.goal) + '</div>' : '') +
         '</div>';
       }
 
@@ -714,20 +864,23 @@ function dashboardHtml(baseDir, mcPath) {
         }
         for (const [key, label] of Object.entries(COLUMN_LABELS)) {
           document.getElementById('col-' + key).textContent = label + ' (' + buckets[key].length + ')';
-          document.getElementById('col-' + key + '-body').innerHTML = buckets[key].map(renderTaskCard).join('');
+          document.getElementById('col-' + key + '-body').innerHTML = buckets[key].length === 0
+            ? renderEmptyState('No tasks')
+            : buckets[key].map(renderTaskCard).join('');
         }
 
         // Initiatives view
-        document.getElementById('initiatives-view').innerHTML = initiatives.length === 0
-          ? '<div style="color:var(--muted);padding:16px;font-size:13px;">No initiatives found.</div>'
-          : initiatives.map(function(init) {
-              const taskCount = init.tasks ? init.tasks.length : 0;
-              return '<div class="initiative-card" data-type="initiative" data-id="' + init.id + '">' +
-                '<div class="init-title">' + init.title + ' <span style="color:var(--muted);font-weight:400;font-size:12px;">' + init.status + '</span></div>' +
-                '<div class="init-meta">' + init.id + ' &middot; ' + init.objective + (init.timeframe ? ' &middot; ' + init.timeframe : '') + ' &middot; ' + taskCount + ' tasks</div>' +
-                (init.goal ? '<div class="init-goal">' + init.goal + '</div>' : '') +
-              '</div>';
-            }).join('');
+        const initiativeBuckets = { active: [], paused: [], complete: [], archived: [] };
+        for (const init of initiatives) {
+          const key = Object.prototype.hasOwnProperty.call(initiativeBuckets, init.status) ? init.status : 'active';
+          initiativeBuckets[key].push(init);
+        }
+        for (const [key, label] of Object.entries(INITIATIVE_COLUMN_LABELS)) {
+          document.getElementById('initiative-col-' + key).textContent = label + ' (' + initiativeBuckets[key].length + ')';
+          document.getElementById('initiative-col-' + key + '-body').innerHTML = initiativeBuckets[key].length === 0
+            ? renderEmptyState('No initiatives')
+            : initiativeBuckets[key].map(renderInitiativeCard).join('');
+        }
 
         // Activity feed
         document.getElementById('activity').innerHTML = activity.length === 0
@@ -735,9 +888,9 @@ function dashboardHtml(baseDir, mcPath) {
           : activity.map(function(event) {
               return '<div class="activity-row">' +
                 '<span class="activity-time">' + fmtShortDate(event.ts) + '</span>' +
-                '<span class="activity-event">' + (event.event || '') + '</span>' +
-                '<span class="activity-target">' + (event.task_id || event.initiative_id || '') + '</span>' +
-                '<span class="activity-detail">' + (event.detail || '') + '</span>' +
+                '<span class="activity-event">' + escapeHtml(event.event || '') + '</span>' +
+                '<span class="activity-target">' + escapeHtml(event.task_id || event.initiative_id || '') + '</span>' +
+                '<span class="activity-detail">' + escapeHtml(event.detail || '') + '</span>' +
               '</div>';
             }).join('');
       }
@@ -785,6 +938,20 @@ function dashboardHtml(baseDir, mcPath) {
         return '<div class="' + cls + '"><div class="detail-field-label">' + label + '</div><div class="' + valCls + '">' + rendered + '</div></div>';
       }
 
+      function renderAcceptanceCriteria(criteria) {
+        if (!criteria || criteria.length === 0) return '';
+        return '<div class="detail-section"><div class="detail-section-title">Acceptance Criteria</div><div class="criteria-list">' +
+          criteria.map(function(item) {
+            var done = !!(item && item.done);
+            var description = item && item.description ? item.description : '';
+            return '<div class="criteria-item' + (done ? ' done' : '') + '">' +
+              '<span class="criteria-check">' + (done ? '&#10003;' : '&#9675;') + '</span>' +
+              '<div class="criteria-text">' + escapeHtml(description) + '</div>' +
+            '</div>';
+          }).join('') +
+        '</div></div>';
+      }
+
       function renderTaskDetail(task) {
         sidebarTitleEl.textContent = task.title || task.id;
         var html = '';
@@ -799,8 +966,10 @@ function dashboardHtml(baseDir, mcPath) {
 
         if (task.description) {
           html += '<div class="detail-section"><div class="detail-section-title">Description</div>';
-          html += '<div class="detail-field full"><div class="detail-field-value">' + task.description + '</div></div></div>';
+          html += '<div class="detail-field full"><div class="detail-field-value">' + escapeHtml(task.description) + '</div></div></div>';
         }
+
+        html += renderAcceptanceCriteria(task.acceptance_criteria);
 
         html += '<div class="detail-section"><div class="detail-section-title">Dates</div><div class="detail-grid">';
         html += field('Created', task.created_at, { date: true });

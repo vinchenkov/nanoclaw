@@ -49,6 +49,11 @@ All Mission Control state changes go through the `mc` CLI. Never write task YAML
    ```
    `mc` handles writing the task file, updating timestamps, and appending to the activity log automatically.
 
+Task fields mean:
+- `description`: what to do and where the deliverable should be written
+- `acceptance_criteria`: the checklist that determines whether you can mark the task `done`
+- `outputs`: the concrete files or branch names you actually produced
+
 
 4. **Append a completion event** to the activity log:
    ```json
@@ -64,7 +69,7 @@ All Mission Control state changes go through the `mc` CLI. Never write task YAML
 6. **Trigger the planner** — write a `spawn_agent` IPC file so the orchestrator picks up immediately:
    ```bash
    cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
-   {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
+   {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
    SPAWN_EOF
    ```
 
@@ -101,7 +106,7 @@ node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task u
   --status cancelled --cancellation-reason "Infeasible because: <reason>"
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
-{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
+{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
 SPAWN_EOF
 ```
 
@@ -111,7 +116,7 @@ node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task u
   --status failed --failure-reason "<error detail>"
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
-{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
+{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
 SPAWN_EOF
 ```
 
@@ -127,7 +132,7 @@ node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task u
   --status blocked --blocked-reason "Need from Vinny: <what is needed>"
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
-{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
+{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
 SPAWN_EOF
 ```
 
@@ -143,7 +148,7 @@ node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task u
   --status blocked --blocked-reason "Wrap-up: time limit reached. Resume file written."
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
-{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
+{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
 SPAWN_EOF
 ```
 
