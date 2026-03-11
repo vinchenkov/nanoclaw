@@ -66,7 +66,7 @@ Homie should balance the research and due dilligence required for seeding genuin
 |-------------------------|------|
 | `/workspace/extra/shared/mission-control/tasks/*.md` | YAML frontmatter — canonical task state |
 | `/workspace/extra/shared/mission-control/initiatives/*.md` | YAML frontmatter — canonical initiative state |
-| `/workspace/extra/shared/mission-control/lock.json` | Single-worker execution lock |
+| `node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock status` | Canonical way to read the single-worker execution lock |
 | `/workspace/extra/shared/mission-control/activity.log.ndjson` | Append-only audit trail |
 | `/workspace/global/CLAUDE.md` | Vinny's objectives — drives task and initiative prioritization / seeding |
 
@@ -166,10 +166,11 @@ node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared <resou
 - `initiative list [--status active]`
 - `initiative update <ID> --status <status>`
 
-**lock**: `acquire`, `release`, `status`
+**lock**: `acquire`, `release`, `status`, `update`
 - `lock acquire --task-id <ID> --worker-type <TYPE>`
 - `lock release`
 - `lock status`
+- `lock update --wrap-up-sent true`
 
 ---
 
@@ -200,7 +201,7 @@ Read all of the following before doing anything else:
 
 1. All `/workspace/extra/shared/mission-control/tasks/*.md` (parse YAML frontmatter)
 2. All `/workspace/extra/shared/mission-control/initiatives/*.md` (parse YAML frontmatter) — needed for initiative-aware prioritization and seeding
-3. `/workspace/extra/shared/mission-control/lock.json`
+3. `node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock status`
 4. Last 50 lines of `/workspace/extra/shared/mission-control/activity.log.ndjson`
 5. `/workspace/global/CLAUDE.md` (Vinny's objectives — required for task prioritization and seeding)
 
@@ -208,10 +209,10 @@ Read all of the following before doing anything else:
 
 ### Step 3 — Handle Lock (if worker is running)
 
-If `lock.json` has `"locked": true`:
+If `mc lock status` reports `"locked": true`:
 
 Calculate `elapsed = now - lock.acquired_at` (in minutes).
-Read `lock.timeout_minutes` and `lock.grace_minutes` from `lock.json`.
+Read `lock.timeout_minutes` and `lock.grace_minutes` from the `mc lock status` output.
 
 > **NanoClaw note:** Workers cannot receive mid-run messages. The container runtime enforces a hard kill at `CONTAINER_TIMEOUT` (75 min). The orchestrator's role here is to reconcile stale lock state — not to communicate with the worker.
 
@@ -219,8 +220,8 @@ Check conditions **in this order**:
 
 | Condition | Action |
 |-----------|--------|
-| `elapsed >= timeout_minutes + grace_minutes` | **Hard release.** Container was killed by the runtime. Check if the task file was updated. If not, read activity log filtered by `lock.task_id` to infer state. Update task to `failed` or `blocked` with a reason. Write `{"locked": false}` to `lock.json`. Append `worker.killed` event. Proceed to Step 4. |
-| `elapsed >= timeout_minutes` and `lock.wrap_up_sent == false` | Grace period started — container may still be finishing. Rewrite `lock.json` with `wrap_up_sent: true`. Append `worker.wrap_up_sent` event. **HEARTBEAT_OK** |
+| `elapsed >= timeout_minutes + grace_minutes` | **Hard release.** Container was killed by the runtime. Check if the task file was updated. If not, read activity log filtered by `lock.task_id` to infer state. Update task to `failed` or `blocked` with a reason. Release the lock via `mc lock release`. Append `worker.killed` event. Proceed to Step 4. |
+| `elapsed >= timeout_minutes` and `lock.wrap_up_sent == false` | Grace period started — container may still be finishing. Mark the grace-period transition via `mc lock update --wrap-up-sent true`. Append `worker.wrap_up_sent` event. **HEARTBEAT_OK** |
 | `elapsed >= timeout_minutes` and `lock.wrap_up_sent == true` | Grace period in progress. **HEARTBEAT_OK** |
 | `elapsed < timeout_minutes` | Worker running normally. **HEARTBEAT_OK** |
 
@@ -230,7 +231,7 @@ Check conditions **in this order**:
 
 ### Step 4 — Verify Completed Work (if lock released)
 
-If `lock.json` has `"locked": false` and a worker was previously running (check recent activity log for `worker.spawned` without a subsequent `task.completed`):
+If `mc lock status` reports `"locked": false` and a worker was previously running (check recent activity log for `worker.spawned` without a subsequent `task.completed`):
 
 Read the previously-assigned task. Verify based on its status:
 
@@ -301,17 +302,11 @@ Execute these steps **in exact order**:
      --status in_progress
    ```
 
-2. **Write `lock.json`** with the full lock shape:
-   ```json
-   {
-     "locked": true,
-     "task_id": "<task_id>",
-     "owner": "worker:<task.worker_type>",
-     "acquired_at": "<ISO8601 now>",
-     "timeout_minutes": 60,
-     "grace_minutes": 15,
-     "wrap_up_sent": false
-   }
+2. **Acquire the worker lock via `mc`:**
+   ```bash
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock acquire \
+     --task-id <task_id> \
+     --worker-type <task.worker_type>
    ```
 
 3. **Dispatch the worker** via IPC — write a JSON file to `/workspace/ipc/tasks/<uuid>.json`:
@@ -410,12 +405,16 @@ Append-only NDJSON at `/workspace/extra/shared/mission-control/activity.log.ndjs
   "locked": true,
   "task_id": "T-20260213-0001",
   "owner": "worker:coding",
+  "model": null,
+  "subagent_id": null,
   "acquired_at": "2026-02-25T23:15:00Z",
   "timeout_minutes": 60,
   "grace_minutes": 15,
   "wrap_up_sent": false
 }
 ```
+
+This schema is owned by `mc.ts`. Homie may inspect it only through `mc lock status`, acquire it only through `mc lock acquire`, mark grace-period state only through `mc lock update`, and clear it only through `mc lock release`.
 
 Released: `{"locked": false}`
 
@@ -450,8 +449,8 @@ If MCP research tools fail after 3 retries, note the gap and proceed with availa
 ## Non-negotiable Invariants
 
 1. **All non-trivial work must be associated with a task or initiative.** Create one first if none exists.
-2. **Single-threaded execution.** At most one worker runs at a time, enforced via `lock.json`.
+2. **Single-threaded execution.** At most one worker runs at a time, enforced via the Mission Control lock managed by `mc`.
 3. **Activity log is append-only.** Never rewrite events. Append only.
-4. **Lock before spawn.** Write `lock.json` fully before writing the IPC dispatch file.
+4. **Lock before spawn.** Acquire the lock through `mc` before writing the IPC dispatch file.
 5. **Self-terminate after dispatch.** After dispatching a worker, terminate this session immediately.
 6. **Never infer tasks from only chat history.** Reference the Workspace Context section to seed new work.

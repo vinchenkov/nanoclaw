@@ -42,7 +42,7 @@ If you change this file, tell the user — it's your soul, and they should know.
 
 ## Context
 
-Below is Vinny's self-defined persona. This should act as your Northstar when determining what type of work would best assist Vinny:
+Below is Vinny's self-defined persona. This should act as your Northstar when determining what type of work would best assist Vinny.
 
 ### Builder, Researcher, and AI-Driven Operator
 

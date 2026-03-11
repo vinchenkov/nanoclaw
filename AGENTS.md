@@ -32,12 +32,16 @@ Service management:
 launchctl load ~/Library/LaunchAgents/com.nanoclaw.plist
 launchctl unload ~/Library/LaunchAgents/com.nanoclaw.plist
 launchctl kickstart -k gui/$(id -u)/com.nanoclaw  # restart
+./scripts/startclaw.sh  # rebuild dist + container image, then start/restart the launchd service
+./scripts/killclaw.sh   # unload the launchd service and stop lingering NanoClaw processes/containers
 
 # Linux (systemd)
 systemctl --user start nanoclaw
 systemctl --user stop nanoclaw
 systemctl --user restart nanoclaw
 ```
+
+`scripts/startclaw.sh` and `scripts/killclaw.sh` are macOS-oriented convenience wrappers. Use `startclaw.sh` after local code or container changes when you want a full rebuild before restarting the service. Use `killclaw.sh` for recovery when the launchd agent or agent containers are wedged; it stops any running `nanoclaw-agent` containers on the host, so treat it as a coarse shutdown tool rather than a narrow per-checkout command.
 
 ## Architecture
 
@@ -167,6 +171,8 @@ Agents access mission-control via:
 ```bash
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared <resource> <command>
 ```
+
+Important: agent-facing access to Mission Control state must go through `mc.ts`. Agents may read or mutate tasks, initiatives, and the worker lock only via `mc` commands, never by opening or rewriting `mission-control/lock.json` directly.
 
 ### Orchestrator heartbeat
 ```

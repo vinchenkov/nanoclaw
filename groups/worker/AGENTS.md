@@ -22,7 +22,7 @@ The only exception is git-based outputs (code repos and Obsidian Vault) — list
 
 ## Your Contract
 
-All task mutations go through the `mc` CLI. Never write task YAML directly.
+All Mission Control state changes go through the `mc` CLI. Never write task YAML directly, and never read or write `mission-control/lock.json` except through `mc lock ...`.
 
 1. **Execute the task** using your own discretion based on the acceptance criteria.
 2. **Update the task via `mc`** when done:
@@ -58,7 +58,7 @@ All task mutations go through the `mc` CLI. Never write task YAML directly.
 
 5. **Release lock:**
    ```bash
-   echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
    ```
 
 6. **Trigger the planner** — write a `spawn_agent` IPC file so the orchestrator picks up immediately:
@@ -99,7 +99,7 @@ If `initiative` is null, your task is a standalone deliverable.
 ```bash
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status cancelled --cancellation-reason "Infeasible because: <reason>"
-echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
@@ -109,7 +109,7 @@ SPAWN_EOF
 ```bash
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status failed --failure-reason "<error detail>"
-echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
@@ -125,7 +125,7 @@ Then:
 ```bash
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status blocked --blocked-reason "Need from Vinny: <what is needed>"
-echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF
@@ -141,7 +141,7 @@ Then:
 ```bash
 node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
   --status blocked --blocked-reason "Wrap-up: time limit reached. Resume file written."
-echo '{"locked": false}' > /workspace/extra/shared/mission-control/lock.json
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
 cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Follow your orchestrator contract at /workspace/group/CLAUDE.md","context_mode":"isolated"}
 SPAWN_EOF

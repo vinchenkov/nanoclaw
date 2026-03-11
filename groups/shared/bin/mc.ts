@@ -85,7 +85,36 @@ interface Initiative {
   updated_at: string;
 }
 
-interface LockState {
+interface LockedState {
+  locked: true;
+  task_id: string;
+  owner: string;
+  model: string | null;
+  subagent_id: string | null;
+  acquired_at: string;
+  timeout_minutes: number;
+  grace_minutes: number;
+  wrap_up_sent: boolean;
+}
+
+interface UnlockedState {
+  locked: false;
+}
+
+type LockState = LockedState | UnlockedState;
+
+interface LockPatchParams {
+  task_id?: string;
+  owner?: string;
+  model?: string | null;
+  subagent_id?: string | null;
+  acquired_at?: string;
+  timeout_minutes?: number;
+  grace_minutes?: number;
+  wrap_up_sent?: boolean;
+}
+
+interface LegacyLockState {
   locked: boolean;
   task_id?: string | null;
   owner?: string | null;
@@ -747,17 +776,140 @@ function appendActivityLog(event: ActivityEvent, root: string): void {
 // Lock operations
 // ============================================================================
 
+function parseBooleanFlag(value: string | undefined, flagName: string): boolean | undefined {
+  if (value === undefined) return undefined;
+  if (value === "true") return true;
+  if (value === "false") return false;
+  fail(`${flagName} must be true or false`);
+}
+
+function parseNumberFlag(value: string | undefined, flagName: string): number | undefined {
+  if (value === undefined) return undefined;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    fail(`${flagName} must be a non-negative number`);
+  }
+  return parsed;
+}
+
+function normalizeLockState(lock: LegacyLockState): LockState {
+  if (!lock || lock.locked !== true) {
+    return { locked: false };
+  }
+
+  const taskId = typeof lock.task_id === "string" && lock.task_id.trim().length > 0
+    ? lock.task_id.trim()
+    : null;
+  const owner = typeof lock.owner === "string" && lock.owner.trim().length > 0
+    ? lock.owner.trim()
+    : null;
+  const acquiredAt = typeof lock.acquired_at === "string" && lock.acquired_at.trim().length > 0
+    ? lock.acquired_at.trim()
+    : null;
+  const timeoutMinutes =
+    typeof lock.timeout_minutes === "number" && Number.isFinite(lock.timeout_minutes)
+      ? lock.timeout_minutes
+      : 60;
+  const graceMinutes =
+    typeof lock.grace_minutes === "number" && Number.isFinite(lock.grace_minutes)
+      ? lock.grace_minutes
+      : 15;
+
+  if (!taskId || !owner || !acquiredAt) {
+    throw new Error("lock.json is invalid: locked state requires task_id, owner, and acquired_at");
+  }
+
+  return {
+    locked: true,
+    task_id: taskId,
+    owner,
+    model: typeof lock.model === "string" ? lock.model : null,
+    subagent_id: typeof lock.subagent_id === "string" ? lock.subagent_id : null,
+    acquired_at: acquiredAt,
+    timeout_minutes: timeoutMinutes,
+    grace_minutes: graceMinutes,
+    wrap_up_sent: lock.wrap_up_sent === true,
+  };
+}
+
 function readLock(root: string): LockState {
   const p = join(root, "mission-control", "lock.json");
   try {
-    return JSON.parse(readFileSync(p, "utf8")) as LockState;
-  } catch {
-    return { locked: false };
+    const parsed = JSON.parse(readFileSync(p, "utf8")) as LegacyLockState;
+    return normalizeLockState(parsed);
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as NodeJS.ErrnoException).code === "ENOENT"
+    ) {
+      return { locked: false };
+    }
+    throw error;
   }
 }
 
+function ensureMissionControlDir(root: string): void {
+  mkdirSync(join(root, "mission-control"), { recursive: true });
+}
+
 function writeLock(lock: LockState, root: string): void {
+  ensureMissionControlDir(root);
   writeFileSync(join(root, "mission-control", "lock.json"), JSON.stringify(lock, null, 2), "utf8");
+}
+
+function acquireLock(
+  params: {
+    taskId: string;
+    workerType: WorkerType;
+    model?: string | null;
+    subagentId?: string | null;
+    timeoutMinutes?: number;
+    graceMinutes?: number;
+  },
+  root: string
+): LockedState {
+  const current = readLock(root);
+  if (current.locked) {
+    throw new Error(`Lock already held by ${current.owner} for task ${current.task_id}`);
+  }
+
+  const lock: LockedState = {
+    locked: true,
+    task_id: params.taskId,
+    owner: `worker:${params.workerType}`,
+    model: params.model ?? null,
+    subagent_id: params.subagentId ?? null,
+    acquired_at: new Date().toISOString(),
+    timeout_minutes: params.timeoutMinutes ?? 60,
+    grace_minutes: params.graceMinutes ?? 15,
+    wrap_up_sent: false,
+  };
+  writeLock(lock, root);
+  return lock;
+}
+
+function patchLock(patch: LockPatchParams, root: string): LockedState {
+  const current = readLock(root);
+  if (!current.locked) {
+    throw new Error("Cannot update lock: lock is not currently held");
+  }
+
+  const next: LockedState = {
+    ...current,
+    ...(patch.task_id !== undefined ? { task_id: patch.task_id } : {}),
+    ...(patch.owner !== undefined ? { owner: patch.owner } : {}),
+    ...(patch.model !== undefined ? { model: patch.model } : {}),
+    ...(patch.subagent_id !== undefined ? { subagent_id: patch.subagent_id } : {}),
+    ...(patch.acquired_at !== undefined ? { acquired_at: patch.acquired_at } : {}),
+    ...(patch.timeout_minutes !== undefined ? { timeout_minutes: patch.timeout_minutes } : {}),
+    ...(patch.grace_minutes !== undefined ? { grace_minutes: patch.grace_minutes } : {}),
+    ...(patch.wrap_up_sent !== undefined ? { wrap_up_sent: patch.wrap_up_sent } : {}),
+  };
+
+  writeLock(next, root);
+  return next;
 }
 
 // ============================================================================
@@ -1020,40 +1172,87 @@ else if (resource === "initiative") {
 // ============================================================================
 
 else if (resource === "lock") {
-  if (!command) fail("Usage: mc lock <acquire|release|status>");
+  if (!command) fail("Usage: mc lock <acquire|release|status|update>");
 
   if (command === "status") {
-    out(readLock(ROOT));
+    try {
+      out(readLock(ROOT));
+    } catch (e) {
+      fail(e instanceof Error ? e.message : String(e));
+    }
   }
 
   if (command === "acquire") {
     const taskId = flags["task-id"];
-    const workerType = flags["worker-type"];
+    const workerType = flags["worker-type"] as WorkerType | undefined;
     if (!taskId) fail("--task-id is required");
     if (!workerType) fail("--worker-type is required");
+    if (!["coding", "research", "writing", "long", "ops", "admin"].includes(workerType)) {
+      fail(`invalid --worker-type: ${workerType}`);
+    }
 
-    const lock: LockState = {
-      locked: true,
-      task_id: taskId,
-      owner: `worker:${workerType}`,
-      model: null,
-      subagent_id: null,
-      acquired_at: new Date().toISOString(),
-      timeout_minutes: 60,
-      grace_minutes: 15,
-      wrap_up_sent: false,
-    };
-    writeLock(lock, ROOT);
-    out(lock);
+    try {
+      const lock = acquireLock(
+        {
+          taskId,
+          workerType,
+          model: flags.model ?? null,
+          subagentId: flags["subagent-id"] ?? null,
+          timeoutMinutes: parseNumberFlag(flags["timeout-minutes"], "--timeout-minutes"),
+          graceMinutes: parseNumberFlag(flags["grace-minutes"], "--grace-minutes"),
+        },
+        ROOT
+      );
+      out(lock);
+    } catch (e) {
+      fail(e instanceof Error ? e.message : String(e));
+    }
   }
 
   if (command === "release") {
-    writeLock({ locked: false }, ROOT);
-    out({ ok: true, locked: false });
+    try {
+      const current = readLock(ROOT);
+      writeLock({ locked: false }, ROOT);
+      out({
+        ok: true,
+        locked: false,
+        previous_task_id: current.locked ? current.task_id : null,
+        previous_owner: current.locked ? current.owner : null,
+      });
+    } catch (e) {
+      fail(e instanceof Error ? e.message : String(e));
+    }
   }
 
-  if (!["acquire", "release", "status"].includes(command)) {
-    fail(`Unknown lock command: ${command}. Use: acquire, release, status`);
+  if (command === "update") {
+    const patch: LockPatchParams = {};
+    if (flags["task-id"] !== undefined) patch.task_id = flags["task-id"];
+    if (flags.owner !== undefined) patch.owner = flags.owner;
+    if (flags.model !== undefined) patch.model = flags.model || null;
+    if (flags["subagent-id"] !== undefined) patch.subagent_id = flags["subagent-id"] || null;
+    if (flags["acquired-at"] !== undefined) patch.acquired_at = flags["acquired-at"];
+    if (flags["timeout-minutes"] !== undefined) {
+      patch.timeout_minutes = parseNumberFlag(flags["timeout-minutes"], "--timeout-minutes");
+    }
+    if (flags["grace-minutes"] !== undefined) {
+      patch.grace_minutes = parseNumberFlag(flags["grace-minutes"], "--grace-minutes");
+    }
+    if (flags["wrap-up-sent"] !== undefined) {
+      patch.wrap_up_sent = parseBooleanFlag(flags["wrap-up-sent"], "--wrap-up-sent");
+    }
+    if (Object.keys(patch).length === 0) {
+      fail("At least one lock field must be provided to update");
+    }
+
+    try {
+      out(patchLock(patch, ROOT));
+    } catch (e) {
+      fail(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  if (!["acquire", "release", "status", "update"].includes(command)) {
+    fail(`Unknown lock command: ${command}. Use: acquire, release, status, update`);
   }
 }
 
