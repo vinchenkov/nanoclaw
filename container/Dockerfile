@@ -32,7 +32,7 @@ ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Install agent-browser, claude-code, and MCP servers globally
 # MCP servers are installed at image-build time for reliability (no runtime npx fetching)
-RUN npm install -g agent-browser @anthropic-ai/claude-code \
+RUN npm install -g agent-browser @anthropic-ai/claude-code @openai/codex \
     @modelcontextprotocol/server-brave-search@0.6.2 \
     firecrawl-mcp@3.10.3
 
@@ -52,7 +52,7 @@ COPY agent-runner/ ./
 RUN npm run build
 
 # Create workspace directories
-RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input
+RUN mkdir -p /workspace/group /workspace/global /workspace/extra /workspace/ipc/messages /workspace/ipc/tasks /workspace/ipc/input /home/node/.codex/sessions
 
 # Create entrypoint script
 # Secrets are passed via stdin JSON — temp file is deleted immediately after Node reads it

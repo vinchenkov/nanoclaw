@@ -7,6 +7,7 @@ import fs from 'fs';
 import path from 'path';
 
 import {
+  AGENT_SDK,
   CONTAINER_IMAGE,
   CONTAINER_MAX_OUTPUT_SIZE,
   CONTAINER_TIMEOUT,
@@ -24,6 +25,7 @@ import {
   stopContainer,
 } from './container-runtime.js';
 import { validateAdditionalMounts } from './mount-security.js';
+import { getRuntime } from './runtime-registry.js';
 import { RegisteredGroup } from './types.js';
 
 // Sentinel markers for robust output parsing (must match agent-runner)
@@ -38,6 +40,7 @@ export interface ContainerInput {
   isMain: boolean;
   isScheduledTask?: boolean;
   assistantName?: string;
+  agentSdk?: 'claude' | 'codex';
   secrets?: Record<string, string>;
 }
 
@@ -129,6 +132,15 @@ function buildVolumeMounts(
     readonly: false,
   });
 
+  // Per-group Codex sessions directory (isolated from other groups)
+  const groupCodexDir = path.join(DATA_DIR, 'sessions', group.folder, '.codex');
+  fs.mkdirSync(path.join(groupCodexDir, 'sessions'), { recursive: true });
+  mounts.push({
+    hostPath: groupCodexDir,
+    containerPath: '/home/node/.codex',
+    readonly: false,
+  });
+
   // Per-group IPC namespace: each group gets its own IPC directory
   // This prevents cross-group privilege escalation via IPC
   const groupIpcDir = resolveGroupIpcPath(group.folder);
@@ -190,6 +202,7 @@ function readSecrets(): Record<string, string> {
     'ANTHROPIC_AUTH_TOKEN',
     'BRAVE_API_KEY',
     'FIRECRAWL_API_KEY',
+    'CODEX_API_KEY',
   ]);
 }
 
@@ -235,6 +248,9 @@ export async function runContainerAgent(
 
   const groupDir = resolveGroupFolderPath(group.folder);
   fs.mkdirSync(groupDir, { recursive: true });
+
+  const runtime = getRuntime(AGENT_SDK);
+  runtime.prepareHostState(group.folder);
 
   const mounts = buildVolumeMounts(group, input.isMain);
   const safeName = group.folder.replace(/[^a-zA-Z0-9-]/g, '-');
