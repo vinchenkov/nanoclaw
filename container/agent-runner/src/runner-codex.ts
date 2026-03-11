@@ -72,85 +72,23 @@ function buildMcpConfig(
 }
 
 /**
- * Ensure AGENTS.md is the canonical file and CLAUDE.md symlinks to it.
- * If a CLAUDE.md exists as a real file, it is renamed to AGENTS.md and
- * replaced with a symlink. If AGENTS.md doesn't exist yet, CLAUDE.md is
- * moved to create it. This runs before Codex starts so both runtimes
- * see consistent content.
- */
-function ensureCanonicalAgentsMd(dir: string): void {
-  const claudeMd = path.join(dir, 'CLAUDE.md');
-  const agentsMd = path.join(dir, 'AGENTS.md');
-
-  const claudeExists = (() => {
-    try { return fs.lstatSync(claudeMd); } catch { return null; }
-  })();
-  const agentsExists = (() => {
-    try { return fs.lstatSync(agentsMd); } catch { return null; }
-  })();
-
-  // Nothing to do if neither file exists
-  if (!claudeExists && !agentsExists) return;
-
-  // CLAUDE.md is already a symlink pointing to AGENTS.md — correct state
-  if (claudeExists?.isSymbolicLink()) {
-    try {
-      if (fs.readlinkSync(claudeMd) === 'AGENTS.md') return;
-    } catch { /* fall through to fix */ }
-  }
-
-  // If AGENTS.md doesn't exist yet, move CLAUDE.md -> AGENTS.md
-  if (!agentsExists && claudeExists && !claudeExists.isSymbolicLink()) {
-    fs.renameSync(claudeMd, agentsMd);
-  } else if (!agentsExists && claudeExists?.isSymbolicLink()) {
-    // CLAUDE.md is a symlink pointing somewhere wrong and no AGENTS.md exists
-    // Read through the symlink to get content, write as AGENTS.md
-    try {
-      const content = fs.readFileSync(claudeMd, 'utf-8');
-      fs.unlinkSync(claudeMd);
-      fs.writeFileSync(agentsMd, content);
-    } catch {
-      return; // broken symlink with no resolution — skip
-    }
-  } else if (agentsExists && claudeExists && !claudeExists.isSymbolicLink()) {
-    // Both exist as real files — AGENTS.md wins, remove the real CLAUDE.md
-    fs.unlinkSync(claudeMd);
-  } else if (agentsExists && claudeExists?.isSymbolicLink()) {
-    // CLAUDE.md is a symlink but pointing wrong — remove it
-    fs.unlinkSync(claudeMd);
-  }
-
-  // Create CLAUDE.md -> AGENTS.md symlink
-  if (!(() => { try { return fs.lstatSync(claudeMd); } catch { return null; } })()) {
-    fs.symlinkSync('AGENTS.md', claudeMd);
-  }
-}
-
-/**
  * Discover additional directories mounted at /workspace/extra/* and
- * /workspace/global. For each directory (including the working directory),
- * ensure an AGENTS.md -> CLAUDE.md symlink exists so Codex CLI auto-imports
- * the instructions natively.
+ * /workspace/global for Codex SDK's additionalDirectories support.
+ * Assumes AGENTS.md (canonical) and CLAUDE.md (symlink) are already
+ * set up correctly on the host.
  */
 function discoverAdditionalDirs(): string[] {
   const dirs: string[] = [];
 
-  // Symlink in the working directory (per-group context)
-  ensureCanonicalAgentsMd('/workspace/group');
-
-  // Global directory
   if (fs.existsSync('/workspace/global')) {
-    ensureCanonicalAgentsMd('/workspace/global');
     dirs.push('/workspace/global');
   }
 
-  // Extra mounts (e.g. shared workspace, SaaS projects)
   const extraBase = '/workspace/extra';
   if (fs.existsSync(extraBase)) {
     for (const entry of fs.readdirSync(extraBase)) {
       const fullPath = path.join(extraBase, entry);
       if (fs.statSync(fullPath).isDirectory()) {
-        ensureCanonicalAgentsMd(fullPath);
         dirs.push(fullPath);
       }
     }
