@@ -26,7 +26,6 @@ import { join } from "node:path";
 // ============================================================================
 
 type TaskStatus =
-  | "backlog"
   | "ready"
   | "in_progress"
   | "done"
@@ -182,8 +181,7 @@ type ParsedFlags = Record<string, FlagValue>;
 // ============================================================================
 
 const allowedTaskTransitions: Record<TaskStatus, TaskStatus[]> = {
-  backlog: ["ready", "cancelled"],
-  ready: ["in_progress", "backlog", "cancelled"],
+  ready: ["in_progress", "cancelled"],
   in_progress: ["done", "blocked", "failed", "cancelled"],
   blocked: ["ready", "cancelled"],
   failed: ["ready"],
@@ -424,10 +422,13 @@ function parseTaskFile(path: string): Task {
     acceptance_criteria = parseBodyAcceptanceCriteria(section);
   }
 
+  const rawStatus = String(frontmatter.status ?? "ready");
+  const status: TaskStatus = rawStatus === "backlog" ? "ready" : (rawStatus as TaskStatus);
+
   return {
     id: String(frontmatter.id ?? ""),
     title: String(frontmatter.title ?? ""),
-    status: (frontmatter.status as TaskStatus) ?? "backlog",
+    status,
     priority: (frontmatter.priority as Priority) ?? "P2",
     worker_type: (frontmatter.worker_type as WorkerType) ?? "ops",
     origin: (frontmatter.origin as "user" | "autonomous") ?? "user",
@@ -599,7 +600,7 @@ function createTask(
     const task: Task = {
       id,
       title: params.title,
-      status: "backlog",
+      status: "ready",
       priority: params.priority,
       worker_type: params.worker_type,
       origin: params.origin ?? "autonomous",

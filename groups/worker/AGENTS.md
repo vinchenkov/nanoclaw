@@ -22,7 +22,7 @@ The only exception is git-based outputs (code repos and Obsidian Vault) — list
 
 ## Your Contract
 
-All Mission Control state changes go through the `mc` CLI. Never write task YAML directly, and never read or write `mission-control/lock.json` except through `mc lock ...`.
+All Mission Control state changes go through the `mc` CLI. Never read or write `mission-control/lock.json` except through `mc lock ...`.
 
 1. **Execute the task** using your own discretion based on the acceptance criteria.
 2. **Update the task via `mc`** when done:

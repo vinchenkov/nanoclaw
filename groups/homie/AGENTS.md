@@ -260,14 +260,31 @@ The worker→verifier feedback loop is in progress. The verifier reviews worker 
 
 **HEARTBEAT_OK**
 
-**If lock is released** (`"locked": false`) and a worker/verifier was previously running:
+**If lock is released** (`"locked": false`):
 
-Read the previously-assigned task. Verify based on its status:
+First, scan **all tasks** for any with status `done`. If one or more `done` tasks exist, the highest-priority one must be verified before any new work is dispatched:
+
+1. Pick the first `done` task (by priority, then creation date)
+2. Acquire the lock for it:
+   ```bash
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock acquire \
+     --task-id <task_id> --worker-type verifier
+   ```
+3. Spawn the verifier via IPC:
+   ```json
+   {"type":"spawn_agent","group_folder":"verifier","prompt":"Verify task <task_id>.","context_mode":"isolated"}
+   ```
+4. Append activity event:
+   ```json
+   {"ts":"...","actor":"Homie","event":"verifier.spawned","task_id":"<task_id>","detail":"Dispatched verifier for task <task_id>"}
+   ```
+5. **Self-terminate.** Do not proceed to Step 5. Verification must complete before new work is seeded.
+
+If **no `done` tasks** exist, check the previously-assigned task (if any) and reconcile:
 
 | Task status | Action |
 |-------------|--------|
 | `verified` | Verification complete. The verifier has already confirmed output quality. Proceed to Step 5. |
-| `done` | Verifier should have handled this. If lock is released but task is still `done`, treat as anomaly — set status to `verified` (outputs were produced), append `task.verified` event, log a warning. |
 | `cancelled` | Confirm `cancellation_reason` is set. Log. Consider whether to break into subtasks. |
 | `blocked` | Confirm `blocked_reason` is set. Append `task.status_changed` event. Notify Vinny on Discord. (Note: verifier may have blocked the task after 3 failed revisions — the `blocked_reason` will explain.) |
 | `failed` | Confirm `failure_reason` is set. Check `retry_count`. If `retry_count < 2`: increment `retry_count`, reset status to `ready`, append `task.status_changed` event (will be retried in Step 5). If `retry_count >= 2`: set status to `blocked`, set `blocked_reason: "Failed 2 times. Needs human review."`, notify Vinny on Discord. |
@@ -368,20 +385,6 @@ Execute these steps **in exact order**:
    ```
 
 5. **Terminate self.** After dispatching, exit this tick immediately. Do not wait for the worker.
-
----
-
-## Verifier Group Registration
-
-If the `verifier` group is not registered (check `available_groups.json` or `mc lock status` output), register it via IPC before dispatching any worker:
-
-```bash
-cat > /workspace/ipc/tasks/register-verifier-$(date +%s).json << 'REG_EOF'
-{"type":"register_group","jid":"verifier-agent","name":"Verifier","folder":"verifier","trigger":"@Verifier","requiresTrigger":true,"containerConfig":{"additionalMounts":["dirtsignals","groups/shared"]}}
-REG_EOF
-```
-
-This only needs to happen once — the registration persists in the database.
 
 ---
 

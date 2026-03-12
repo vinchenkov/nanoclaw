@@ -83,10 +83,12 @@ function safeReadJson(path, fallback) {
 function parseTask(path) {
   const raw = readFileSync(path, 'utf8');
   const { frontmatter } = parseFrontmatter(raw);
+  const rawStatus = String(frontmatter.status ?? 'ready');
+  const status = rawStatus === 'backlog' ? 'ready' : rawStatus;
   return {
     id: String(frontmatter.id ?? ''),
     title: String(frontmatter.title ?? ''),
-    status: String(frontmatter.status ?? 'backlog'),
+    status,
     priority: String(frontmatter.priority ?? 'P2'),
     worker_type: String(frontmatter.worker_type ?? 'ops'),
     initiative: frontmatter.initiative == null || frontmatter.initiative === '' ? null : String(frontmatter.initiative),
@@ -678,10 +680,6 @@ function dashboardHtml(baseDir, mcPath) {
 
       <div class="board" id="board">
         <div class="column">
-          <div class="column-header" id="col-backlog">BACKLOG (0)</div>
-          <div class="column-body" id="col-backlog-body"></div>
-        </div>
-        <div class="column">
           <div class="column-header" id="col-ready">READY (0)</div>
           <div class="column-body" id="col-ready-body"></div>
         </div>
@@ -694,8 +692,12 @@ function dashboardHtml(baseDir, mcPath) {
           <div class="column-body" id="col-blocked-body"></div>
         </div>
         <div class="column">
-          <div class="column-header" id="col-done">DONE / VERIFIED (0)</div>
+          <div class="column-header" id="col-done">DONE (0)</div>
           <div class="column-body" id="col-done-body"></div>
+        </div>
+        <div class="column">
+          <div class="column-header" id="col-verified">VERIFIED (0)</div>
+          <div class="column-body" id="col-verified-body"></div>
         </div>
       </div>
     </div>
@@ -741,22 +743,21 @@ function dashboardHtml(baseDir, mcPath) {
 
     <script>
       const STATUS_COLUMNS = {
-        backlog: 'backlog',
         ready: 'ready',
         in_progress: 'in_progress',
         blocked: 'blocked',
         done: 'done',
-        verified: 'done',
+        verified: 'verified',
         failed: 'blocked',
         cancelled: 'done',
       };
 
       const COLUMN_LABELS = {
-        backlog: 'BACKLOG',
         ready: 'READY',
         in_progress: 'IN PROGRESS',
         blocked: 'BLOCKED',
-        done: 'DONE / VERIFIED',
+        done: 'DONE',
+        verified: 'VERIFIED',
       };
 
       const INITIATIVE_COLUMN_LABELS = {
@@ -857,9 +858,9 @@ function dashboardHtml(baseDir, mcPath) {
         }
 
         // Kanban columns
-        const buckets = { backlog: [], ready: [], in_progress: [], blocked: [], done: [] };
+        const buckets = { ready: [], in_progress: [], blocked: [], done: [], verified: [] };
         for (const task of tasks) {
-          const col = STATUS_COLUMNS[task.status] || 'backlog';
+          const col = STATUS_COLUMNS[task.status] || 'ready';
           buckets[col].push(task);
         }
         for (const [key, label] of Object.entries(COLUMN_LABELS)) {
