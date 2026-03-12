@@ -262,9 +262,11 @@ async function runAgent(
   prompt: string,
   chatJid: string,
   onOutput?: (output: ContainerOutput) => Promise<void>,
+  options?: { isolated?: boolean },
 ): Promise<'success' | 'error'> {
   const isMain = group.isMain === true;
-  const sessionId = sessions[group.folder];
+  const isolated = options?.isolated ?? false;
+  const sessionId = isolated ? undefined : sessions[group.folder];
 
   // Update tasks snapshot for container to read (filtered by group)
   const tasks = getAllTasks();
@@ -294,7 +296,7 @@ async function runAgent(
   // Wrap onOutput to track session ID from streamed results
   const wrappedOnOutput = onOutput
     ? async (output: ContainerOutput) => {
-        if (output.newSessionId) {
+        if (output.newSessionId && !isolated) {
           sessions[group.folder] = output.newSessionId;
           setSession(group.folder, AGENT_SDK, output.newSessionId);
         }
@@ -319,7 +321,7 @@ async function runAgent(
       wrappedOnOutput,
     );
 
-    if (output.newSessionId) {
+    if (output.newSessionId && !isolated) {
       sessions[group.folder] = output.newSessionId;
       setSession(group.folder, AGENT_SDK, output.newSessionId);
     }
@@ -603,12 +605,18 @@ async function main(): Promise<void> {
             queue.closeStdin(targetJid);
           }, SPAWN_CLOSE_DELAY_MS);
         };
-        await runAgent(group, prompt, targetJid, async (output) => {
-          if (output.status === 'success') {
-            scheduleClose();
-            queue.notifyIdle(targetJid);
-          }
-        });
+        await runAgent(
+          group,
+          prompt,
+          targetJid,
+          async (output) => {
+            if (output.status === 'success') {
+              scheduleClose();
+              queue.notifyIdle(targetJid);
+            }
+          },
+          { isolated: contextMode === 'isolated' },
+        );
         if (closeTimer) clearTimeout(closeTimer);
       });
     },

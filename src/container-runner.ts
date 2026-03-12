@@ -482,8 +482,9 @@ export async function runContainerAgent(
       ];
 
       const isError = code !== 0;
+      const isSilentExit = code === 0 && !hadStreamingOutput;
 
-      if (isVerbose || isError) {
+      if (isVerbose || isError || isSilentExit) {
         logLines.push(
           `=== Input ===`,
           JSON.stringify(input, null, 2),

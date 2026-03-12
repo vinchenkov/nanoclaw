@@ -57,7 +57,7 @@ Task fields mean:
 
 4. **Append a completion event** to the activity log:
    ```json
-   {"ts":"<ISO8601>","actor":"<task_id>","event":"task.completed","task_id":"<task_id>","detail":"<status + one-line summary>"}
+   {"ts":"<ISO8601>","actor":"worker","event":"task.completed","task_id":"<task_id>","detail":"<status + one-line summary>"}
    ```
    Note: `mc task update --status` already appends `task.status_changed`. This completion event is a separate human-readable audit entry.
 
@@ -74,7 +74,7 @@ Task fields mean:
    ```
    Append activity event:
    ```json
-   {"ts":"<ISO8601>","actor":"<task_id>","event":"verifier.spawned","task_id":"<task_id>","detail":"Spawned verifier for task <task_id>"}
+   {"ts":"<ISO8601>","actor":"worker","event":"verifier.spawned","task_id":"<task_id>","detail":"Spawned verifier for task <task_id>"}
    ```
 
 6. **On failure/blocked/cancelled: Release lock and trigger planner** (these bypass verification):
