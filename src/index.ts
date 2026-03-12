@@ -595,7 +595,21 @@ async function main(): Promise<void> {
 
       const taskId = `spawn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       queue.enqueueTask(targetJid, taskId, async () => {
-        await runAgent(group, prompt, targetJid);
+        const SPAWN_CLOSE_DELAY_MS = 10_000;
+        let closeTimer: ReturnType<typeof setTimeout> | null = null;
+        const scheduleClose = () => {
+          if (closeTimer) return;
+          closeTimer = setTimeout(() => {
+            queue.closeStdin(targetJid);
+          }, SPAWN_CLOSE_DELAY_MS);
+        };
+        await runAgent(group, prompt, targetJid, async (output) => {
+          if (output.status === 'success') {
+            scheduleClose();
+            queue.notifyIdle(targetJid);
+          }
+        });
+        if (closeTimer) clearTimeout(closeTimer);
       });
     },
   });

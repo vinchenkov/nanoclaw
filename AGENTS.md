@@ -1,6 +1,13 @@
-# CLAUDE.md
+# AGETNS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to agents when working with code in this repository.
+
+## Living Document
+This is a living document. It should act as a reflection of the underlying model, and is assumed to be up-to-date.
+**ALWAYS update this file if you make any changes that would render it stale.**
+This document contains typical AGENTS.md semantics, but also acts a living memory store.
+If you encounter any surprising observations, win hard-fought insights, useful commands, key abstractions, and anything else that would help your future self,
+include them as part of this file.
 
 # NanoClaw
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createServer } from 'node:http';
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, mkdirSync, writeFileSync, appendFileSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -91,12 +91,14 @@ function parseTask(path) {
     status,
     priority: String(frontmatter.priority ?? 'P2'),
     worker_type: String(frontmatter.worker_type ?? 'ops'),
+    origin: String(frontmatter.origin ?? 'user'),
     initiative: frontmatter.initiative == null || frontmatter.initiative === '' ? null : String(frontmatter.initiative),
     description: frontmatter.description ? String(frontmatter.description) : '',
     acceptance_criteria: Array.isArray(frontmatter.acceptance_criteria) ? frontmatter.acceptance_criteria : [],
     outputs: Array.isArray(frontmatter.outputs) ? frontmatter.outputs : [],
     depends_on: Array.isArray(frontmatter.depends_on) ? frontmatter.depends_on : [],
     retry_count: Number(frontmatter.retry_count ?? 0),
+    revision_count: Number(frontmatter.revision_count ?? 0),
     blocked_reason: frontmatter.blocked_reason == null || frontmatter.blocked_reason === '' ? null : String(frontmatter.blocked_reason),
     failure_reason: frontmatter.failure_reason == null || frontmatter.failure_reason === '' ? null : String(frontmatter.failure_reason),
     cancellation_reason: frontmatter.cancellation_reason == null || frontmatter.cancellation_reason === '' ? null : String(frontmatter.cancellation_reason),
@@ -105,6 +107,7 @@ function parseTask(path) {
     completed_at: frontmatter.completed_at ? String(frontmatter.completed_at) : null,
     updated_at: frontmatter.updated_at ? String(frontmatter.updated_at) : null,
     due: frontmatter.due ? String(frontmatter.due) : null,
+    project: frontmatter.project ?? null,
   };
 }
 
@@ -201,6 +204,150 @@ function buildSummary(tasks, initiatives, lock) {
     blocked_tasks: tasks.filter((task) => task.status === 'blocked').length,
     in_progress_tasks: tasks.filter((task) => task.status === 'in_progress').length,
   };
+}
+
+// Write logic adapted from mc.ts
+function sleepMs(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function withFileLock(name, root, fn) {
+  const dir = join(root, 'mission-control', '.mc-locks', name);
+  mkdirSync(join(root, 'mission-control', '.mc-locks'), { recursive: true });
+  const startedAt = Date.now();
+  while (true) {
+    try {
+      mkdirSync(dir, { recursive: false });
+      break;
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err;
+      if (Date.now() - startedAt > 5000) throw new Error(`Timed out waiting for lock: ${name}`);
+      sleepMs(50);
+    }
+  }
+  writeFileSync(join(dir, 'owner.json'), JSON.stringify({ pid: process.pid, created_at: Date.now() }));
+  try {
+    return fn();
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+function fmtVal(v) {
+  if (v === null || v === undefined) return '';
+  if (Array.isArray(v) || (typeof v === 'object' && v !== null)) return JSON.stringify(v);
+  return String(v);
+}
+
+function renderNewTaskFile(task) {
+  return [
+    '---',
+    `id: ${task.id}`,
+    `title: ${JSON.stringify(task.title)}`,
+    `status: ${task.status}`,
+    `priority: ${task.priority}`,
+    `worker_type: ${task.worker_type}`,
+    `origin: ${task.origin}`,
+    `initiative: ${fmtVal(task.initiative)}`,
+    `description: ${JSON.stringify(task.description)}`,
+    `acceptance_criteria: ${JSON.stringify(task.acceptance_criteria)}`,
+    `outputs: ${JSON.stringify(task.outputs)}`,
+    `project: ${fmtVal(task.project)}`,
+    `depends_on: ${JSON.stringify(task.depends_on)}`,
+    `retry_count: ${task.retry_count}`,
+    `revision_count: ${task.revision_count}`,
+    `blocked_reason: ${fmtVal(task.blocked_reason)}`,
+    `failure_reason: ${fmtVal(task.failure_reason)}`,
+    `cancellation_reason: ${fmtVal(task.cancellation_reason)}`,
+    `created_at: ${task.created_at}`,
+    `started_at: ${fmtVal(task.started_at)}`,
+    `completed_at: ${fmtVal(task.completed_at)}`,
+    `updated_at: ${task.updated_at}`,
+    `due: ${fmtVal(task.due)}`,
+    '---',
+    '',
+  ].join('\n');
+}
+
+function renderLegacyTaskFile(task, body) {
+  const fm = [
+    '---',
+    `id: ${task.id}`,
+    `title: ${JSON.stringify(task.title)}`,
+    `status: ${task.status}`,
+    `origin: ${task.origin}`,
+    `priority: ${task.priority}`,
+    `worker_type: ${task.worker_type}`,
+    `created_at: ${task.created_at}`,
+    `updated_at: ${task.updated_at}`,
+    `started_at: ${fmtVal(task.started_at)}`,
+    `completed_at: ${fmtVal(task.completed_at)}`,
+    `due: ${fmtVal(task.due)}`,
+    `cancellation_reason: ${fmtVal(task.cancellation_reason)}`,
+    `blocked_reason: ${fmtVal(task.blocked_reason)}`,
+    `failure_reason: ${fmtVal(task.failure_reason)}`,
+    `retry_count: ${task.retry_count}`,
+    `revision_count: ${task.revision_count}`,
+    `project: ${task.project != null ? JSON.stringify(task.project) : ''}`,
+    `depends_on: ${JSON.stringify(task.depends_on)}`,
+    `outputs: ${JSON.stringify(task.outputs)}`,
+    ...(task.initiative ? [`initiative: ${task.initiative}`] : []),
+    '---',
+    '',
+  ].join('\n');
+  return `${fm}${body.trim()}\n`;
+}
+
+function renderInitiativeFrontmatter(initiative) {
+  return [
+    '---',
+    `id: ${initiative.id}`,
+    `title: ${JSON.stringify(initiative.title)}`,
+    `status: ${initiative.status}`,
+    `objective: ${initiative.objective}`,
+    `goal: ${JSON.stringify(initiative.goal)}`,
+    `timeframe: ${JSON.stringify(initiative.timeframe)}`,
+    `tasks: ${JSON.stringify(initiative.tasks)}`,
+    `created_at: ${initiative.created_at}`,
+    `updated_at: ${initiative.updated_at}`,
+    '---',
+    '',
+  ].join('\n');
+}
+
+function appendActivityLog(event, root) {
+  const logPath = join(root, 'mission-control', 'activity.log.ndjson');
+  appendFileSync(logPath, JSON.stringify({ ts: new Date().toISOString(), actor: 'dashboard', ...event }) + '\n');
+}
+
+function nextStandaloneTaskId(tasks) {
+  const d = new Date();
+  const day = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  const maxSeq = tasks
+    .filter((t) => t.id.startsWith(`T-${day}-`))
+    .map((t) => Number(t.id.slice(-4)))
+    .reduce((max, n) => Math.max(max, Number.isFinite(n) ? n : 0), 0);
+  return `T-${day}-${String(maxSeq + 1).padStart(4, '0')}`;
+}
+
+function nextInitiativeTaskSeq(tasks) {
+  const maxSeq = tasks
+    .filter((t) => /^I-\d{3}-/.test(t.id))
+    .map((t) => Number(t.id.slice(2, 5)))
+    .reduce((max, n) => Math.max(max, Number.isFinite(n) ? n : 0), 0);
+  return String(maxSeq + 1).padStart(3, '0');
+}
+
+function titleToKebabUpper(title) {
+  return title.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function initiativeIdFromTitle(title) {
+  return `I-${titleToKebabUpper(title)}`;
+}
+
+function initiativeTaskId(seq, title) {
+  return `I-${seq}-${titleToKebabUpper(title)}`;
 }
 
 function json(res, code, payload) {
@@ -341,7 +488,7 @@ function dashboardHtml(baseDir, mcPath) {
         font-size: 13px;
         color: var(--muted);
       }
-      .btn-new-task {
+      .btn-new {
         background: var(--accent);
         color: #fff;
         border: none;
@@ -351,7 +498,7 @@ function dashboardHtml(baseDir, mcPath) {
         font-weight: 600;
         cursor: pointer;
       }
-      .btn-new-task:hover { background: #4d9eff; }
+      .btn-new:hover { background: #4d9eff; }
 
       /* Kanban board */
       .board {
@@ -526,8 +673,8 @@ function dashboardHtml(baseDir, mcPath) {
         position: fixed;
         top: 0;
         right: 0;
-        width: 420px;
-        max-width: 90vw;
+        width: 480px;
+        max-width: 95vw;
         height: 100vh;
         background: var(--surface);
         border-left: 1px solid var(--border);
@@ -645,6 +792,25 @@ function dashboardHtml(baseDir, mcPath) {
       .task-card, .initiative-card { cursor: pointer; transition: border-color 0.15s; }
       .task-card:hover, .initiative-card:hover { border-color: var(--accent); }
 
+      /* Form controls */
+      label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+      input, select, textarea {
+        width: 100%;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        padding: 8px 10px;
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+      input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+      .form-actions { display: flex; gap: 10px; margin-top: 10px; }
+      .btn-save { background: var(--ok); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 600; cursor: pointer; flex: 1; }
+      .btn-save:hover { background: #46c95d; }
+      .btn-cancel { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 8px 16px; cursor: pointer; }
+      .btn-cancel:hover { background: var(--card); }
+
       @media (max-width: 900px) {
         .board { grid-template-columns: 1fr 1fr; }
         .board.initiatives-board { grid-template-columns: 1fr 1fr; }
@@ -675,7 +841,7 @@ function dashboardHtml(baseDir, mcPath) {
     <div class="tasks-view active" id="tasks-view">
       <div class="toolbar">
         <span class="toolbar-label">Live board and feed</span>
-        <button class="btn-new-task" id="btn-new-task">+ New Task</button>
+        <button class="btn-new" id="btn-new-task">+ New Task</button>
       </div>
 
       <div class="board" id="board">
@@ -705,6 +871,7 @@ function dashboardHtml(baseDir, mcPath) {
     <div class="initiatives-view" id="initiatives-view">
       <div class="initiatives-toolbar">
         <span class="toolbar-label">Grouped by initiative lifecycle</span>
+        <button class="btn-new" id="btn-new-initiative">+ New Initiative</button>
       </div>
 
       <div class="board initiatives-board">
@@ -767,9 +934,29 @@ function dashboardHtml(baseDir, mcPath) {
         archived: 'ARCHIVED',
       };
 
+      const OBJECTIVES = ['projectcal', 'robotics', 'ai-writing', 'north-star', 'other'];
+      const WORKER_TYPES = ['coding', 'research', 'writing', 'long', 'ops', 'admin'];
+      const PRIORITIES = ['P0', 'P1', 'P2', 'P3'];
+
+      var currentTasks = [];
+      var currentInitiatives = [];
+
       async function fetchJson(path) {
         const response = await fetch(path, { cache: 'no-store' });
         if (!response.ok) throw new Error(path + ' -> ' + response.status);
+        return response.json();
+      }
+
+      async function postJson(path, payload, method = 'POST') {
+        const response = await fetch(path, {
+          method,
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.message || 'Action failed');
+        }
         return response.json();
       }
 
@@ -838,6 +1025,9 @@ function dashboardHtml(baseDir, mcPath) {
           fetchJson('/api/lock'),
           fetchJson('/api/activity?limit=25'),
         ]);
+
+        currentTasks = tasks;
+        currentInitiatives = initiatives;
 
         // System status
         const statusEl = document.getElementById('system-status');
@@ -962,8 +1152,17 @@ function dashboardHtml(baseDir, mcPath) {
         html += field('Status', task.status, { badge: statusBadgeClass(task.status) });
         html += field('Priority', task.priority, { badge: 'badge-priority' });
         html += field('Worker Type', task.worker_type);
-        html += field('Initiative', task.initiative, { mono: true });
         html += '</div></div>';
+
+        html += '<div class="detail-section"><div class="detail-section-title">Linking</div>';
+        html += '<label>Initiative</label><select id="edit-task-initiative">';
+        html += '<option value="">(None)</option>';
+        currentInitiatives.forEach(init => {
+          html += '<option value="' + init.id + '"' + (task.initiative === init.id ? ' selected' : '') + '>' + init.id + ': ' + init.title + '</option>';
+        });
+        html += '</select>';
+        html += '<button class="btn-save" style="flex:none;margin-top:0;" id="btn-link-task">Link / Update</button>';
+        html += '</div>';
 
         if (task.description) {
           html += '<div class="detail-section"><div class="detail-section-title">Description</div>';
@@ -980,33 +1179,18 @@ function dashboardHtml(baseDir, mcPath) {
         html += field('Due', task.due, { date: true });
         html += '</div></div>';
 
-        if (task.outputs && task.outputs.length > 0) {
-          html += '<div class="detail-section"><div class="detail-section-title">Outputs</div>';
-          html += '<div class="detail-field full"><div class="detail-field-value mono">' + task.outputs.join('<br>') + '</div></div></div>';
-        }
-
-        if (task.depends_on && task.depends_on.length > 0) {
-          html += '<div class="detail-section"><div class="detail-section-title">Dependencies</div>';
-          html += '<div class="detail-field full"><div class="detail-field-value mono">' + task.depends_on.join(', ') + '</div></div></div>';
-        }
-
-        var reasons = [];
-        if (task.blocked_reason) reasons.push(['Blocked Reason', task.blocked_reason]);
-        if (task.failure_reason) reasons.push(['Failure Reason', task.failure_reason]);
-        if (task.cancellation_reason) reasons.push(['Cancellation Reason', task.cancellation_reason]);
-        if (reasons.length > 0) {
-          html += '<div class="detail-section"><div class="detail-section-title">Notes</div><div class="detail-grid">';
-          reasons.forEach(function(r) { html += field(r[0], r[1], { full: true }); });
-          html += '</div></div>';
-        }
-
-        if (task.retry_count > 0) {
-          html += '<div class="detail-section"><div class="detail-grid">';
-          html += field('Retry Count', String(task.retry_count));
-          html += '</div></div>';
-        }
-
         sidebarBodyEl.innerHTML = html;
+
+        document.getElementById('btn-link-task').onclick = async () => {
+          const initId = document.getElementById('edit-task-initiative').value;
+          try {
+            await postJson('/api/tasks/' + encodeURIComponent(task.id), { initiative: initId || null }, 'PATCH');
+            closeSidebar();
+            refresh();
+          } catch (err) {
+            alert(err.message);
+          }
+        };
       }
 
       function renderInitiativeDetail(init) {
@@ -1052,6 +1236,85 @@ function dashboardHtml(baseDir, mcPath) {
           overlayEl.classList.add('open');
         });
       }
+
+      // New Task / Initiative Forms
+      function showNewTaskForm() {
+        sidebarTitleEl.textContent = 'New Task';
+        var html = '<div class="detail-section">';
+        html += '<label>Title</label><input type="text" id="new-task-title" placeholder="Summary of work">';
+        html += '<label>Description</label><textarea id="new-task-description" rows="3"></textarea>';
+        html += '<label>Worker Type</label><select id="new-task-worker">';
+        WORKER_TYPES.forEach(t => html += '<option value="' + t + '"' + (t === 'ops' ? ' selected' : '') + '>' + t + '</option>');
+        html += '</select>';
+        html += '<label>Priority</label><select id="new-task-priority">';
+        PRIORITIES.forEach(p => html += '<option value="' + p + '"' + (p === 'P2' ? ' selected' : '') + '>' + p + '</option>');
+        html += '</select>';
+        html += '<label>Initiative (Optional)</label><select id="new-task-initiative">';
+        html += '<option value="">(None)</option>';
+        currentInitiatives.forEach(init => html += '<option value="' + init.id + '">' + init.id + ': ' + init.title + '</option>');
+        html += '</select>';
+        html += '<label>Acceptance Criteria (one per line)</label><textarea id="new-task-criteria" rows="3"></textarea>';
+        html += '<div class="form-actions"><button class="btn-save" id="btn-save-task">Create Task</button><button class="btn-cancel" id="btn-cancel-task">Cancel</button></div>';
+        html += '</div>';
+        sidebarBodyEl.innerHTML = html;
+        sidebarEl.classList.add('open');
+        overlayEl.classList.add('open');
+
+        document.getElementById('btn-cancel-task').onclick = closeSidebar;
+        document.getElementById('btn-save-task').onclick = async () => {
+          const payload = {
+            title: document.getElementById('new-task-title').value,
+            description: document.getElementById('new-task-description').value,
+            worker_type: document.getElementById('new-task-worker').value,
+            priority: document.getElementById('new-task-priority').value,
+            initiative: document.getElementById('new-task-initiative').value || null,
+            acceptance_criteria: document.getElementById('new-task-criteria').value.split('\\n').filter(Boolean).map(line => ({ description: line.trim(), done: false }))
+          };
+          try {
+            await postJson('/api/tasks', payload);
+            closeSidebar();
+            refresh();
+          } catch (err) {
+            alert(err.message);
+          }
+        };
+      }
+
+      function showNewInitiativeForm() {
+        sidebarTitleEl.textContent = 'New Initiative';
+        var html = '<div class="detail-section">';
+        html += '<label>Title</label><input type="text" id="new-init-title" placeholder="Project Name">';
+        html += '<label>Goal</label><textarea id="new-init-goal" rows="2" placeholder="What is the desired outcome?"></textarea>';
+        html += '<label>Objective</label><select id="new-init-objective">';
+        OBJECTIVES.forEach(o => html += '<option value="' + o + '"' + (o === 'other' ? ' selected' : '') + '>' + o + '</option>');
+        html += '</select>';
+        html += '<label>Timeframe</label><input type="text" id="new-init-timeframe" placeholder="e.g. Q1 2026">';
+        html += '<div class="form-actions"><button class="btn-save" id="btn-save-init">Create Initiative</button><button class="btn-cancel" id="btn-cancel-init">Cancel</button></div>';
+        html += '</div>';
+        sidebarBodyEl.innerHTML = html;
+        sidebarEl.classList.add('open');
+        overlayEl.classList.add('open');
+
+        document.getElementById('btn-cancel-init').onclick = closeSidebar;
+        document.getElementById('btn-save-init').onclick = async () => {
+          const payload = {
+            title: document.getElementById('new-init-title').value,
+            goal: document.getElementById('new-init-goal').value,
+            objective: document.getElementById('new-init-objective').value,
+            timeframe: document.getElementById('new-init-timeframe').value
+          };
+          try {
+            await postJson('/api/initiatives', payload);
+            closeSidebar();
+            refresh();
+          } catch (err) {
+            alert(err.message);
+          }
+        };
+      }
+
+      document.getElementById('btn-new-task').onclick = showNewTaskForm;
+      document.getElementById('btn-new-initiative').onclick = showNewInitiativeForm;
 
       document.addEventListener('click', function(e) {
         var card = e.target.closest('[data-type][data-id]');
@@ -1109,7 +1372,7 @@ if (flags['dry-run'] === 'true') {
   process.exit(0);
 }
 
-const server = createServer((req, res) => {
+const server = createServer(async (req, res) => {
   try {
     const requestUrl = new URL(req.url || '/', `http://${host}:${port}`);
     const { pathname, searchParams } = requestUrl;
@@ -1117,34 +1380,136 @@ const server = createServer((req, res) => {
     if (pathname === '/health' || pathname === '/api/health') {
       const tasks = readTasks(root);
       const initiatives = readInitiatives(root);
-      return json(res, 200, {
-        ok: true,
-        root,
-        mission_control: missionControlPath,
-        tasks: tasks.length,
-        initiatives: initiatives.length,
-      });
+      return json(res, 200, { ok: true, root, mission_control: missionControlPath, tasks: tasks.length, initiatives: initiatives.length });
     }
 
-    if (pathname === '/api/tasks') {
+    if (pathname === '/api/tasks' && req.method === 'GET') {
       let tasks = readTasks(root);
       const status = searchParams.get('status');
       const priority = searchParams.get('priority');
       const initiative = searchParams.get('initiative');
       const query = (searchParams.get('q') || '').trim().toLowerCase();
-
       if (status) tasks = tasks.filter((task) => task.status === status);
       if (priority) tasks = tasks.filter((task) => task.priority === priority);
       if (initiative) tasks = tasks.filter((task) => task.initiative === initiative);
       if (query) {
-        tasks = tasks.filter((task) => {
-          return task.id.toLowerCase().includes(query) ||
-            task.title.toLowerCase().includes(query) ||
-            task.description.toLowerCase().includes(query);
-        });
+        tasks = tasks.filter((task) => task.id.toLowerCase().includes(query) || task.title.toLowerCase().includes(query) || task.description.toLowerCase().includes(query));
       }
-
       return json(res, 200, tasks);
+    }
+
+    if (pathname === '/api/tasks' && req.method === 'POST') {
+      let body = '';
+      for await (const chunk of req) body += chunk;
+      const params = JSON.parse(body);
+      if (!params.title || !params.description) return json(res, 400, { message: 'Title and description required' });
+
+      const result = withFileLock('task-create', root, () => {
+        const tasks = readTasks(root);
+        const now = new Date().toISOString();
+        const id = params.initiative ? initiativeTaskId(nextInitiativeTaskSeq(tasks), params.title) : nextStandaloneTaskId(tasks);
+        const task = {
+          id,
+          title: params.title,
+          status: 'ready',
+          priority: params.priority || 'P2',
+          worker_type: params.worker_type || 'ops',
+          origin: 'user',
+          initiative: params.initiative || null,
+          description: params.description,
+          acceptance_criteria: params.acceptance_criteria || [],
+          outputs: [],
+          project: null,
+          depends_on: [],
+          retry_count: 0,
+          revision_count: 0,
+          blocked_reason: null,
+          failure_reason: null,
+          cancellation_reason: null,
+          created_at: now,
+          started_at: null,
+          completed_at: null,
+          updated_at: now,
+          due: null,
+        };
+        const dir = join(root, 'mission-control', 'tasks');
+        mkdirSync(dir, { recursive: true });
+        writeFileSync(join(dir, `${id}.md`), renderNewTaskFile(task));
+
+        if (task.initiative) {
+          try {
+            const initDir = join(root, 'mission-control', 'initiatives');
+            const initPath = join(initDir, `${task.initiative}.md`);
+            if (existsSync(initPath)) {
+              const init = parseInitiative(initPath);
+              if (!init.tasks.includes(id)) {
+                init.tasks.push(id);
+                init.updated_at = now;
+                writeFileSync(initPath, renderInitiativeFrontmatter(init));
+              }
+            }
+          } catch (e) { /* ignore initiative link error */ }
+        }
+
+        appendActivityLog({ event: 'task.created', task_id: id, detail: task.title }, root);
+        return task;
+      });
+      return json(res, 201, result);
+    }
+
+    if (pathname.startsWith('/api/tasks/') && (req.method === 'PATCH' || req.method === 'PUT')) {
+      const id = decodeURIComponent(pathname.slice('/api/tasks/'.length));
+      let body = '';
+      for await (const chunk of req) body += chunk;
+      const patch = JSON.parse(body);
+
+      const result = withFileLock('task-update', root, () => {
+        const dir = join(root, 'mission-control', 'tasks');
+        const path = join(dir, `${id}.md`);
+        if (!existsSync(path)) throw new Error('Task not found');
+        const raw = readFileSync(path, 'utf8');
+        const { body: contentBody } = parseFrontmatter(raw);
+        const task = parseTask(path);
+        const oldInitiative = task.initiative;
+        
+        const now = new Date().toISOString();
+        const updated = { ...task, ...patch, updated_at: now };
+        
+        if (contentBody.trim()) {
+          writeFileSync(path, renderLegacyTaskFile(updated, contentBody));
+        } else {
+          writeFileSync(path, renderNewTaskFile(updated));
+        }
+
+        // Handle initiative re-linking
+        if (updated.initiative !== oldInitiative) {
+          const initDir = join(root, 'mission-control', 'initiatives');
+          if (oldInitiative) {
+            const oldPath = join(initDir, `${oldInitiative}.md`);
+            if (existsSync(oldPath)) {
+              const init = parseInitiative(oldPath);
+              init.tasks = init.tasks.filter(tid => tid !== id);
+              init.updated_at = now;
+              writeFileSync(oldPath, renderInitiativeFrontmatter(init));
+            }
+          }
+          if (updated.initiative) {
+            const newPath = join(initDir, `${updated.initiative}.md`);
+            if (existsSync(newPath)) {
+              const init = parseInitiative(newPath);
+              if (!init.tasks.includes(id)) {
+                init.tasks.push(id);
+                init.updated_at = now;
+                writeFileSync(newPath, renderInitiativeFrontmatter(init));
+              }
+            }
+          }
+        }
+
+        appendActivityLog({ event: 'task.updated', task_id: id, detail: 'Updated via dashboard' }, root);
+        return updated;
+      });
+      return json(res, 200, result);
     }
 
     if (pathname.startsWith('/api/tasks/')) {
@@ -1154,11 +1519,39 @@ const server = createServer((req, res) => {
       return json(res, 200, task);
     }
 
-    if (pathname === '/api/initiatives') {
+    if (pathname === '/api/initiatives' && req.method === 'GET') {
       let initiatives = readInitiatives(root);
       const status = searchParams.get('status');
       if (status) initiatives = initiatives.filter((item) => item.status === status);
       return json(res, 200, initiatives);
+    }
+
+    if (pathname === '/api/initiatives' && req.method === 'POST') {
+      let body = '';
+      for await (const chunk of req) body += chunk;
+      const params = JSON.parse(body);
+      if (!params.title || !params.goal) return json(res, 400, { message: 'Title and goal required' });
+
+      const id = initiativeIdFromTitle(params.title);
+      const now = new Date().toISOString();
+      const initiative = {
+        id,
+        title: params.title,
+        status: 'active',
+        objective: params.objective || 'other',
+        goal: params.goal,
+        timeframe: params.timeframe || '',
+        tasks: [],
+        created_at: now,
+        updated_at: now,
+      };
+      const dir = join(root, 'mission-control', 'initiatives');
+      mkdirSync(dir, { recursive: true });
+      const path = join(dir, `${id}.md`);
+      if (existsSync(path)) return json(res, 400, { message: 'Initiative already exists' });
+      writeFileSync(path, renderInitiativeFrontmatter(initiative));
+      appendActivityLog({ event: 'initiative.created', initiative_id: id, detail: initiative.title }, root);
+      return json(res, 201, initiative);
     }
 
     if (pathname.startsWith('/api/initiatives/')) {
@@ -1168,35 +1561,16 @@ const server = createServer((req, res) => {
       return json(res, 200, initiative);
     }
 
-    if (pathname === '/api/lock') {
-      return json(res, 200, readLock(root));
-    }
-
+    if (pathname === '/api/lock') return json(res, 200, readLock(root));
     if (pathname === '/api/activity') {
       const limit = Number(searchParams.get('limit') || 200);
-      return json(res, 200, readActivity(root, Number.isFinite(limit) ? limit : 200));
+      return json(res, 200, readActivity(root, limit));
     }
-
     if (pathname === '/api/summary') {
       const tasks = readTasks(root);
       const initiatives = readInitiatives(root);
       const lock = readLock(root);
       return json(res, 200, buildSummary(tasks, initiatives, lock));
-    }
-
-    if (pathname === '/api/output') {
-      const relativePath = searchParams.get('path');
-      if (!relativePath) return json(res, 400, { error: 'Query param "path" is required' });
-
-      const cleaned = relativePath.replace(/^\/+/, '');
-      if (cleaned.includes('..')) return json(res, 400, { error: 'Invalid path' });
-      if (!cleaned.startsWith('mission-control/outputs/')) {
-        return json(res, 400, { error: 'Path must be under mission-control/outputs/' });
-      }
-
-      const absolute = join(root, cleaned);
-      if (!existsSync(absolute)) return json(res, 404, { error: `Output file not found: ${cleaned}` });
-      return text(res, 200, readFileSync(absolute, 'utf8'));
     }
 
     if (pathname === '/' || pathname === '/dashboard') {
@@ -1205,10 +1579,7 @@ const server = createServer((req, res) => {
 
     return json(res, 404, { error: 'Not found', path: pathname });
   } catch (error) {
-    return json(res, 500, {
-      error: 'internal_error',
-      message: error instanceof Error ? error.message : String(error),
-    });
+    return json(res, 500, { error: 'internal_error', message: error instanceof Error ? error.message : String(error) });
   }
 });
 
