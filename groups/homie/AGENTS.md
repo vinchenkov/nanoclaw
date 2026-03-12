@@ -213,7 +213,7 @@ If the time is **08:00–08:05** and no `daily.briefing` event exists in today's
 1. Compile Daily Briefing (see [Daily Briefing](#daily-briefing) section below)
 2. Write briefing to `/workspace/group/briefings/YYYY-MM-DD.md`
 3. Send summary to Discord
-4. Append `{"ts":"...","actor":"Homie","event":"daily.briefing","detail":"Morning briefing compiled and sent"}`
+4. Append `{"ts":"...","actor":"homie","event":"daily.briefing","detail":"Morning briefing compiled and sent"}`
 
 Continue to Step 2 regardless.
 
@@ -276,7 +276,7 @@ First, scan **all tasks** for any with status `done`. If one or more `done` task
    ```
 4. Append activity event:
    ```json
-   {"ts":"...","actor":"Homie","event":"verifier.spawned","task_id":"<task_id>","detail":"Dispatched verifier for task <task_id>"}
+   {"ts":"...","actor":"homie","event":"verifier.spawned","task_id":"<task_id>","detail":"Dispatched verifier for task <task_id>"}
    ```
 5. **Self-terminate.** Do not proceed to Step 5. Verification must complete before new work is seeded.
 
@@ -381,7 +381,7 @@ Execute these steps **in exact order**:
 
 4. **Append to activity log:**
    ```json
-   {"ts":"...","actor":"Homie","event":"worker.spawned","task_id":"<task_id>","detail":"Dispatched worker via IPC for task <task_id> (<task.title>)"}
+   {"ts":"...","actor":"homie","event":"worker.spawned","task_id":"<task_id>","detail":"Dispatched worker via IPC for task <task_id> (<task.title>)"}
    ```
 
 5. **Terminate self.** After dispatching, exit this tick immediately. Do not wait for the worker.
@@ -435,27 +435,27 @@ Discord summary: one short paragraph covering highlights + blockers + top recomm
 Append-only NDJSON at `/workspace/extra/shared/mission-control/activity.log.ndjson`. Each entry on its own line:
 
 ```json
-{"ts":"<ISO8601>","actor":"<Homie|task_id>","event":"<event_type>","task_id":"<id_or_omit>","detail":"..."}
+{"ts":"<ISO8601>","actor":"homie","event":"<event_type>","task_id":"<id_or_omit>","detail":"..."}
 ```
 
 ### Event Types
 
 | Event | Actor | When |
 |-------|-------|------|
-| `daily.briefing` | Homie | 8:00 AM morning briefing compiled |
-| `task.created` | Homie / mc | New task added |
-| `task.status_changed` | Homie / Worker / mc | Any status transition |
-| `worker.spawned` | Homie | Worker dispatched via IPC |
-| `worker.wrap_up_sent` | Homie | Grace period entered (lock marked wrap_up_sent) |
-| `worker.killed` | Homie | Hard release after grace period expired |
-| `task.completed` | Worker | Task reached terminal status |
-| `task.verified` | Verifier | Outputs confirmed, quality approved |
-| `task.revision_requested` | Verifier | Verifier sent task back for revision |
-| `task.verification_failed` | Verifier | Task blocked after max revisions |
-| `verifier.spawned` | Worker | Worker dispatched verifier via IPC |
-| `progress.note` | Worker | Interim progress update |
-| `initiative.created` | Homie / mc | New initiative file written |
-| `initiative.status_changed` | Homie / mc | Initiative status transition |
+| `daily.briefing` | homie | 8:00 AM morning briefing compiled |
+| `task.created` | homie / mc | New task added |
+| `task.status_changed` | homie / worker / mc | Any status transition |
+| `worker.spawned` | homie | Worker dispatched via IPC |
+| `worker.wrap_up_sent` | homie | Grace period entered (lock marked wrap_up_sent) |
+| `worker.killed` | homie | Hard release after grace period expired |
+| `task.completed` | worker | Task reached terminal status |
+| `task.verified` | verifier | Outputs confirmed, quality approved |
+| `task.revision_requested` | verifier | Verifier sent task back for revision |
+| `task.verification_failed` | verifier | Task blocked after max revisions |
+| `verifier.spawned` | worker | Worker dispatched verifier via IPC |
+| `progress.note` | worker | Interim progress update |
+| `initiative.created` | homie / mc | New initiative file written |
+| `initiative.status_changed` | homie / mc | Initiative status transition |
 | `initiative.completed` | mc | All initiative tasks reached done/verified |
 
 ---

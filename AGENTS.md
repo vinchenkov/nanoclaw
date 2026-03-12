@@ -186,6 +186,8 @@ node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared <resou
 
 Important: agent-facing access to Mission Control state must go through `mc.ts`. Agents may read or mutate tasks, initiatives, and the worker lock only via `mc` commands, never by opening or rewriting `mission-control/lock.json` directly.
 
+Agent-authored mission-control audit entries should use the group folder name as `actor`: `homie`, `worker`, or `verifier`. Do not use the assistant display name (`Homie`) or a task ID in the `actor` field.
+
 ### Orchestrator heartbeat
 ```
 id: heartbeat-5min  |  interval: 300000ms  |  context_mode: isolated

@@ -651,12 +651,24 @@ function dashboardHtml(baseDir, mcPath) {
         padding: 5px 0;
         font-size: 12px;
         border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
       }
       .activity-row:last-child { border-bottom: none; }
       .activity-time { color: var(--muted); white-space: nowrap; min-width: 140px; }
+      .activity-actor {
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        color: var(--text);
+        background: rgba(148, 163, 184, 0.12);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 999px;
+        padding: 1px 8px;
+        white-space: nowrap;
+        min-width: 72px;
+        text-align: center;
+      }
       .activity-event { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--accent); min-width: 140px; }
       .activity-target { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--muted); min-width: 120px; }
-      .activity-detail { color: var(--text); opacity: 0.8; }
+      .activity-detail { color: var(--text); opacity: 0.8; flex: 1 1 260px; }
 
       /* Detail sidebar */
       .sidebar-overlay {
@@ -990,6 +1002,16 @@ function dashboardHtml(baseDir, mcPath) {
         return '<div class="column-empty">' + escapeHtml(label) + '</div>';
       }
 
+      function renderActivityRow(event) {
+        return '<div class="activity-row">' +
+          '<span class="activity-time">' + fmtShortDate(event.ts) + '</span>' +
+          '<span class="activity-actor">' + escapeHtml(event.actor || 'unknown') + '</span>' +
+          '<span class="activity-event">' + escapeHtml(event.event || '') + '</span>' +
+          '<span class="activity-target">' + escapeHtml(event.task_id || event.initiative_id || '') + '</span>' +
+          '<span class="activity-detail">' + escapeHtml(event.detail || '') + '</span>' +
+        '</div>';
+      }
+
       function renderTaskCard(task) {
         return '<div class="task-card" data-type="task" data-id="' + task.id + '">' +
           '<div class="task-row">' +
@@ -1076,14 +1098,7 @@ function dashboardHtml(baseDir, mcPath) {
         // Activity feed
         document.getElementById('activity').innerHTML = activity.length === 0
           ? '<div style="color:var(--muted);font-size:13px;padding:8px 0;">No activity yet.</div>'
-          : activity.map(function(event) {
-              return '<div class="activity-row">' +
-                '<span class="activity-time">' + fmtShortDate(event.ts) + '</span>' +
-                '<span class="activity-event">' + escapeHtml(event.event || '') + '</span>' +
-                '<span class="activity-target">' + escapeHtml(event.task_id || event.initiative_id || '') + '</span>' +
-                '<span class="activity-detail">' + escapeHtml(event.detail || '') + '</span>' +
-              '</div>';
-            }).join('');
+          : activity.map(renderActivityRow).join('');
       }
 
       // Tab switching
