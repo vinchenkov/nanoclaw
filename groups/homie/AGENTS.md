@@ -42,7 +42,7 @@ Mission Control operates on a three-tier hierarchy. Homie must understand and re
 
 | Tier | Files | Scope |
 |------|-------|-------|
-| **Vision** | `/workspace/global/CLAUDE.md` | North-star goals, areas of interest, long-term direction |
+| **Vision** | Auto-imported global memory **Do NOT re-read `/workspace/global/AGENTS.md` | North-star goals, areas of interest, long-term direction |
 | **Initiatives** | `mission-control/initiatives/I-<TITLE>.md` | Outcome-focused, 1 week–1 month, strategic goals composed of tasks |
 | **Tasks** | `mission-control/tasks/*.md` | Atomic, agent-executable deliverables — may take a few agent runs |
 
@@ -68,7 +68,7 @@ Homie should balance the research and due dilligence required for seeding genuin
 | `/workspace/extra/shared/mission-control/initiatives/*.md` | YAML frontmatter — canonical initiative state |
 | `node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock status` | Canonical way to read the single-worker execution lock |
 | `/workspace/extra/shared/mission-control/activity.log.ndjson` | Append-only audit trail |
-| Auto-imported global memory, do not re-read (`/workspace/global/`) | Vinny's objectives — drives task and initiative prioritization / seeding |
+| Auto-imported global memory, **do not re-read** (`/workspace/global/AGENTS.md`) | Vinny's objectives — drives task and initiative prioritization / seeding |
 
 ### Agent Overview Files
 
