@@ -405,10 +405,16 @@ export async function processTaskIpc(
         ([_, g]) => g.folder === targetFolder,
       );
 
-      // Authorization: non-main can spawn itself or the main group
+      // Authorization: non-main can spawn itself, the main group, or allowed cross-spawns
+      const ALLOWED_CROSS_SPAWNS = new Set([
+        'worker:verifier',
+        'verifier:worker',
+      ]);
+
       if (!isMain && targetFolder !== sourceGroup) {
         const targetIsMain = targetEntry && targetEntry[1].isMain;
-        if (!targetIsMain) {
+        const crossKey = `${sourceGroup}:${targetFolder}`;
+        if (!targetIsMain && !ALLOWED_CROSS_SPAWNS.has(crossKey)) {
           logger.warn(
             { sourceGroup, targetFolder },
             'Unauthorized spawn_agent attempt blocked',

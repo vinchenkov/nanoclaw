@@ -1,7 +1,6 @@
 # Orchestrator Contract
 
 This document defines the **pivotal planning role** of and **mandatory orchestration loop** for Homie, the Orchestrator of Mission Control.
-**This is YOU if you are reading it.**
 Follow it exactly on every heartbeat tick. Do not improvise.
 
 ---
@@ -253,17 +252,24 @@ Check conditions **in this order**:
 
 ---
 
-### Step 4 — Verify Completed Work (if lock released)
+### Step 4 — Check Work Status
 
-If `mc lock status` reports `"locked": false` and a worker was previously running (check recent activity log for `worker.spawned` without a subsequent `task.completed`):
+**If lock is held** (`"locked": true`) and owner starts with `verifier:` or `worker:`:
+
+The worker→verifier feedback loop is in progress. The verifier reviews worker output, and may re-spawn the worker for revisions (up to 3 times). This is handled automatically via IPC — no orchestrator intervention needed.
+
+**HEARTBEAT_OK**
+
+**If lock is released** (`"locked": false`) and a worker/verifier was previously running:
 
 Read the previously-assigned task. Verify based on its status:
 
 | Task status | Action |
 |-------------|--------|
-| `done` | Quick-verify: do the paths listed in `outputs` exist? If yes, set status to `verified`, append `task.verified` event. If no, treat as `failed`. |
+| `verified` | Verification complete. The verifier has already confirmed output quality. Proceed to Step 5. |
+| `done` | Verifier should have handled this. If lock is released but task is still `done`, treat as anomaly — set status to `verified` (outputs were produced), append `task.verified` event, log a warning. |
 | `cancelled` | Confirm `cancellation_reason` is set. Log. Consider whether to break into subtasks. |
-| `blocked` | Confirm `blocked_reason` is set. Append `task.status_changed` event. Notify Vinny on Discord. |
+| `blocked` | Confirm `blocked_reason` is set. Append `task.status_changed` event. Notify Vinny on Discord. (Note: verifier may have blocked the task after 3 failed revisions — the `blocked_reason` will explain.) |
 | `failed` | Confirm `failure_reason` is set. Check `retry_count`. If `retry_count < 2`: increment `retry_count`, reset status to `ready`, append `task.status_changed` event (will be retried in Step 5). If `retry_count >= 2`: set status to `blocked`, set `blocked_reason: "Failed 2 times. Needs human review."`, notify Vinny on Discord. |
 | Task NOT updated | Filter activity log by task ID. Infer what happened. Update task to best-guess status with an explanatory reason field. May respawn in Step 5. |
 
@@ -365,6 +371,20 @@ Execute these steps **in exact order**:
 
 ---
 
+## Verifier Group Registration
+
+If the `verifier` group is not registered (check `available_groups.json` or `mc lock status` output), register it via IPC before dispatching any worker:
+
+```bash
+cat > /workspace/ipc/tasks/register-verifier-$(date +%s).json << 'REG_EOF'
+{"type":"register_group","jid":"verifier-agent","name":"Verifier","folder":"verifier","trigger":"@Verifier","requiresTrigger":true,"containerConfig":{"additionalMounts":["dirtsignals","groups/shared"]}}
+REG_EOF
+```
+
+This only needs to happen once — the registration persists in the database.
+
+---
+
 ## Worker Briefing
 
 The `prompt` written in the IPC dispatch JSON should be concise and direct.
@@ -426,7 +446,10 @@ Append-only NDJSON at `/workspace/extra/shared/mission-control/activity.log.ndjs
 | `worker.wrap_up_sent` | Homie | Grace period entered (lock marked wrap_up_sent) |
 | `worker.killed` | Homie | Hard release after grace period expired |
 | `task.completed` | Worker | Task reached terminal status |
-| `task.verified` | Homie | Outputs confirmed present |
+| `task.verified` | Verifier | Outputs confirmed, quality approved |
+| `task.revision_requested` | Verifier | Verifier sent task back for revision |
+| `task.verification_failed` | Verifier | Task blocked after max revisions |
+| `verifier.spawned` | Worker | Worker dispatched verifier via IPC |
 | `progress.note` | Worker | Interim progress update |
 | `initiative.created` | Homie / mc | New initiative file written |
 | `initiative.status_changed` | Homie / mc | Initiative status transition |

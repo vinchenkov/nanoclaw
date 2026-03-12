@@ -10,7 +10,7 @@ Personal Claude assistant. See [README.md](README.md) for philosophy and setup. 
 
 Single Node.js process with skill-based channel system. Channels (WhatsApp, Telegram, Slack, Discord, Gmail) are skills that self-register at startup. Messages route to Claude Agent SDK running in containers (Linux VMs). Each group has isolated filesystem and memory.
 
-**This install:** Assistant name is **Homie**. Channel is Discord (bot: Homie#5609, channel `1468824513654423697`, guild `1468824512756973705`). Model provider is MiniMax via `ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic`. Two groups: `homie` (orchestrator, is_main) and `worker` (task execution). Orchestrator runs on a 5-minute heartbeat scheduler.
+**This install:** Assistant name is **Homie**. Channel is Discord (bot: Homie#5609, channel `1468824513654423697`, guild `1468824512756973705`). Model provider is MiniMax via `ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic`. Three groups: `homie` (orchestrator, is_main), `worker` (task execution), and `verifier` (output verification). Orchestrator runs on a 5-minute heartbeat scheduler.
 
 ## Development Commands
 
@@ -144,6 +144,7 @@ Secrets (`ANTHROPIC_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`, etc.) are read in `cont
 |--------|-----|---------|---------|
 | `homie` | `dc:1468824513654423697` | yes | Orchestrator — tick loop, task dispatch, Discord comms |
 | `worker` | `worker-agent` | no | Task execution — spawned by orchestrator via IPC |
+| `verifier` | `verifier-agent` | no | Output verification — reviews worker deliverables against acceptance criteria and AGENTS.md philosophy |
 
 ### Group layouts
 ```
@@ -154,18 +155,22 @@ groups/homie/
 groups/worker/
   CLAUDE.md               # Worker agent instructions
 
+groups/verifier/
+  CLAUDE.md               # Verifier agent instructions
+
 groups/shared/
   bin/mc.ts               # Mission control CLI (standalone, node, --base-dir flag)
   mission-control/
     tasks/                # Task files
     initiatives/          # Initiative files
     outputs/              # Task output files
+    revisions/            # Verifier revision feedback files
     activity.log.ndjson   # Audit log
     lock.json             # Worker lock (locked/unlocked)
 ```
 
-### Container mounts for homie/worker
-Both groups get `dirtsignals` (rw) and `groups/shared` (rw) as additional mounts at `/workspace/extra/`.
+### Container mounts for homie/worker/verifier
+All three groups get `dirtsignals` (rw) and `groups/shared` (rw) as additional mounts at `/workspace/extra/`.
 
 Agents access mission-control via:
 ```bash

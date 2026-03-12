@@ -61,19 +61,31 @@ Task fields mean:
    ```
    Note: `mc task update --status` already appends `task.status_changed`. This completion event is a separate human-readable audit entry.
 
-5. **Release lock:**
+5. **On success (`done`): Spawn verifier** — do NOT release the lock. Transfer ownership and spawn verifier:
    ```bash
-   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
+   # Transfer lock to verifier
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock update \
+     --owner "verifier:<worker_type>"
+
+   # Spawn verifier
+   cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
+   {"type":"spawn_agent","group_folder":"verifier","prompt":"Verify task <task_id>.","context_mode":"isolated"}
+   SPAWN_EOF
+   ```
+   Append activity event:
+   ```json
+   {"ts":"<ISO8601>","actor":"<task_id>","event":"verifier.spawned","task_id":"<task_id>","detail":"Spawned verifier for task <task_id>"}
    ```
 
-6. **Trigger the planner** — write a `spawn_agent` IPC file so the orchestrator picks up immediately:
+6. **On failure/blocked/cancelled: Release lock and trigger planner** (these bypass verification):
    ```bash
+   node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
    cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
    {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
    SPAWN_EOF
    ```
 
-7. **Self-terminate.** Exit immediately after triggering the planner.
+7. **Self-terminate.** Exit immediately after spawning verifier or triggering the planner.
 
 ---
 
@@ -151,6 +163,21 @@ cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
 SPAWN_EOF
 ```
+
+---
+
+## Revision Awareness
+
+When spawned with a "REVISION REQUIRED" prompt, you are being asked to address specific deficiencies found by the verifier:
+
+1. **Read the revision file** at the path specified in the prompt (e.g., `/workspace/extra/shared/mission-control/revisions/<task_id>-REVISION.md`)
+2. **Read the task** to refresh your understanding of the acceptance criteria and outputs
+3. **Address each deficiency** listed in the revision file — be specific and thorough
+4. **Preserve what was good** — the revision file notes what worked well, don't regress
+5. **Re-produce the deliverable** with fixes applied
+6. **Mark the task `done` again** (this triggers another verifier cycle)
+
+The task's `revision_count` tracks how many revisions have been attempted. You don't need to manage this — the verifier handles incrementing it.
 
 ---
 

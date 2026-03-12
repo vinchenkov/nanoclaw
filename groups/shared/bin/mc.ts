@@ -59,6 +59,7 @@ interface Task {
   project: string | null;
   depends_on: string[];
   retry_count: number;
+  revision_count: number;
   blocked_reason: string | null;
   failure_reason: string | null;
   cancellation_reason: string | null;
@@ -159,6 +160,7 @@ interface UpdateTaskParams {
   depends_on?: string[];
   blocked_by?: string[];
   retry_count?: number;
+  revision_count?: number;
   started_at?: string | null;
   completed_at?: string | null;
 }
@@ -185,7 +187,7 @@ const allowedTaskTransitions: Record<TaskStatus, TaskStatus[]> = {
   in_progress: ["done", "blocked", "failed", "cancelled"],
   blocked: ["ready", "cancelled"],
   failed: ["ready"],
-  done: ["verified"],
+  done: ["verified", "in_progress"],
   verified: [],
   cancelled: [],
 };
@@ -436,6 +438,7 @@ function parseTaskFile(path: string): Task {
     project: (frontmatter.project as string | null) ?? null,
     depends_on: Array.isArray(frontmatter.depends_on) ? (frontmatter.depends_on as string[]) : [],
     retry_count: Number(frontmatter.retry_count ?? 0),
+    revision_count: Number(frontmatter.revision_count ?? 0),
     blocked_reason: (frontmatter.blocked_reason as string | null) ?? null,
     failure_reason: (frontmatter.failure_reason as string | null) ?? null,
     cancellation_reason: (frontmatter.cancellation_reason as string | null) ?? null,
@@ -469,6 +472,7 @@ function renderNewTaskFile(task: Task): string {
     `project: ${fmtVal(task.project)}`,
     `depends_on: ${JSON.stringify(task.depends_on)}`,
     `retry_count: ${task.retry_count}`,
+    `revision_count: ${task.revision_count}`,
     `blocked_reason: ${fmtVal(task.blocked_reason)}`,
     `failure_reason: ${fmtVal(task.failure_reason)}`,
     `cancellation_reason: ${fmtVal(task.cancellation_reason)}`,
@@ -501,6 +505,7 @@ function renderLegacyTaskFile(task: Task, body: string): string {
     `blocked_reason: ${fmtVal(task.blocked_reason)}`,
     `failure_reason: ${fmtVal(task.failure_reason)}`,
     `retry_count: ${task.retry_count}`,
+    `revision_count: ${task.revision_count}`,
     `tags: ${JSON.stringify(task.tags ?? [])}`,
     `project: ${task.project != null ? JSON.stringify(task.project) : ""}`,
     `depends_on: ${JSON.stringify(task.depends_on)}`,
@@ -605,6 +610,7 @@ function createTask(
       project: params.project ?? null,
       depends_on: params.depends_on ?? [],
       retry_count: 0,
+      revision_count: 0,
       blocked_reason: null,
       failure_reason: null,
       cancellation_reason: null,
@@ -683,6 +689,7 @@ function applyTaskPatch(task: Task, patch: UpdateTaskParams): Task {
   if (patch.depends_on !== undefined) next.depends_on = patch.depends_on;
   if (patch.blocked_by !== undefined) next.blocked_by = patch.blocked_by;
   if (patch.retry_count !== undefined) next.retry_count = patch.retry_count;
+  if (patch.revision_count !== undefined) next.revision_count = patch.revision_count;
   if (patch.started_at !== undefined) next.started_at = patch.started_at;
   if (patch.completed_at !== undefined) next.completed_at = patch.completed_at;
 
@@ -1227,6 +1234,8 @@ if (resource === "task") {
       patch.depends_on = (getFlag(flags, "depends-on") as string).split(",").map((s) => s.trim()).filter(Boolean);
     if (getFlag(flags, "blocked-by") !== undefined)
       patch.blocked_by = (getFlag(flags, "blocked-by") as string).split(",").map((s) => s.trim()).filter(Boolean);
+    if (getFlag(flags, "revision-count") !== undefined)
+      patch.revision_count = parseNumberFlag(getFlag(flags, "revision-count"), "--revision-count");
 
     // Enforce output path convention
     if (patch.outputs && patch.status === "done") {
