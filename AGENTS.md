@@ -1,4 +1,4 @@
-# AGETNS.md
+# AGENTS.md
 
 This file provides guidance to agents when working with code in this repository.
 
@@ -15,7 +15,7 @@ Personal Claude assistant. See [README.md](README.md) for philosophy and setup. 
 
 ## Quick Context
 
-Single Node.js process with skill-based channel system. Channels (WhatsApp, Telegram, Slack, Discord, Gmail) are skills that self-register at startup. Messages route to Claude Agent SDK running in containers (Linux VMs). Each group has isolated filesystem and memory.
+Single Node.js process with skill-based channel system. Channels (WhatsApp, Telegram, Slack, Discord, Gmail) are skills that self-register at startup. Messages route to Claude or Codex Agent SDK running in containers (Linux VMs). Each group has isolated filesystem and memory.
 
 **This install:** Assistant name is **Homie**. Channel is Discord (bot: Homie#5609, channel `1468824513654423697`, guild `1468824512756973705`).
 
@@ -87,7 +87,7 @@ Channel → SQLite → Poll loop (2s) → GroupQueue → Container (Claude Agent
 | `src/group-folder.ts` | Path validation and traversal prevention for group folder names |
 | `src/env.ts` | Custom `.env` parser — deliberately does NOT load into `process.env` to prevent secret leakage to child processes |
 | `src/types.ts` | Shared interfaces (`Channel`, `RegisteredGroup`, `ScheduledTask`, etc.) |
-| `groups/{name}/CLAUDE.md` | Per-group memory (isolated) |
+| `groups/{name}/AGENTS.md` | Per-group agent directives (canonical). `CLAUDE.md` in each group folder is a symlink → `AGENTS.md` |
 | `container/agent-runner/src/index.ts` | Agent entrypoint inside container |
 | `container/skills/agent-browser.md` | Browser automation tool (available to all agents via Bash) |
 
@@ -108,7 +108,8 @@ data/
     agent-runner-src/ # Per-group copy of agent-runner source (customizable)
 store/          # SQLite database
 groups/{name}/
-  CLAUDE.md     # Group memory
+  AGENTS.md     # Per-group agent directives (canonical)
+  CLAUDE.md     # Symlink → AGENTS.md (loaded by Claude Code inside container)
   logs/         # Container run logs (written per container run)
 ```
 
@@ -142,6 +143,7 @@ Key `.env` values read at startup (see `src/config.ts`):
 | `MAX_CONCURRENT_CONTAINERS` | `5` | Global container concurrency |
 | `LOG_LEVEL` | `info` | Pino log level |
 | `TZ` | system timezone | Timezone for scheduled tasks (cron expressions) |
+| `EVALUATE_MODE` | `false` | When `true`, injects ephemeral SPAWN_CRITIC directive into each non-critic agent prompt and seeds the `critic` group |
 
 Secrets (`ANTHROPIC_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`, etc.) are read in `container-runner.ts` and passed via container stdin — never written to disk or visible in process env.
 
@@ -152,18 +154,29 @@ Secrets (`ANTHROPIC_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`, etc.) are read in `cont
 | `homie` | `dc:1468824513654423697` | yes | Orchestrator — tick loop, task dispatch, Discord comms |
 | `worker` | `worker-agent` | no | Task execution — spawned by orchestrator via IPC |
 | `verifier` | `verifier-agent` | no | Output verification — reviews worker deliverables against acceptance criteria and AGENTS.md philosophy |
+| `critic` | `critic-agent` | no | Adherence critic — evaluates whether agents followed their AGENTS.md directives (only active when `EVALUATE_MODE=true`) |
 
 ### Group layouts
+
+Each group's `CLAUDE.md` is a symlink to `AGENTS.md`. `AGENTS.md` is the canonical directive file; `CLAUDE.md` exists so Claude Code inside the container picks it up automatically.
+
 ```
 groups/homie/
-  CLAUDE.md               # Orchestrator tick loop instructions
+  AGENTS.md               # Orchestrator tick loop instructions (canonical)
+  CLAUDE.md               # → AGENTS.md
   briefings/              # Daily briefings written by orchestrator
 
 groups/worker/
-  CLAUDE.md               # Worker agent instructions
+  AGENTS.md               # Worker agent instructions (canonical)
+  CLAUDE.md               # → AGENTS.md
 
 groups/verifier/
-  CLAUDE.md               # Verifier agent instructions
+  AGENTS.md               # Verifier agent instructions (canonical)
+  CLAUDE.md               # → AGENTS.md
+
+groups/critic/
+  AGENTS.md               # Critic agent instructions (no CLAUDE.md symlink needed — critic is spawned with isolated context)
+  critiques/              # Critique files written by critic (ISO-timestamp-group-critique.md)
 
 groups/shared/
   bin/mc.ts               # Mission control CLI (standalone, node, --base-dir flag)
@@ -178,6 +191,11 @@ groups/shared/
 
 ### Container mounts for homie/worker/verifier
 All three groups get `dirtsignals` (rw) and `groups/shared` (rw) as additional mounts at `/workspace/extra/`.
+
+### Container mounts for critic
+In addition to the standard per-group mounts, critic gets:
+- `groups/` → `/workspace/groups` (read-only) — all group AGENTS.md files
+- `data/sessions/` → `/workspace/sessions` (read-only) — all codex session rollout logs
 
 Agents access mission-control via:
 ```bash

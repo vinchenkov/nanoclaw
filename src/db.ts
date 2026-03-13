@@ -644,6 +644,25 @@ export function getRegisteredGroup(
   };
 }
 
+export function seedRegisteredGroup(jid: string, group: RegisteredGroup): void {
+  if (!isValidGroupFolder(group.folder)) {
+    throw new Error(`Invalid group folder "${group.folder}" for JID ${jid}`);
+  }
+  db.prepare(
+    `INSERT OR IGNORE INTO registered_groups (jid, name, folder, trigger_pattern, added_at, container_config, requires_trigger, is_main)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    jid,
+    group.name,
+    group.folder,
+    group.trigger,
+    group.added_at,
+    group.containerConfig ? JSON.stringify(group.containerConfig) : null,
+    group.requiresTrigger === undefined ? 1 : group.requiresTrigger ? 1 : 0,
+    group.isMain ? 1 : 0,
+  );
+}
+
 export function setRegisteredGroup(jid: string, group: RegisteredGroup): void {
   if (!isValidGroupFolder(group.folder)) {
     throw new Error(`Invalid group folder "${group.folder}" for JID ${jid}`);

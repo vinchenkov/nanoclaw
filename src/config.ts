@@ -11,6 +11,7 @@ const envConfig = readEnvFile([
   'ASSISTANT_HAS_OWN_NUMBER',
   'AGENT_SDK',
   'CODEX_MODEL',
+  'EVALUATE_MODE',
 ]);
 
 export const ASSISTANT_NAME =
@@ -23,6 +24,8 @@ export const AGENT_SDK: 'claude' | 'codex' = (process.env.AGENT_SDK ||
   'claude') as 'claude' | 'codex';
 export const CODEX_MODEL: string | undefined =
   process.env.CODEX_MODEL || envConfig.CODEX_MODEL || undefined;
+export const EVALUATE_MODE =
+  (process.env.EVALUATE_MODE || envConfig.EVALUATE_MODE) === 'true';
 export const POLL_INTERVAL = 2000;
 export const SCHEDULER_POLL_INTERVAL = 60000;
 

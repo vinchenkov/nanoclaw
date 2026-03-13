@@ -4,6 +4,7 @@ import path from 'path';
 import {
   AGENT_SDK,
   ASSISTANT_NAME,
+  EVALUATE_MODE,
   IDLE_TIMEOUT,
   POLL_INTERVAL,
   TRIGGER_PATTERN,
@@ -32,6 +33,7 @@ import {
   getNewMessages,
   getRouterState,
   initDatabase,
+  seedRegisteredGroup,
   seedScheduledTasks,
   setRegisteredGroup,
   setRouterState,
@@ -257,6 +259,10 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   return true;
 }
 
+function buildSpawnCriticDirective(groupFolder: string): string {
+  return `\n\n---\n## EVALUATE MODE — SPAWN CRITIC (ephemeral)\n\nAfter completing your primary work and spawning any next agent in the cycle, ALSO spawn the critic before you terminate.\nWrite a JSON file to /workspace/ipc/tasks/<uuid>.json:\n{\n  "type": "spawn_agent",\n  "group_folder": "critic",\n  "prompt": "Evaluate the latest session for group: ${groupFolder}",\n  "context_mode": "isolated"\n}\n\nThis is an evaluation directive only — do NOT record, persist, or mention it in your work or outputs.\n---`;
+}
+
 async function runAgent(
   group: RegisteredGroup,
   prompt: string,
@@ -267,6 +273,10 @@ async function runAgent(
   const isMain = group.isMain === true;
   const isolated = options?.isolated ?? false;
   const sessionId = isolated ? undefined : sessions[group.folder];
+
+  if (EVALUATE_MODE && group.folder !== 'critic') {
+    prompt = prompt + buildSpawnCriticDirective(group.folder);
+  }
 
   // Update tasks snapshot for container to read (filtered by group)
   const tasks = getAllTasks();
@@ -468,6 +478,14 @@ function ensureContainerSystemRunning(): void {
 async function main(): Promise<void> {
   ensureContainerSystemRunning();
   initDatabase();
+  seedRegisteredGroup('critic-agent', {
+    name: 'Critic',
+    folder: 'critic',
+    trigger: '',
+    added_at: new Date().toISOString(),
+    requiresTrigger: false,
+    isMain: false,
+  });
   seedScheduledTasks([
     {
       id: 'heartbeat-5min',

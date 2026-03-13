@@ -187,6 +187,20 @@ function buildVolumeMounts(
     mounts.push(...validatedMounts);
   }
 
+  // Critic gets read-only access to all group AGENTS.md files and codex session logs
+  if (group.folder === 'critic') {
+    mounts.push({
+      hostPath: GROUPS_DIR,
+      containerPath: '/workspace/groups',
+      readonly: true,
+    });
+    mounts.push({
+      hostPath: path.join(DATA_DIR, 'sessions'),
+      containerPath: '/workspace/sessions',
+      readonly: true,
+    });
+  }
+
   return mounts;
 }
 
