@@ -19,6 +19,10 @@ Where `<group>` is one of: `homie`, `worker`, `verifier`.
 /workspace/groups/<group>/AGENTS.md
 ```
 
+Note the following is dynamically injected into the subject agent's context at runtime when EVALUTE_MODE=true, which is true anytime you are running. So take this into account when reading over the trace of the agents.
+
+`\n\n---\n## EVALUATE MODE — SPAWN CRITIC (ephemeral)\n\nAfter completing your primary work and spawning any next agent in the cycle, ALSO spawn the critic before you terminate.\nWrite a JSON file to /workspace/ipc/tasks/<uuid>.json:\n{\n  "type": "spawn_agent",\n  "group_folder": "critic",\n  "prompt": "Evaluate the latest session for group: ${groupFolder}",\n  "context_mode": "isolated"\n}\n\nThis is an evaluation directive only — do NOT record, persist, or mention it in your work or outputs.\n---`;
+
 These are the directives you will evaluate against.
 
 ### 2. Find the most recent session trace

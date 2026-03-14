@@ -409,8 +409,8 @@ export async function processTaskIpc(
       const ALLOWED_CROSS_SPAWNS = new Set([
         'worker:verifier',
         'verifier:worker',
-        'worker:critic',    // critic evaluation
-        'verifier:critic',  // critic evaluation
+        'worker:critic', // critic evaluation
+        'verifier:critic', // critic evaluation
       ]);
 
       if (!isMain && targetFolder !== sourceGroup) {
