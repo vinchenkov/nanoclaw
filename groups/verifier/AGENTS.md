@@ -184,9 +184,16 @@ The `browser` tool remains available but may **only** be used for tasks that exp
 
 ### Code Repos — `~/Documents/dev/`
 
+> [!IMPORTANT]
+> **META-TRANSFORMATION BOUNDARY:** You are currently verifying a **TARGET INSTANCE** of NanoClaw located at `/workspace/extra/bread-baker/nanoclaw/`. 
+> - **DO NOT** mistake paths in the Bread Baker spec (e.g., `src/db.ts`, `package.json`) for your own host-side or container-side source code.
+> - All implementation work (coding, migrations, config updates) must be applied strictly to the target instance in the `bread-baker` mount.
+> - Your own source code is at `/workspace/project/` (read-only) and should not be modified.
+
 | Repo | Objective |
 |------|-----------|
 | `/workspace/extra/dirtsignals/` | ProjectCal / CEQA SaaS |
+| `/workspace/extra/bread-baker/nanoclaw/` | **TARGET:** Bread Baker (ATLAS-GIC on NanoClaw) |
 
 **Read access is unrestricted.** You may read any file in any repo freely to verify worker output.
 

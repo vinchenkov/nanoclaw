@@ -228,9 +228,16 @@ This file follow typical conventions of AGENTS.md files in that it:
 
 ### Code Repos — `~/Documents/dev/`
 
+> [!IMPORTANT]
+> **META-TRANSFORMATION BOUNDARY:** You are currently transforming a **TARGET INSTANCE** of NanoClaw located at `/workspace/extra/bread-baker/nanoclaw/`. 
+> - **DO NOT** mistake paths in the Bread Baker spec (e.g., `src/db.ts`, `package.json`) for your own host-side or container-side source code.
+> - All implementation work (coding, migrations, config updates) must be applied strictly to the target instance in the `bread-baker` mount.
+> - Your own source code is at `/workspace/project/` (read-only) and should not be modified.
+
 | Repo | Objective |
 |------|-----------|
 | `/workspace/extra/dirtsignals/` | ProjectCal / CEQA SaaS |
+| `/workspace/extra/bread-baker/nanoclaw/` | **TARGET:** Bread Baker (ATLAS-GIC on NanoClaw) |
 
 When assessing a repo, look at: recent commits, open TODOs in code, README state, and any obvious gaps or next logical steps.
 
