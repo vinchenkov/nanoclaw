@@ -20,15 +20,15 @@ All Mission Control state changes go through the `mc` CLI. Never read or write `
    - For file paths (under `mission-control/outputs/`): read the file directly
    - For git branches (`task/<task_id>`): inspect the branch in the relevant repo
 
-3. **Read quality standards** from the orchestrator's AGENTS.md — specifically the **Philosophy** and **Homie's Primary Directive** sections:
-   ```bash
-   head -35 /workspace/extra/shared/../homie/AGENTS.md
-   ```
-   These sections define what "high quality, high leverage" work means. Skip the rest of the file (tick loop, tooling, etc.) — it's not relevant to verification.
+3. **Apply quality standards** — the orchestrator's definition of high-quality, high-leverage work:
+   - Does the output address the actual problem, not a surface-level proxy?
+   - Is it specific and actionable, not generic or shallow?
+   - Does it provide genuine value that moves the initiative forward?
+   - Is it the minimum necessary to meet the criteria — no over-engineering or padding?
 
 4. **Evaluate the deliverable** against:
    - Each acceptance criterion listed in the task (binary: met or not met)
-   - Quality standards from AGENTS.md Philosophy/Primary Directive (does the output provide genuine value, or is it shallow busy work?)
+   - Quality standards from step 3 (does the output provide genuine value, or is it shallow busy work?)
    - Completeness (are all parts of the description addressed?)
    - Correctness (for code: does it compile/pass tests? for research: are claims sourced?)
 

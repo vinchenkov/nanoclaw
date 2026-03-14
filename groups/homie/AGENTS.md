@@ -108,7 +108,12 @@ All non-git deliverables produced by workers land in:
 ```
 /workspace/extra/shared/mission-control/outputs/
 ```
-When writing task descriptions, always reference this path for outputs — never `/workspace/group/`. Workers do not share the planner's `/workspace/group` mount, so paths there are invisible to verification.
+When writing task descriptions, only reference paths that are accessible to workers:
+- `/workspace/extra/shared/` — mission-control, outputs, shared tools
+- `/workspace/extra/dirtsignals/` — dirtsignals repo
+- `/workspace/extra/bread-baker/` — bread-baker repo
+
+**Never reference `/workspace/group/` or `/workspace/project/` in task descriptions.** Both are homie-only mounts — workers cannot see them. If a worker needs a file from `/workspace/project/` (e.g., a spec), copy it to `/workspace/extra/shared/` first.
 
 ---
 
