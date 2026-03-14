@@ -132,6 +132,20 @@ cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
 SPAWN_EOF
 ```
 
+### Required Input File Missing
+
+If the task description references a specific file that does not exist at the given path:
+1. Attempt to locate it via `Glob` search (try alternate paths, case variations, etc.)
+2. If still not found after reasonable effort, mark the task `blocked` — **do not proceed with incomplete information**:
+```bash
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared task update <task_id> \
+  --status blocked --blocked-reason "Required input file '<path>' not found. Searched via Glob — no match."
+node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
+cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
+{"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
+SPAWN_EOF
+```
+
 ### User Input Needed
 Write `/workspace/extra/shared/mission-control/resume/RESUME-<task_id>.md` with:
 - Summary of work done so far
