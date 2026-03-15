@@ -164,15 +164,21 @@ Each group's `CLAUDE.md` is a symlink to `AGENTS.md`. `AGENTS.md` is the canonic
 groups/homie/
   AGENTS.md               # Orchestrator tick loop instructions (canonical)
   CLAUDE.md               # → AGENTS.md
+  AGENT-SPIRIT.md         # Non-negotiable intent — critic must not edit this
+  prompt-metrics.json     # Per-group penalty tracking for auto-engineer loop
   briefings/              # Daily briefings written by orchestrator
 
 groups/worker/
   AGENTS.md               # Worker agent instructions (canonical)
   CLAUDE.md               # → AGENTS.md
+  AGENT-SPIRIT.md         # Non-negotiable intent — critic must not edit this
+  prompt-metrics.json     # Per-group penalty tracking for auto-engineer loop
 
 groups/verifier/
   AGENTS.md               # Verifier agent instructions (canonical)
   CLAUDE.md               # → AGENTS.md
+  AGENT-SPIRIT.md         # Non-negotiable intent — critic must not edit this
+  prompt-metrics.json     # Per-group penalty tracking for auto-engineer loop
 
 groups/critic/
   AGENTS.md               # Critic agent instructions (no CLAUDE.md symlink needed — critic is spawned with isolated context)
@@ -194,8 +200,11 @@ All three groups get `dirtsignals` (rw) and `groups/shared` (rw) as additional m
 
 ### Container mounts for critic
 In addition to the standard per-group mounts, critic gets:
-- `groups/` → `/workspace/groups` (read-only) — all group AGENTS.md files
+- `groups/` → `/workspace/groups` (**read-write**) — all group AGENTS.md/AGENT-SPIRIT.md/prompt-metrics.json files
 - `data/sessions/` → `/workspace/sessions` (read-only) — all codex session rollout logs
+- `.git/` → `/workspace/.git` (read-write) — so critic can commit prompt edits with `git -C /workspace/groups`
+
+Git identity for critic commits: `GIT_AUTHOR_NAME=critic`, `GIT_AUTHOR_EMAIL=critic@nanoclaw` (injected via env).
 
 Agents access mission-control via:
 ```bash
