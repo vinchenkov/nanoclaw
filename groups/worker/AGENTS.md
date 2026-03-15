@@ -49,19 +49,16 @@ All Mission Control state changes go through the `mc` CLI. Never read or write `
    ```
    `mc` handles writing the task file, updating timestamps, and appending to the activity log automatically.
 
-Task fields mean:
-- `description`: what to do and where the deliverable should be written
-- `acceptance_criteria`: the checklist that determines whether you can mark the task `done`
-- `outputs`: the concrete files or branch names you actually produced
+2a. **Verify output exists** (REQUIRED): After writing/copying the output file, run `ls <output_path>` or `test -f <output_path>` to confirm it exists before calling mc task update. Do not assume Write or cp succeeded. If mc rejected your path and you changed it without writing the file to the new location, the verifier will find broken state. If the path was rejected, either copy the file to `mission-control/outputs/` or use git worktree for code repo outputs.
 
-
-4. **Append a completion event** to the activity log:
-   ```json
-   {"ts":"<ISO8601>","actor":"worker","event":"task.completed","task_id":"<task_id>","detail":"<status + one-line summary>"}
+3. **Append task.completed event** (REQUIRED for ALL terminal statuses):
+   Append to `/workspace/extra/shared/mission-control/activity.jsonl`:
+   ```bash
+   echo '{"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","actor":"worker","event":"task.completed","task_id":"<task_id>","detail":"done: <one-line summary>"}' >> /workspace/extra/shared/mission-control/activity.jsonl
    ```
-   Note: `mc task update --status` already appends `task.status_changed`. This completion event is a separate human-readable audit entry.
+   This is MANDATORY. Do not skip this even though mc task update also logs status_changed. Skipping is a directive violation.
 
-5. **On success (`done`): Spawn verifier** — do NOT release the lock. Transfer ownership and spawn verifier:
+4. **On success (`done`): Spawn verifier** — do NOT release the lock. Transfer ownership and spawn verifier:
    ```bash
    # Transfer lock to verifier
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock update \
@@ -71,21 +68,21 @@ Task fields mean:
    cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
    {"type":"spawn_agent","group_folder":"verifier","prompt":"Verify task <task_id>.","context_mode":"isolated"}
    SPAWN_EOF
-   ```
-   Append activity event:
-   ```json
-   {"ts":"<ISO8601>","actor":"worker","event":"verifier.spawned","task_id":"<task_id>","detail":"Spawned verifier for task <task_id>"}
+
+   # Append verifier.spawned event (REQUIRED)
+   echo '{"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","actor":"worker","event":"verifier.spawned","task_id":"<task_id>","detail":"Spawned verifier for task <task_id>"}' >> /workspace/extra/shared/mission-control/activity.jsonl
    ```
 
-6. **On failure/blocked/cancelled: Release lock and trigger planner** (these bypass verification):
+5. **On failure/blocked/cancelled: Release lock and trigger planner** (these bypass verification):
    ```bash
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
    cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
    {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
    SPAWN_EOF
    ```
+   The task.completed event from Step 3 already covers this terminal status.
 
-7. **Self-terminate.** Exit immediately after spawning verifier or triggering the planner.
+6. **Self-terminate.** Exit immediately after spawning verifier or triggering the planner.
 
 ---
 
@@ -195,10 +192,30 @@ The task's `revision_count` tracks how many revisions have been attempted. You d
 
 ---
 
+## Swarm Guidance
+
+You may use subagents and agent teams at your own discretion when a task has parallelizable sub-work.
+
+**Use the `Task` tool (subagents)** for fire-and-forget parallel work:
+- Researching N independent sources simultaneously
+- Analyzing N files or data points independently
+- Running N web searches in parallel
+
+**Use `TeamCreate` / `SendMessage` (agent teams)** for collaborative exploration:
+- When teammates need to share findings mid-flight
+- Competing hypotheses that benefit from cross-checking
+
+**Constraints:**
+- Subagents and teammates are contained within your container run. They cannot write to `/workspace/ipc/` or spawn NanoClaw agents.
+- You are responsible for collecting all results and writing the final deliverable to `mission-control/outputs/`.
+- You still own the final `mc task update`, lock transfer, and verifier spawn. The swarm is invisible to the orchestrator pipeline.
+- Not worth it for linear work, single-threaded I/O, or tasks that take under ~30s total.
+
+---
+
 ## Tools You Do NOT Have
 
 You cannot use: `cron`, `gateway`, `nodes`, `message` tools.
-You cannot spawn subagents.
 You cannot send Discord messages or communicate externally.
 Only the Orchestrator communicates externally.
 
