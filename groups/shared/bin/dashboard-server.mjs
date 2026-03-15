@@ -584,6 +584,13 @@ function dashboardHtml(baseDir, mcPath) {
       .task-card .task-worker {
         text-transform: capitalize;
       }
+      .task-card .task-blocked-reason {
+        color: var(--danger);
+        font-size: 11px;
+        font-style: italic;
+        margin-top: -2px;
+        line-height: 1.3;
+      }
 
       /* Initiatives view */
       .initiatives-view { display: none; }
@@ -1020,6 +1027,8 @@ function dashboardHtml(baseDir, mcPath) {
               (task.priority ? '<span class="task-badge priority">' + escapeHtml(task.priority) + '</span>' : '') +
             '</div>' +
           '</div>' +
+          (task.status === 'blocked' && task.blocked_reason ? '<div class="task-blocked-reason">' + escapeHtml(task.blocked_reason) + '</div>' : '') +
+          (task.status === 'failed' && task.failure_reason ? '<div class="task-blocked-reason">' + escapeHtml(task.failure_reason) + '</div>' : '') +
           '<div class="task-meta">' +
             (task.worker_type ? '<span class="task-worker">' + escapeHtml(task.worker_type) + '</span>' : '') +
           '</div>' +
@@ -1168,6 +1177,19 @@ function dashboardHtml(baseDir, mcPath) {
         html += field('Priority', task.priority, { badge: 'badge-priority' });
         html += field('Worker Type', task.worker_type);
         html += '</div></div>';
+
+        if (task.status === 'blocked' && task.blocked_reason) {
+          html += '<div class="detail-section"><div class="detail-section-title">Blocked Reason</div>';
+          html += '<div class="detail-field full" style="border-left: 3px solid var(--danger)"><div class="detail-field-value" style="color:var(--danger)">' + escapeHtml(task.blocked_reason) + '</div></div></div>';
+        }
+        if (task.status === 'failed' && task.failure_reason) {
+          html += '<div class="detail-section"><div class="detail-section-title">Failure Reason</div>';
+          html += '<div class="detail-field full" style="border-left: 3px solid var(--danger)"><div class="detail-field-value" style="color:var(--danger)">' + escapeHtml(task.failure_reason) + '</div></div></div>';
+        }
+        if (task.status === 'cancelled' && task.cancellation_reason) {
+          html += '<div class="detail-section"><div class="detail-section-title">Cancellation Reason</div>';
+          html += '<div class="detail-field full" style="border-left: 3px solid var(--muted)"><div class="detail-field-value" style="color:var(--muted)">' + escapeHtml(task.cancellation_reason) + '</div></div></div>';
+        }
 
         html += '<div class="detail-section"><div class="detail-section-title">Linking</div>';
         html += '<label>Initiative</label><select id="edit-task-initiative">';

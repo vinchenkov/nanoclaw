@@ -136,6 +136,7 @@ Key `.env` values read at startup (see `src/config.ts`):
 |----------|---------|---------|
 | `ASSISTANT_NAME` | `Andy` | Trigger word (`@Andy`) |
 | `ASSISTANT_HAS_OWN_NUMBER` | `false` | When `true`, bot has its own phone number (changes trigger behavior) |
+| `AGENT_SDK` | `claude` | Selects which agent runtime to launch: `claude` or `codex` |
 | `CONTAINER_IMAGE` | `nanoclaw-agent:latest` | Agent container image |
 | `CONTAINER_TIMEOUT` | `1800000` (30m) | Hard kill timeout |
 | `CONTAINER_MAX_OUTPUT_SIZE` | `10485760` (10MB) | Max bytes captured from container stdout |
@@ -145,7 +146,7 @@ Key `.env` values read at startup (see `src/config.ts`):
 | `TZ` | system timezone | Timezone for scheduled tasks (cron expressions) |
 | `EVALUATE_MODE` | `false` | When `true`, injects ephemeral SPAWN_CRITIC directive into each non-critic agent prompt and seeds the `critic` group |
 
-Secrets (`ANTHROPIC_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`, etc.) are read in `container-runner.ts` and passed via container stdin — never written to disk or visible in process env.
+Secrets (`ANTHROPIC_API_KEY`, `CLAUDE_CODE_OAUTH_TOKEN`, etc.) are read in `container-runner.ts` and passed via container stdin — never written to disk or visible in process env. Every group container also receives a non-secret `NANOCLAW_AGENT_SDK` env var reflecting the active runtime (`claude` or `codex`). During each agent run, the runner also writes ephemeral session metadata to `/tmp/nanoclaw-session.json` inside that container only; subject agents read it when spawning critic so they can pass the exact session id and trace location without writing to any shared directory.
 
 ## Groups
 
@@ -201,7 +202,7 @@ All three groups get `dirtsignals` (rw) and `groups/shared` (rw) as additional m
 ### Container mounts for critic
 In addition to the standard per-group mounts, critic gets:
 - `groups/` → `/workspace/groups` (**read-write**) — all group AGENTS.md/AGENT-SPIRIT.md/prompt-metrics.json files
-- `data/sessions/` → `/workspace/sessions` (read-only) — all codex session rollout logs
+- `data/sessions/` → `/workspace/sessions` (read-only) — all group session data, including both `.claude` and `.codex` traces
 - `.git/` → `/workspace/.git` (read-write) — so critic can commit prompt edits with `git -C /workspace/groups`
 
 Git identity for critic commits: `GIT_AUTHOR_NAME=critic`, `GIT_AUTHOR_EMAIL=critic@nanoclaw` (injected via env).

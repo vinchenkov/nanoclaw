@@ -16,10 +16,13 @@ import {
   IPC_INPUT_DIR,
   IPC_INPUT_CLOSE_SENTINEL,
   IPC_POLL_MS,
+  SESSION_METADATA_PATH,
+  clearSessionMetadata,
   drainIpcInput,
   log,
   shouldClose,
   waitForIpcMessage,
+  writeSessionMetadata,
   writeOutput,
 } from './shared.js';
 
@@ -138,6 +141,8 @@ export async function runCodexAgent(
   sdkEnv: Record<string, string | undefined>,
 ): Promise<void> {
   fs.mkdirSync(IPC_INPUT_DIR, { recursive: true });
+  clearSessionMetadata();
+  log(`Session metadata file reset: ${SESSION_METADATA_PATH}`);
 
   // Clean up stale _close sentinel from previous container runs
   try {
@@ -226,6 +231,14 @@ export async function runCodexAgent(
         log(
           `Codex turn complete. Session: ${newSessionId}, response length: ${result.turn.finalResponse?.length || 0}`,
         );
+        if (newSessionId) {
+          writeSessionMetadata({
+            sdk: 'codex',
+            group: containerInput.groupFolder,
+            sessionId: newSessionId,
+            tracePath: `/workspace/sessions/${containerInput.groupFolder}/.codex/sessions`,
+          });
+        }
         writeOutput({
           status: 'success',
           result: result.turn.finalResponse || null,

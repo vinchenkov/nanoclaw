@@ -14,15 +14,18 @@ import {
 import { fileURLToPath } from 'url';
 
 import {
+  SESSION_METADATA_PATH,
   ContainerInput,
   ContainerOutput,
   IPC_INPUT_DIR,
   IPC_INPUT_CLOSE_SENTINEL,
   IPC_POLL_MS,
+  clearSessionMetadata,
   drainIpcInput,
   log,
   shouldClose,
   waitForIpcMessage,
+  writeSessionMetadata,
   writeOutput,
 } from './shared.js';
 
@@ -427,6 +430,12 @@ async function runQuery(
     if (message.type === 'system' && message.subtype === 'init') {
       newSessionId = message.session_id;
       log(`Session initialized: ${newSessionId}`);
+      writeSessionMetadata({
+        sdk: 'claude',
+        group: containerInput.groupFolder,
+        sessionId: newSessionId,
+        tracePath: `/workspace/sessions/${containerInput.groupFolder}/.claude/projects/-workspace-group/${newSessionId}.jsonl`,
+      });
     }
 
     if (
@@ -474,6 +483,8 @@ export async function runClaudeAgent(
   containerInput: ContainerInput,
   sdkEnv: Record<string, string | undefined>,
 ): Promise<void> {
+  clearSessionMetadata();
+  log(`Session metadata file reset: ${SESSION_METADATA_PATH}`);
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const mcpServerPath = path.join(__dirname, 'ipc-mcp-stdio.js');
 
