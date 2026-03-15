@@ -141,17 +141,18 @@ Be specific. Quote or paraphrase the session trace when citing evidence. Do not 
 
 ### 7. Make one atomic prompt edit
 
-1. Find the most recent critique file for this group: list `/workspace/group/critiques/`, filter for files whose frontmatter contains `subject: <group>`, and pick the newest by filename sort.
+1. Find up to the 5 most recent critique files for this group: list `/workspace/group/critiques/`, filter for files whose frontmatter contains `subject: <group>`, sort by filename, and take the newest 5.
 2. Read `/workspace/groups/<group>/AGENT-SPIRIT.md`.
-3. From the critique's **Suggestions** section, select the single most impactful suggestion. If there is a tie, prefer whichever simplifies or shortens the prompt.
-4. Verify the proposed edit does not contradict anything in `AGENT-SPIRIT.md`. If it does, choose the next suggestion. If no spirit-safe suggestion exists, **skip and terminate**.
-5. Apply exactly one conceptual change to `/workspace/groups/<group>/AGENTS.md`. Follow the prompt engineering principles below.
-6. Commit the change:
+3. Read all selected critique files before ideating a prompt change. Use them to identify repeated failure modes, avoid overfitting to a single run, and ground the edit in multi-run evidence.
+4. From the selected critiques' **Suggestions** sections, select the single most impactful suggestion. Prefer one supported by repeated patterns across the recent critiques. If there is a tie, prefer whichever simplifies or shortens the prompt.
+5. Verify the proposed edit does not contradict anything in `AGENT-SPIRIT.md`. If it does, choose the next suggestion. If no spirit-safe suggestion exists, **skip and terminate**.
+6. Apply exactly one conceptual change to `/workspace/groups/<group>/AGENTS.md`. Follow the prompt engineering principles below.
+7. Commit the change:
    ```bash
    git -C /workspace/groups add <group>/AGENTS.md
    git -C /workspace/groups commit -m "critic: adjust <group> — <reason>"
    ```
-7. Save the new commit SHA to `last_edit_commit` in the metrics file; write the file.
+8. Save the new commit SHA to `last_edit_commit` in the metrics file; write the file.
 
 ## Prompt Engineering Principles
 
