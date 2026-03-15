@@ -1,6 +1,37 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('./config.js', async () => {
+  const actual =
+    await vi.importActual<typeof import('./config.js')>('./config.js');
+  return {
+    ...actual,
+    EVALUATE_MODE: true,
+    SCHEDULER_POLL_INTERVAL: 1,
+  };
+});
+
+vi.mock('./container-runner.js', () => ({
+  runContainerAgent: vi.fn(
+    async (
+      _group: unknown,
+      _input: unknown,
+      _onProcess: unknown,
+      onOutput?: (output: {
+        status: 'success';
+        result: string;
+      }) => Promise<void>,
+    ) => {
+      if (onOutput) {
+        await onOutput({ status: 'success', result: 'scheduled response' });
+      }
+      return { status: 'success', result: null };
+    },
+  ),
+  writeTasksSnapshot: vi.fn(),
+}));
+
 import { _initTestDatabase, createTask, getTaskById } from './db.js';
+import { runContainerAgent } from './container-runner.js';
 import {
   _resetSchedulerLoopForTests,
   computeNextRun,
@@ -50,6 +81,116 @@ describe('task scheduler', () => {
 
     const task = getTaskById('task-invalid-folder');
     expect(task?.status).toBe('paused');
+  });
+
+  it('adds the evaluate-mode directive for scheduled non-critic runs', async () => {
+    createTask({
+      id: 'task-homie-evaluate',
+      group_folder: 'homie',
+      chat_jid: 'dc:123',
+      prompt: 'Execute your orchestrator tick loop.',
+      schedule_type: 'once',
+      schedule_value: '2026-02-22T00:00:00.000Z',
+      context_mode: 'isolated',
+      next_run: new Date(Date.now() - 60_000).toISOString(),
+      status: 'active',
+      created_at: '2026-02-22T00:00:00.000Z',
+    });
+
+    const enqueueTask = vi.fn(
+      (_groupJid: string, _taskId: string, fn: () => Promise<void>) => {
+        void fn();
+      },
+    );
+
+    startSchedulerLoop({
+      registeredGroups: () => ({
+        'dc:123': {
+          name: 'Homie',
+          folder: 'homie',
+          trigger: '',
+          added_at: '2026-02-22T00:00:00.000Z',
+          isMain: true,
+          requiresTrigger: false,
+        },
+      }),
+      getSessions: () => ({}),
+      queue: {
+        enqueueTask,
+        closeStdin: vi.fn(),
+        notifyIdle: vi.fn(),
+      } as any,
+      onProcess: () => {},
+      sendMessage: async () => {},
+    });
+
+    await vi.advanceTimersByTimeAsync(10);
+
+    expect(runContainerAgent).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        prompt: expect.stringContaining(
+          '## EVALUATE MODE — SPAWN CRITIC (ephemeral)',
+        ),
+      }),
+      expect.any(Function),
+      expect.any(Function),
+    );
+  });
+
+  it('does not add the evaluate-mode directive for scheduled critic runs', async () => {
+    vi.mocked(runContainerAgent).mockClear();
+
+    createTask({
+      id: 'task-critic-no-evaluate',
+      group_folder: 'critic',
+      chat_jid: 'critic-agent',
+      prompt: 'Review the latest session.',
+      schedule_type: 'once',
+      schedule_value: '2026-02-22T00:00:00.000Z',
+      context_mode: 'isolated',
+      next_run: new Date(Date.now() - 60_000).toISOString(),
+      status: 'active',
+      created_at: '2026-02-22T00:00:00.000Z',
+    });
+
+    const enqueueTask = vi.fn(
+      (_groupJid: string, _taskId: string, fn: () => Promise<void>) => {
+        void fn();
+      },
+    );
+
+    startSchedulerLoop({
+      registeredGroups: () => ({
+        'critic-agent': {
+          name: 'Critic',
+          folder: 'critic',
+          trigger: '',
+          added_at: '2026-02-22T00:00:00.000Z',
+          isMain: false,
+          requiresTrigger: false,
+        },
+      }),
+      getSessions: () => ({}),
+      queue: {
+        enqueueTask,
+        closeStdin: vi.fn(),
+        notifyIdle: vi.fn(),
+      } as any,
+      onProcess: () => {},
+      sendMessage: async () => {},
+    });
+
+    await vi.advanceTimersByTimeAsync(10);
+
+    expect(runContainerAgent).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        prompt: 'Review the latest session.',
+      }),
+      expect.any(Function),
+      expect.any(Function),
+    );
   });
 
   it('computeNextRun anchors interval tasks to scheduled time to prevent drift', () => {
