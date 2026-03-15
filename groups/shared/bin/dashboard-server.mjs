@@ -294,6 +294,70 @@ function readSessionDetail(sessionsDir, group, sdk, sessionId) {
   return { id: sessionId, entries };
 }
 
+function listCritiques(critiquesDir) {
+  if (!existsSync(critiquesDir)) return [];
+  return readdirSync(critiquesDir)
+    .filter(f => f.endsWith('.md'))
+    .map(f => {
+      try {
+        const raw = readFileSync(join(critiquesDir, f), 'utf8');
+        const { frontmatter, body } = parseFrontmatter(raw);
+        const summaryMatch = body.match(/## Summary\s*\n+([\s\S]*?)(?=\n## |$)/);
+        return {
+          filename: f,
+          subject: String(frontmatter.subject || ''),
+          evaluated_at: String(frontmatter.evaluated_at || ''),
+          total_penalty: Number(frontmatter.total_penalty ?? 0),
+          prompt_commit: String(frontmatter.prompt_commit || '').slice(0, 8),
+          summary: summaryMatch ? summaryMatch[1].trim().slice(0, 200) : '',
+        };
+      } catch { return null; }
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.filename.localeCompare(a.filename));
+}
+
+function readCritiqueDetail(critiquesDir, filename) {
+  if (!filename.endsWith('.md') || filename.includes('/') || filename.includes('..') || filename.includes('\0')) return null;
+  const filePath = join(critiquesDir, filename);
+  if (!existsSync(filePath)) return null;
+  try {
+    const raw = readFileSync(filePath, 'utf8');
+    const { frontmatter, body } = parseFrontmatter(raw);
+    return {
+      filename,
+      subject: String(frontmatter.subject || ''),
+      session: String(frontmatter.session || 'none'),
+      evaluated_at: String(frontmatter.evaluated_at || ''),
+      total_penalty: Number(frontmatter.total_penalty ?? 0),
+      prompt_commit: String(frontmatter.prompt_commit || ''),
+      body: body.trim(),
+    };
+  } catch { return null; }
+}
+
+function listBriefings(briefingsDir) {
+  if (!existsSync(briefingsDir)) return [];
+  return readdirSync(briefingsDir)
+    .filter(f => f.endsWith('.md'))
+    .map(f => {
+      try {
+        const raw = readFileSync(join(briefingsDir, f), 'utf8');
+        const preview = raw.split('\n').filter(l => l.trim() && !l.startsWith('#')).slice(0, 3).join(' ').slice(0, 160);
+        return { filename: f, date: f.replace('.md', ''), preview };
+      } catch { return null; }
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
+
+function readBriefingDetail(briefingsDir, filename) {
+  if (!/^\d{4}-\d{2}-\d{2}\.md$/.test(filename)) return null;
+  const filePath = join(briefingsDir, filename);
+  if (!existsSync(filePath)) return null;
+  return { filename, date: filename.replace('.md', ''), body: readFileSync(filePath, 'utf8') };
+}
+
 function buildSummary(tasks, initiatives, lock) {
   const statusCounts = {};
   const priorityCounts = {};
@@ -1172,6 +1236,207 @@ function dashboardHtml(baseDir, mcPath) {
         .obs-layout { grid-template-columns: 1fr; height: auto; }
         .obs-session-list { max-height: 250px; }
       }
+
+      /* Critiques view */
+      .critiques-view { display: none; }
+      .critiques-view.active { display: block; }
+      .crit-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .crit-filter {
+        padding: 5px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--card);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .crit-filter:hover { color: var(--text); border-color: var(--text); }
+      .crit-filter.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .crit-layout {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 12px;
+        height: calc(100vh - 200px);
+        min-height: 400px;
+      }
+      .crit-list {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--col-radius);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      .crit-list-header {
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .crit-item {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.1s;
+      }
+      .crit-item:hover { background: rgba(56,139,253,0.08); }
+      .crit-item.active { background: rgba(56,139,253,0.15); border-left: 3px solid var(--accent); }
+      .crit-item-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      .crit-subject {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .crit-subject.worker { background: rgba(56,139,253,0.15); color: #7cb7ff; }
+      .crit-subject.verifier { background: rgba(63,185,80,0.15); color: var(--ok); }
+      .crit-subject.homie { background: rgba(210,153,34,0.15); color: #f3c86a; }
+      .crit-penalty {
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .crit-penalty.zero { color: var(--ok); }
+      .crit-penalty.low { color: var(--warn); }
+      .crit-penalty.high { color: var(--danger); }
+      .crit-time {
+        font-size: 11px;
+        color: var(--muted);
+        margin-left: auto;
+      }
+      .crit-preview {
+        font-size: 12px;
+        color: var(--text);
+        opacity: 0.75;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .crit-reader {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--col-radius);
+        overflow-y: auto;
+        padding: 20px 24px;
+      }
+      .crit-reader-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .crit-reader-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .crit-reader-meta .meta-item {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .crit-reader-meta .meta-item strong { color: var(--text); }
+      .crit-reader-body { line-height: 1.7; }
+      .crit-reader-body h2 { font-size: 18px; margin: 20px 0 8px; color: var(--text); }
+      .crit-reader-body h3 { font-size: 15px; margin: 16px 0 6px; color: var(--text); }
+      .crit-reader-body h4 { font-size: 13px; margin: 12px 0 4px; color: var(--text); }
+      .crit-reader-body p { margin: 4px 0; font-size: 13px; }
+      .crit-reader-body ul { margin: 6px 0; padding-left: 20px; }
+      .crit-reader-body li { font-size: 13px; margin: 4px 0; line-height: 1.5; }
+      @media (max-width: 768px) {
+        .crit-layout { grid-template-columns: 1fr; height: auto; }
+        .crit-list { max-height: 300px; }
+      }
+
+      /* Briefings view */
+      .briefings-view { display: none; }
+      .briefings-view.active { display: block; }
+      .brief-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 12px;
+        height: calc(100vh - 180px);
+        min-height: 400px;
+      }
+      .brief-list {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--col-radius);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      .brief-list-header {
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+      .brief-item {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.1s;
+      }
+      .brief-item:hover { background: rgba(56,139,253,0.08); }
+      .brief-item.active { background: rgba(56,139,253,0.15); border-left: 3px solid var(--accent); }
+      .brief-date {
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 3px;
+      }
+      .brief-preview {
+        font-size: 11px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .brief-reader {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--col-radius);
+        overflow-y: auto;
+        padding: 20px 24px;
+      }
+      .brief-reader-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .brief-reader-body { line-height: 1.7; }
+      .brief-reader-body h1 { font-size: 20px; margin: 0 0 16px; color: var(--text); }
+      .brief-reader-body h2 { font-size: 16px; margin: 20px 0 8px; color: var(--text); }
+      .brief-reader-body h3 { font-size: 14px; margin: 14px 0 6px; color: var(--text); }
+      .brief-reader-body p { margin: 4px 0; font-size: 13px; }
+      .brief-reader-body ul { margin: 6px 0; padding-left: 20px; }
+      .brief-reader-body li { font-size: 13px; margin: 4px 0; line-height: 1.5; }
     </style>
   </head>
   <body>
@@ -1190,6 +1455,8 @@ function dashboardHtml(baseDir, mcPath) {
       <button class="tab active" data-view="tasks">Tasks</button>
       <button class="tab" data-view="initiatives">Initiatives</button>
       <button class="tab" data-view="observability">Observability</button>
+      <button class="tab" data-view="critiques">Critiques</button>
+      <button class="tab" data-view="briefings">Briefings</button>
     </div>
 
     <div class="tasks-view active" id="tasks-view">
@@ -1263,6 +1530,36 @@ function dashboardHtml(baseDir, mcPath) {
         </div>
         <div class="obs-viewer" id="obs-viewer">
           <div class="obs-viewer-empty">Select a session to view</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="critiques-view" id="critiques-view">
+      <div class="crit-controls" id="crit-controls">
+        <button class="crit-filter active" data-subject="all">All</button>
+        <button class="crit-filter" data-subject="worker">Worker</button>
+        <button class="crit-filter" data-subject="verifier">Verifier</button>
+        <button class="crit-filter" data-subject="homie">Homie</button>
+      </div>
+      <div class="crit-layout">
+        <div class="crit-list">
+          <div class="crit-list-header" id="crit-list-header">Critiques</div>
+          <div id="crit-items"></div>
+        </div>
+        <div class="crit-reader" id="crit-reader">
+          <div class="crit-reader-empty">Select a critique to read</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="briefings-view" id="briefings-view">
+      <div class="brief-layout">
+        <div class="brief-list">
+          <div class="brief-list-header" id="brief-list-header">Briefings</div>
+          <div id="brief-items"></div>
+        </div>
+        <div class="brief-reader" id="brief-reader">
+          <div class="brief-reader-empty">Select a briefing to read</div>
         </div>
       </div>
     </div>
@@ -1473,7 +1770,11 @@ function dashboardHtml(baseDir, mcPath) {
           document.getElementById('tasks-view').classList.toggle('active', view === 'tasks');
           document.getElementById('initiatives-view').classList.toggle('active', view === 'initiatives');
           document.getElementById('observability-view').classList.toggle('active', view === 'observability');
+          document.getElementById('critiques-view').classList.toggle('active', view === 'critiques');
+          document.getElementById('briefings-view').classList.toggle('active', view === 'briefings');
           if (view === 'observability') loadObsGroups();
+          if (view === 'critiques') loadCritiques();
+          if (view === 'briefings') loadBriefings();
         });
       });
 
@@ -1918,6 +2219,182 @@ function dashboardHtml(baseDir, mcPath) {
         });
       });
 
+      // Simple markdown to HTML renderer
+      function renderMd(text) {
+        var lines = text.split('\\n');
+        var html = '';
+        var inList = false;
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          if (line.startsWith('#### ')) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<h4>' + inlineMd(line.slice(5)) + '</h4>';
+          } else if (line.startsWith('### ')) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<h3>' + inlineMd(line.slice(4)) + '</h3>';
+          } else if (line.startsWith('## ')) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<h2>' + inlineMd(line.slice(3)) + '</h2>';
+          } else if (line.startsWith('# ')) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<h1 style="font-size:20px;margin:0 0 12px;">' + inlineMd(line.slice(2)) + '</h1>';
+          } else if (line.startsWith('- ')) {
+            if (!inList) { html += '<ul>'; inList = true; }
+            html += '<li>' + inlineMd(line.slice(2)) + '</li>';
+          } else if (!line.trim()) {
+            if (inList) { html += '</ul>'; inList = false; }
+          } else {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<p>' + inlineMd(line) + '</p>';
+          }
+        }
+        if (inList) html += '</ul>';
+        return html;
+      }
+
+      function inlineMd(text) {
+        var bt = String.fromCharCode(96);
+        var codeRe = new RegExp(bt + '([^' + bt + ']+)' + bt, 'g');
+        return escapeHtml(text)
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(codeRe, '<code style="background:var(--card);padding:1px 5px;border-radius:3px;font-size:12px;">$1</code>');
+      }
+
+      // Critiques
+      var critState = { subject: 'all', selected: '' };
+
+      async function loadCritiques() {
+        var container = document.getElementById('crit-items');
+        var header = document.getElementById('crit-list-header');
+        container.innerHTML = '<div class="obs-no-sessions">Loading...</div>';
+
+        try {
+          var url = '/api/critiques';
+          if (critState.subject !== 'all') url += '?subject=' + critState.subject;
+          var critiques = await fetchJson(url);
+          header.textContent = 'Critiques (' + critiques.length + ')';
+
+          if (critiques.length === 0) {
+            container.innerHTML = '<div class="obs-no-sessions">No critiques found</div>';
+            return;
+          }
+
+          container.innerHTML = critiques.map(function(c) {
+            var penClass = c.total_penalty === 0 ? 'zero' : (c.total_penalty <= 3 ? 'low' : 'high');
+            var ts = c.evaluated_at.replace(/T/, ' ').replace(/-/g, ':').slice(0, 16).replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3');
+            return '<div class="crit-item' + (critState.selected === c.filename ? ' active' : '') + '" data-filename="' + escapeHtml(c.filename) + '">' +
+              '<div class="crit-item-header">' +
+                '<span class="crit-subject ' + c.subject + '">' + escapeHtml(c.subject) + '</span>' +
+                '<span class="crit-penalty ' + penClass + '">penalty: ' + c.total_penalty + '</span>' +
+                '<span class="crit-time">' + escapeHtml(ts) + '</span>' +
+              '</div>' +
+              '<div class="crit-preview">' + escapeHtml(c.summary || '(no summary)') + '</div>' +
+            '</div>';
+          }).join('');
+
+          container.querySelectorAll('.crit-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+              critState.selected = item.getAttribute('data-filename');
+              container.querySelectorAll('.crit-item').forEach(function(i) { i.classList.remove('active'); });
+              item.classList.add('active');
+              loadCritiqueDetail();
+            });
+          });
+        } catch (err) {
+          container.innerHTML = '<div class="obs-no-sessions" style="color:var(--danger);">Failed to load critiques</div>';
+        }
+      }
+
+      async function loadCritiqueDetail() {
+        var reader = document.getElementById('crit-reader');
+        reader.innerHTML = '<div class="crit-reader-empty">Loading...</div>';
+
+        try {
+          var data = await fetchJson('/api/critiques/' + encodeURIComponent(critState.selected));
+
+          var html = '<div class="crit-reader-meta">';
+          html += '<div class="meta-item"><strong>Subject:</strong> ' + escapeHtml(data.subject) + '</div>';
+          html += '<div class="meta-item"><strong>Evaluated:</strong> ' + escapeHtml(data.evaluated_at) + '</div>';
+          html += '<div class="meta-item"><strong>Penalty:</strong> ' + data.total_penalty + '</div>';
+          html += '<div class="meta-item"><strong>Commit:</strong> <code style="background:var(--card);padding:1px 5px;border-radius:3px;font-size:11px;">' + escapeHtml(data.prompt_commit.slice(0, 8)) + '</code></div>';
+          if (data.session && data.session !== 'none') {
+            html += '<div class="meta-item"><strong>Session:</strong> <code style="background:var(--card);padding:1px 5px;border-radius:3px;font-size:11px;">' + escapeHtml(data.session.split('/').pop()) + '</code></div>';
+          }
+          html += '</div>';
+          html += '<div class="crit-reader-body">' + renderMd(data.body) + '</div>';
+
+          reader.innerHTML = html;
+        } catch (err) {
+          reader.innerHTML = '<div class="crit-reader-empty" style="color:var(--danger);">Failed to load critique: ' + escapeHtml(err.message) + '</div>';
+        }
+      }
+
+      document.querySelectorAll('.crit-filter').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.crit-filter').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          critState.subject = btn.getAttribute('data-subject');
+          critState.selected = '';
+          document.getElementById('crit-reader').innerHTML = '<div class="crit-reader-empty">Select a critique to read</div>';
+          loadCritiques();
+        });
+      });
+
+      // Briefings
+      var briefState = { selected: '' };
+
+      async function loadBriefings() {
+        var container = document.getElementById('brief-items');
+        var header = document.getElementById('brief-list-header');
+        container.innerHTML = '<div class="obs-no-sessions">Loading...</div>';
+
+        try {
+          var briefings = await fetchJson('/api/briefings');
+          header.textContent = 'Briefings (' + briefings.length + ')';
+
+          if (briefings.length === 0) {
+            container.innerHTML = '<div class="obs-no-sessions">No briefings found</div>';
+            return;
+          }
+
+          container.innerHTML = briefings.map(function(b) {
+            return '<div class="brief-item' + (briefState.selected === b.filename ? ' active' : '') + '" data-filename="' + escapeHtml(b.filename) + '">' +
+              '<div class="brief-date">' + escapeHtml(b.date) + '</div>' +
+              '<div class="brief-preview">' + escapeHtml(b.preview) + '</div>' +
+            '</div>';
+          }).join('');
+
+          container.querySelectorAll('.brief-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+              briefState.selected = item.getAttribute('data-filename');
+              container.querySelectorAll('.brief-item').forEach(function(i) { i.classList.remove('active'); });
+              item.classList.add('active');
+              loadBriefingDetail();
+            });
+          });
+
+          if (briefings.length > 0 && !briefState.selected) {
+            briefState.selected = briefings[0].filename;
+            container.querySelector('.brief-item').classList.add('active');
+            loadBriefingDetail();
+          }
+        } catch (err) {
+          container.innerHTML = '<div class="obs-no-sessions" style="color:var(--danger);">Failed to load briefings</div>';
+        }
+      }
+
+      async function loadBriefingDetail() {
+        var reader = document.getElementById('brief-reader');
+        reader.innerHTML = '<div class="brief-reader-empty">Loading...</div>';
+
+        try {
+          var data = await fetchJson('/api/briefings/' + encodeURIComponent(briefState.selected));
+          reader.innerHTML = '<div class="brief-reader-body">' + renderMd(data.body) + '</div>';
+        } catch (err) {
+          reader.innerHTML = '<div class="brief-reader-empty" style="color:var(--danger);">Failed to load briefing</div>';
+        }
+      }
+
       refresh().catch(function(err) {
         document.body.insertAdjacentHTML('afterbegin',
           '<div style="background:var(--card);border:1px solid var(--danger);border-radius:8px;padding:12px;margin-bottom:12px;color:var(--danger);">Dashboard load failed: ' + err.message + '</div>'
@@ -1938,6 +2415,8 @@ const host = flags.host || process.env.DASHBOARD_HOST || '127.0.0.1';
 const port = Number(flags.port || process.env.DASHBOARD_PORT || 4377);
 const missionControlPath = join(root, 'mission-control');
 const sessionsDir = resolve(root, '../../data/sessions');
+const critiquesDir = resolve(root, '../critic/critiques');
+const briefingsDir = resolve(root, '../homie/briefings');
 
 if (!existsSync(missionControlPath) || !statSync(missionControlPath).isDirectory()) {
   process.stderr.write(`dashboard error: mission-control directory not found at ${missionControlPath}\n`);
@@ -2168,6 +2647,31 @@ const server = createServer(async (req, res) => {
       const initiatives = readInitiatives(root);
       const lock = readLock(root);
       return json(res, 200, buildSummary(tasks, initiatives, lock));
+    }
+
+    if (pathname === '/api/critiques' && req.method === 'GET') {
+      const subject = searchParams.get('subject');
+      let critiques = listCritiques(critiquesDir);
+      if (subject) critiques = critiques.filter(c => c.subject === subject);
+      return json(res, 200, critiques);
+    }
+
+    if (/^\/api\/critiques\/[^/]+$/.test(pathname) && req.method === 'GET') {
+      const filename = decodeURIComponent(pathname.slice('/api/critiques/'.length));
+      const detail = readCritiqueDetail(critiquesDir, filename);
+      if (!detail) return json(res, 404, { error: 'Critique not found' });
+      return json(res, 200, detail);
+    }
+
+    if (pathname === '/api/briefings' && req.method === 'GET') {
+      return json(res, 200, listBriefings(briefingsDir));
+    }
+
+    if (/^\/api\/briefings\/[^/]+$/.test(pathname) && req.method === 'GET') {
+      const filename = decodeURIComponent(pathname.slice('/api/briefings/'.length));
+      const detail = readBriefingDetail(briefingsDir, filename);
+      if (!detail) return json(res, 404, { error: 'Briefing not found' });
+      return json(res, 200, detail);
     }
 
     if (pathname === '/api/sessions/groups') {
