@@ -187,6 +187,7 @@ groups/critic/
 
 groups/shared/
   bin/mc.ts               # Mission control CLI (standalone, node, --base-dir flag)
+  bin/dashboard-server.mjs # Dashboard web UI (vanilla HTML/CSS/JS, default port 4377)
   mission-control/
     tasks/                # Task files
     initiatives/          # Initiative files
