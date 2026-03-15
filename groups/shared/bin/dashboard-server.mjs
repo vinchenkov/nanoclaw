@@ -2254,9 +2254,10 @@ function dashboardHtml(baseDir, mcPath) {
 
       function inlineMd(text) {
         var bt = String.fromCharCode(96);
+        var boldRe = new RegExp('\\\\*\\\\*(.*?)\\\\*\\\\*', 'g');
         var codeRe = new RegExp(bt + '([^' + bt + ']+)' + bt, 'g');
         return escapeHtml(text)
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(boldRe, '<strong>$1</strong>')
           .replace(codeRe, '<code style="background:var(--card);padding:1px 5px;border-radius:3px;font-size:12px;">$1</code>');
       }
 
