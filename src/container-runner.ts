@@ -187,17 +187,23 @@ function buildVolumeMounts(
     mounts.push(...validatedMounts);
   }
 
-  // Critic gets read-only access to all group AGENTS.md files and codex session logs
+  // Critic gets read-write access to group AGENTS.md files and codex session logs,
+  // plus a .git mount so it can commit prompt edits.
   if (group.folder === 'critic') {
     mounts.push({
       hostPath: GROUPS_DIR,
       containerPath: '/workspace/groups',
-      readonly: true,
+      readonly: false,
     });
     mounts.push({
       hostPath: path.join(DATA_DIR, 'sessions'),
       containerPath: '/workspace/sessions',
       readonly: true,
+    });
+    mounts.push({
+      hostPath: path.join(projectRoot, '.git'),
+      containerPath: '/workspace/.git',
+      readonly: false,
     });
   }
 
@@ -223,11 +229,18 @@ function readSecrets(): Record<string, string> {
 function buildContainerArgs(
   mounts: VolumeMount[],
   containerName: string,
+  extraEnv?: Record<string, string>,
 ): string[] {
   const args: string[] = ['run', '-i', '--rm', '--name', containerName];
 
   // Pass host timezone so container's local time matches the user's
   args.push('-e', `TZ=${TIMEZONE}`);
+
+  if (extraEnv) {
+    for (const [key, value] of Object.entries(extraEnv)) {
+      args.push('-e', `${key}=${value}`);
+    }
+  }
 
   // Run as host user so bind-mounted files are accessible.
   // Skip when running as root (uid 0), as the container's node user (uid 1000),
@@ -269,7 +282,16 @@ export async function runContainerAgent(
   const mounts = buildVolumeMounts(group, input.isMain);
   const safeName = group.folder.replace(/[^a-zA-Z0-9-]/g, '-');
   const containerName = `nanoclaw-${safeName}-${Date.now()}`;
-  const containerArgs = buildContainerArgs(mounts, containerName);
+  const criticEnv =
+    group.folder === 'critic'
+      ? {
+          GIT_AUTHOR_NAME: 'critic',
+          GIT_AUTHOR_EMAIL: 'critic@nanoclaw',
+          GIT_COMMITTER_NAME: 'critic',
+          GIT_COMMITTER_EMAIL: 'critic@nanoclaw',
+        }
+      : undefined;
+  const containerArgs = buildContainerArgs(mounts, containerName, criticEnv);
 
   logger.debug(
     {
