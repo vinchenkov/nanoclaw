@@ -49,20 +49,17 @@ All Mission Control state changes go through the `mc` CLI. Never read or write `
    ```
    `mc` handles writing the task file, updating timestamps, and appending to the activity log automatically.
 
-2a. **Verify output exists** (REQUIRED): Before spawning verifier, confirm the output file actually exists at the path you specified in `--outputs`. If mc rejected your path and you changed it without writing the file to the new location, the verifier will find broken state. If the path was rejected, either copy the file to `mission-control/outputs/` or use git worktree for code repo outputs.
-
 Task fields mean:
 - `description`: what to do and where the deliverable should be written
 - `acceptance_criteria`: the checklist that determines whether you can mark the task `done`
 - `outputs`: the concrete files or branch names you actually produced
 
 
-4. **Append a completion event** to the activity log (REQUIRED):
+4. **Append a completion event** to the activity log:
    ```json
    {"ts":"<ISO8601>","actor":"worker","event":"task.completed","task_id":"<task_id>","detail":"<status + one-line summary>"}
    ```
-   **This is MANDATORY for ALL terminal statuses (done, blocked, cancelled, failed).** The `mc task update` command does NOT automatically log task.completed - you must do this manually. Do not proceed to lock release or verifier spawn without appending this event.
-   Note: `mc task update --status` already appends `task.status_changed`. This completion event is a separate human-readable audit entry. Skipping this step is a directive violation.
+   Note: `mc task update --status` already appends `task.status_changed`. This completion event is a separate human-readable audit entry.
 
 5. **On success (`done`): Spawn verifier** — do NOT release the lock. Transfer ownership and spawn verifier:
    ```bash
@@ -198,30 +195,10 @@ The task's `revision_count` tracks how many revisions have been attempted. You d
 
 ---
 
-## Swarm Guidance
-
-You may use subagents and agent teams at your own discretion when a task has parallelizable sub-work.
-
-**Use the `Task` tool (subagents)** for fire-and-forget parallel work:
-- Researching N independent sources simultaneously
-- Analyzing N files or data points independently
-- Running N web searches in parallel
-
-**Use `TeamCreate` / `SendMessage` (agent teams)** for collaborative exploration:
-- When teammates need to share findings mid-flight
-- Competing hypotheses that benefit from cross-checking
-
-**Constraints:**
-- Subagents and teammates are contained within your container run. They cannot write to `/workspace/ipc/` or spawn NanoClaw agents.
-- You are responsible for collecting all results and writing the final deliverable to `mission-control/outputs/`.
-- You still own the final `mc task update`, lock transfer, and verifier spawn. The swarm is invisible to the orchestrator pipeline.
-- Not worth it for linear work, single-threaded I/O, or tasks that take under ~30s total.
-
----
-
 ## Tools You Do NOT Have
 
 You cannot use: `cron`, `gateway`, `nodes`, `message` tools.
+You cannot spawn subagents.
 You cannot send Discord messages or communicate externally.
 Only the Orchestrator communicates externally.
 
