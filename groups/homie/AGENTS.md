@@ -235,10 +235,12 @@ Continue to Step 2 regardless.
 
 Read all of the following before doing anything else:
 
-1. All `/workspace/extra/shared/mission-control/tasks/*.md` (parse YAML frontmatter)
-2. All `/workspace/extra/shared/mission-control/initiatives/*.md` (parse YAML frontmatter) — needed for initiative-aware prioritization and seeding
+1. All `/workspace/extra/shared/mission-control/tasks/*.md` (parse YAML frontmatter) — or use `mc task list` as a shortcut
+2. All `/workspace/extra/shared/mission-control/initiatives/*.md` (parse YAML frontmatter) — or use `mc initiative list` as a shortcut; needed for initiative-aware prioritization and seeding
 3. `node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock status`
 4. Last 50 lines of `/workspace/extra/shared/mission-control/activity.log.ndjson`
+
+> **Note:** Only read the files and run the commands listed above. Do not explore workspace directories during Load State.
 
 ---
 
