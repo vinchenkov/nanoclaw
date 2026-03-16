@@ -52,13 +52,14 @@ All Mission Control state changes go through the `mc` CLI. Never read or write `
 2a. **Verify output exists** (REQUIRED): After writing/copying the output file, run `ls <output_path>` or `test -f <output_path>` to confirm it exists before calling mc task update. Do not assume Write or cp succeeded. If mc rejected your path and you changed it without writing the file to the new location, the verifier will find broken state. If the path was rejected, either copy the file to `mission-control/outputs/` or use git worktree for code repo outputs.
 
 3. **Append task.completed event** (REQUIRED for ALL terminal statuses):
-   The task.completed event is now handled atomically within Step 4 (for done) and Step 5 (for blocked/failed/cancelled). Do not append it separately — use the combined command blocks in those steps.
+   Append to `/workspace/extra/shared/mission-control/activity.jsonl`:
+   ```bash
+   echo '{"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","actor":"worker","event":"task.completed","task_id":"<task_id>","detail":"done: <one-line summary>"}' >> /workspace/extra/shared/mission-control/activity.jsonl
+   ```
+   This is MANDATORY. Do not skip this even though mc task update also logs status_changed. Skipping is a directive violation.
 
 4. **On success (`done`): Spawn verifier** — do NOT release the lock. Transfer ownership and spawn verifier:
    ```bash
-   # Append task.completed event first (REQUIRED)
-   echo '{"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","actor":"worker","event":"task.completed","task_id":"<task_id>","detail":"done: <one-line summary>"}' >> /workspace/extra/shared/mission-control/activity.jsonl
-
    # Transfer lock to verifier
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock update \
      --owner "verifier:<worker_type>"
@@ -74,14 +75,12 @@ All Mission Control state changes go through the `mc` CLI. Never read or write `
 
 5. **On failure/blocked/cancelled: Release lock and trigger planner** (these bypass verification):
    ```bash
-   # Append task.completed event first (REQUIRED)
-   echo '{"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","actor":"worker","event":"task.completed","task_id":"<task_id>","detail":"<status>: <reason>"}' >> /workspace/extra/shared/mission-control/activity.jsonl
-
    node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock release
    cat > /workspace/ipc/tasks/spawn-$(date +%s)-$RANDOM.json << 'SPAWN_EOF'
    {"type":"spawn_agent","group_folder":"homie","prompt":"Heartbeat tick. Execute your orchestrator tick loop.","context_mode":"isolated"}
    SPAWN_EOF
    ```
+   The task.completed event from Step 3 already covers this terminal status.
 
 6. **Self-terminate.** Exit immediately after spawning verifier or triggering the planner.
 
