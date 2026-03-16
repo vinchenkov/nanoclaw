@@ -84,6 +84,8 @@ All Mission Control state changes go through the `mc` CLI. Never read or write `
 
 6. **Self-terminate.** Exit immediately after spawning verifier or triggering the planner.
 
+**Note:** Only spawn verifier on task completion. Do not spawn critic or any other agents.
+
 ---
 
 ## Initiative Context
