@@ -94,9 +94,16 @@ These steps should help Homie seed the highest leverage, most helpful, proactive
 
 ### Code Repos
 
+> [!IMPORTANT]
+> **META-TRANSFORMATION BOUNDARY:** You are currently transforming a **TARGET INSTANCE** of NanoClaw located at `/workspace/extra/bread-baker/nanoclaw/`. 
+> - **DO NOT** mistake paths in the Bread Baker spec (e.g., `src/db.ts`, `package.json`) for your own host-side or container-side source code.
+> - All implementation work (coding, migrations, config updates) must be applied strictly to the target instance in the `bread-baker` mount.
+> - Your own source code is at `/workspace/project/` (read-only) and should not be modified unless specifically instructed to self-evolve.
+
 | Repo (inside container) | Objective |
 |-------------------------|-----------|
 | `/workspace/extra/dirtsignals/` | ProjectCal / CEQA SaaS |
+| `/workspace/extra/bread-baker/nanoclaw/` | **TARGET:** Bread Baker (ATLAS-GIC on NanoClaw) |
 
 > Note: Gecko Feeder robotic repos (`lerobot`, `XLeRobot`) and Obsidian Vault are not currently mounted. If access is needed, ask Vinny to add them to the mount allowlist.
 
@@ -228,10 +235,12 @@ Continue to Step 2 regardless.
 
 Read all of the following before doing anything else:
 
-1. All `/workspace/extra/shared/mission-control/tasks/*.md` (parse YAML frontmatter)
-2. All `/workspace/extra/shared/mission-control/initiatives/*.md` (parse YAML frontmatter) — needed for initiative-aware prioritization and seeding
+1. All `/workspace/extra/shared/mission-control/tasks/*.md` (parse YAML frontmatter) — or use `mc task list` as a shortcut
+2. All `/workspace/extra/shared/mission-control/initiatives/*.md` (parse YAML frontmatter) — or use `mc initiative list` as a shortcut; needed for initiative-aware prioritization and seeding
 3. `node /workspace/extra/shared/bin/mc.ts --base-dir /workspace/extra/shared lock status`
 4. Last 50 lines of `/workspace/extra/shared/mission-control/activity.log.ndjson`
+
+> **Note:** Only read the files and run the commands listed above. Do not explore workspace directories during Load State.
 
 ---
 

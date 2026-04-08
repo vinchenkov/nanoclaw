@@ -282,16 +282,16 @@ export async function runContainerAgent(
   const mounts = buildVolumeMounts(group, input.isMain);
   const safeName = group.folder.replace(/[^a-zA-Z0-9-]/g, '-');
   const containerName = `nanoclaw-${safeName}-${Date.now()}`;
-  const criticEnv =
-    group.folder === 'critic'
-      ? {
-          GIT_AUTHOR_NAME: 'critic',
-          GIT_AUTHOR_EMAIL: 'critic@nanoclaw',
-          GIT_COMMITTER_NAME: 'critic',
-          GIT_COMMITTER_EMAIL: 'critic@nanoclaw',
-        }
-      : undefined;
-  const containerArgs = buildContainerArgs(mounts, containerName, criticEnv);
+  const containerEnv: Record<string, string> = {
+    NANOCLAW_AGENT_SDK: AGENT_SDK,
+  };
+  if (group.folder === 'critic') {
+    containerEnv.GIT_AUTHOR_NAME = 'critic';
+    containerEnv.GIT_AUTHOR_EMAIL = 'critic@nanoclaw';
+    containerEnv.GIT_COMMITTER_NAME = 'critic';
+    containerEnv.GIT_COMMITTER_EMAIL = 'critic@nanoclaw';
+  }
+  const containerArgs = buildContainerArgs(mounts, containerName, containerEnv);
 
   logger.debug(
     {

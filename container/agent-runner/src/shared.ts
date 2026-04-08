@@ -25,9 +25,17 @@ export interface ContainerOutput {
   error?: string;
 }
 
+export interface SessionMetadata {
+  sdk: 'claude' | 'codex';
+  group: string;
+  sessionId: string;
+  tracePath: string;
+}
+
 export const IPC_INPUT_DIR = '/workspace/ipc/input';
 export const IPC_INPUT_CLOSE_SENTINEL = path.join(IPC_INPUT_DIR, '_close');
 export const IPC_POLL_MS = 500;
+export const SESSION_METADATA_PATH = '/tmp/nanoclaw-session.json';
 
 export const OUTPUT_START_MARKER = '---NANOCLAW_OUTPUT_START---';
 export const OUTPUT_END_MARKER = '---NANOCLAW_OUTPUT_END---';
@@ -40,6 +48,29 @@ export function writeOutput(output: ContainerOutput): void {
 
 export function log(message: string): void {
   console.error(`[agent-runner] ${message}`);
+}
+
+export function clearSessionMetadata(): void {
+  try {
+    fs.unlinkSync(SESSION_METADATA_PATH);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function writeSessionMetadata(metadata: SessionMetadata): void {
+  try {
+    fs.mkdirSync(path.dirname(SESSION_METADATA_PATH), { recursive: true });
+    fs.writeFileSync(
+      SESSION_METADATA_PATH,
+      JSON.stringify(metadata, null, 2) + '\n',
+    );
+    log(`Wrote session metadata to ${SESSION_METADATA_PATH}`);
+  } catch (err) {
+    log(
+      `Failed to write session metadata: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 }
 
 export async function readStdin(): Promise<string> {

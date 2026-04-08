@@ -18,6 +18,9 @@ logs/
 # Temp files
 .tmp-*
 
+# Critic Metric files
+**/prompt-metrics.json
+
 # OS
 .DS_Store
 
