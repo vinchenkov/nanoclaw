@@ -1,0 +1,16 @@
+{
+  "agent": "atlas_l2_industrials",
+  "regime": "NEUTRAL",
+  "regime_conviction": 50,
+  "macro_score": 0.0,
+  "signals": {
+    "infrastructure_spending": "unknown",
+    "sector_relative_strength": "unknown",
+    "macro_environment": "initializing",
+    "interest_rate_sensitivity": "high"
+  },
+  "ticker_universe": ["CAT","DE","UNP","HON","GE","BA","LMT","RTX","MMM","UPS"],
+  "top_picks": [],
+  "rationale": "Initial state - agent created. Awaiting L1 signals and first data fetch.",
+  "last_updated": "2026-03-15T15:30:00Z"
+}

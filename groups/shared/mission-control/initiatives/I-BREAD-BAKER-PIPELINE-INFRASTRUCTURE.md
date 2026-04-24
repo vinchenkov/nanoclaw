@@ -1,0 +1,11 @@
+---
+id: I-BREAD-BAKER-PIPELINE-INFRASTRUCTURE
+title: "BREAD-BAKER-PIPELINE-INFRASTRUCTURE"
+status: complete
+objective: other
+goal: "Create pipeline infrastructure agents (market_fetcher, scorecard, autoresearch, autoresearch_evaluator, pipeline_watchdog)"
+timeframe: "2 days"
+tasks: ["I-035-CREATE-ATLAS-MARKET-FETCHER-AGENT-CLAUDE-MD","I-036-CREATE-ATLAS-SCORECARD-AGENT-CLAUDE-MD","I-037-CREATE-ATLAS-AUTORESEARCH-AGENT-CLAUDE-MD","I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","I-039-CREATE-ATLAS-PIPELINE-WATCHDOG-AGENT-CLAUDE-MD"]
+created_at: 2026-03-15T08:39:21.883Z
+updated_at: 2026-03-15T19:59:49.132Z
+---

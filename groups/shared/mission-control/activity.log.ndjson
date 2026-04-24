@@ -1,0 +1,515 @@
+{"ts":"2026-03-15T08:17:25.167Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-FULL-TRANSFORMATION","detail":"BREAD-BAKER-FULL-TRANSFORMATION"}
+{"ts":"2026-03-15T08:17:25.438Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-STATIC-ANALYSIS-AND-GAP-VERIFICATION","detail":"BREAD-BAKER-STATIC-ANALYSIS-AND-GAP-VERIFICATION"}
+{"ts":"2026-03-15T08:17:25.705Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-BREAD-BAKER-STATIC-ANALYSIS-AND-GAP-VERIFICATION","detail":"active → paused"}
+{"ts":"2026-03-15T08:17:25.969Z","actor":"mc","event":"task.created","task_id":"I-001-DECOMPOSE-BREAD-BAKER-IMPLEMENTATION-SPEC-INTO-INITIATIVES-AND-TASKS","detail":"Decompose Bread Baker Implementation Spec into Initiatives and Tasks"}
+{"ts":"2026-03-15T08:17:26.520Z","actor":"mc","event":"task.created","task_id":"I-002-EXHAUSTIVE-STATIC-ANALYSIS-AND-GAP-REPORTING","detail":"Exhaustive Static Analysis and Gap Reporting"}
+{"ts":"2026-03-15T08:27:18.841Z","actor":"mc","event":"task.status_changed","task_id":"I-001-DECOMPOSE-BREAD-BAKER-IMPLEMENTATION-SPEC-INTO-INITIATIVES-AND-TASKS","detail":"ready → in_progress"}
+{"ts":"2026-03-15T08:27:22.345Z","actor":"homie","event":"worker.spawned","task_id":"I-001-DECOMPOSE-BREAD-BAKER-IMPLEMENTATION-SPEC-INTO-INITIATIVES-AND-TASKS","detail":"Dispatched worker via IPC for task I-001 (Decompose Bread Baker Implementation Spec)"}
+{"ts":"2026-03-15T08:30:29.507Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-INFRASTRUCTURE","detail":"BREAD-BAKER-INFRASTRUCTURE"}
+{"ts":"2026-03-15T08:31:25.770Z","actor":"mc","event":"task.created","task_id":"I-003-EXTEND-SCHEDULER-WITH-DEPENDENCY-GATED-SCHEDULING","detail":"Extend scheduler with dependency-gated scheduling"}
+{"ts":"2026-03-15T08:31:34.305Z","actor":"mc","event":"task.created","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Create mount allowlist configuration"}
+{"ts":"2026-03-15T08:31:42.870Z","actor":"mc","event":"task.created","task_id":"I-005-CREATE-DATA-DIRECTORY-STRUCTURE-AND-INITIALIZE-STATE-FILES","detail":"Create data directory structure and initialize state files"}
+{"ts":"2026-03-15T08:31:49.038Z","actor":"mc","event":"task.created","task_id":"I-006-ADD-ENVIRONMENT-VARIABLES-AND-MAKE-SCHEDULER-POLL-INTERVAL-CONFIGURABLE","detail":"Add environment variables and make scheduler poll interval configurable"}
+{"ts":"2026-03-15T08:31:54.930Z","actor":"mc","event":"task.created","task_id":"I-007-UPDATE-DOCKERFILE-WITH-NUMPY-JQ-AND-GIT-CONFIGURATION","detail":"Update Dockerfile with numpy, jq, and git configuration"}
+{"ts":"2026-03-15T08:32:03.100Z","actor":"mc","event":"task.created","task_id":"I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT","detail":"Create deterministic scorecard math Python script"}
+{"ts":"2026-03-15T08:32:10.304Z","actor":"mc","event":"task.created","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Create API keys configuration file"}
+{"ts":"2026-03-15T08:32:47.775Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-L1-AGENTS","detail":"BREAD-BAKER-L1-AGENTS"}
+{"ts":"2026-03-15T08:33:34.850Z","actor":"mc","event":"task.created","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"Create atlas_l1_central_bank agent CLAUDE.md"}
+{"ts":"2026-03-15T08:33:52.940Z","actor":"mc","event":"task.created","task_id":"I-011-CREATE-ATLAS-L1-GEOPOLITICAL-AGENT-CLAUDE-MD","detail":"Create atlas_l1_geopolitical agent CLAUDE.md"}
+{"ts":"2026-03-15T08:33:59.550Z","actor":"mc","event":"task.created","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Create atlas_l1_china agent CLAUDE.md"}
+{"ts":"2026-03-15T08:34:06.140Z","actor":"mc","event":"task.created","task_id":"I-013-CREATE-ATLAS-L1-DOLLAR-AGENT-CLAUDE-MD","detail":"Create atlas_l1_dollar agent CLAUDE.md"}
+{"ts":"2026-03-15T08:34:12.950Z","actor":"mc","event":"task.created","task_id":"I-014-CREATE-ATLAS-L1-YIELD-CURVE-AGENT-CLAUDE-MD","detail":"Create atlas_l1_yield_curve agent CLAUDE.md"}
+{"ts":"2026-03-15T08:34:19.516Z","actor":"mc","event":"task.created","task_id":"I-015-CREATE-ATLAS-L1-COMMODITIES-AGENT-CLAUDE-MD","detail":"Create atlas_l1_commodities agent CLAUDE.md"}
+{"ts":"2026-03-15T08:34:26.369Z","actor":"mc","event":"task.created","task_id":"I-016-CREATE-ATLAS-L1-VOLATILITY-AGENT-CLAUDE-MD","detail":"Create atlas_l1_volatility agent CLAUDE.md"}
+{"ts":"2026-03-15T08:34:58.597Z","actor":"mc","event":"task.created","task_id":"I-017-CREATE-ATLAS-L1-EMERGING-MARKETS-AGENT-CLAUDE-MD","detail":"Create atlas_l1_emerging_markets agent CLAUDE.md"}
+{"ts":"2026-03-15T08:35:05.294Z","actor":"mc","event":"task.created","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Create atlas_l1_news_sentiment agent CLAUDE.md"}
+{"ts":"2026-03-15T08:35:12.820Z","actor":"mc","event":"task.created","task_id":"I-019-CREATE-ATLAS-L1-INSTITUTIONAL-FLOW-AGENT-CLAUDE-MD","detail":"Create atlas_l1_institutional_flow agent CLAUDE.md"}
+{"ts":"2026-03-15T08:35:25.505Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-L2-AGENTS","detail":"BREAD-BAKER-L2-AGENTS"}
+{"ts":"2026-03-15T08:35:34.929Z","actor":"mc","event":"task.created","task_id":"I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD","detail":"Create atlas_l2_semiconductor agent CLAUDE.md"}
+{"ts":"2026-03-15T08:35:42.525Z","actor":"mc","event":"task.created","task_id":"I-021-CREATE-ATLAS-L2-ENERGY-AGENT-CLAUDE-MD","detail":"Create atlas_l2_energy agent CLAUDE.md"}
+{"ts":"2026-03-15T08:36:14.348Z","actor":"mc","event":"task.created","task_id":"I-022-CREATE-ATLAS-L2-BIOTECH-AGENT-CLAUDE-MD","detail":"Create atlas_l2_biotech agent CLAUDE.md"}
+{"ts":"2026-03-15T08:36:22.660Z","actor":"mc","event":"task.created","task_id":"I-023-CREATE-ATLAS-L2-CONSUMER-AGENT-CLAUDE-MD","detail":"Create atlas_l2_consumer agent CLAUDE.md"}
+{"ts":"2026-03-15T08:36:31.466Z","actor":"mc","event":"task.created","task_id":"I-024-CREATE-ATLAS-L2-FINANCIALS-AGENT-CLAUDE-MD","detail":"Create atlas_l2_financials agent CLAUDE.md"}
+{"ts":"2026-03-15T08:36:39.759Z","actor":"mc","event":"task.created","task_id":"I-025-CREATE-ATLAS-L2-INDUSTRIALS-AGENT-CLAUDE-MD","detail":"Create atlas_l2_industrials agent CLAUDE.md"}
+{"ts":"2026-03-15T08:36:48.958Z","actor":"mc","event":"task.created","task_id":"I-026-CREATE-ATLAS-L2-RELATIONSHIP-MAPPER-AGENT-CLAUDE-MD","detail":"Create atlas_l2_relationship_mapper agent CLAUDE.md"}
+{"ts":"2026-03-15T08:37:23.122Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-L3-AGENTS","detail":"BREAD-BAKER-L3-AGENTS"}
+{"ts":"2026-03-15T08:37:32.546Z","actor":"mc","event":"task.created","task_id":"I-027-CREATE-ATLAS-L3-DRUCKENMILLER-AGENT-CLAUDE-MD","detail":"Create atlas_l3_druckenmiller agent CLAUDE.md"}
+{"ts":"2026-03-15T08:37:41.195Z","actor":"mc","event":"task.created","task_id":"I-028-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-CLAUDE-MD","detail":"Create atlas_l3_aschenbrenner agent CLAUDE.md"}
+{"ts":"2026-03-15T08:37:49.817Z","actor":"mc","event":"task.created","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Create atlas_l3_baker agent CLAUDE.md"}
+{"ts":"2026-03-15T08:37:58.167Z","actor":"mc","event":"task.created","task_id":"I-030-CREATE-ATLAS-L3-ACKMAN-AGENT-CLAUDE-MD","detail":"Create atlas_l3_ackman agent CLAUDE.md"}
+{"ts":"2026-03-15T08:38:10.720Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-L4-AGENTS","detail":"BREAD-BAKER-L4-AGENTS"}
+{"ts":"2026-03-15T08:38:39.430Z","actor":"mc","event":"task.created","task_id":"I-031-CREATE-ATLAS-L4-CRO-CHIEF-RISK-OFFICER-AGENT-CLAUDE-MD","detail":"Create atlas_l4_cro (Chief Risk Officer) agent CLAUDE.md"}
+{"ts":"2026-03-15T08:38:47.379Z","actor":"mc","event":"task.created","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"Create atlas_l4_alpha_discovery agent CLAUDE.md"}
+{"ts":"2026-03-15T08:38:58.674Z","actor":"mc","event":"task.created","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"Create atlas_l4_cio (Chief Investment Officer) agent CLAUDE.md"}
+{"ts":"2026-03-15T08:39:08.288Z","actor":"mc","event":"task.created","task_id":"I-034-CREATE-ATLAS-L4-AUTONOMOUS-EXECUTION-AGENT-CLAUDE-MD","detail":"Create atlas_l4_autonomous_execution agent CLAUDE.md"}
+{"ts":"2026-03-15T08:39:21.883Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-PIPELINE-INFRASTRUCTURE","detail":"BREAD-BAKER-PIPELINE-INFRASTRUCTURE"}
+{"ts":"2026-03-15T08:39:51.099Z","actor":"mc","event":"task.created","task_id":"I-035-CREATE-ATLAS-MARKET-FETCHER-AGENT-CLAUDE-MD","detail":"Create atlas_market_fetcher agent CLAUDE.md"}
+{"ts":"2026-03-15T08:40:03.483Z","actor":"mc","event":"task.created","task_id":"I-036-CREATE-ATLAS-SCORECARD-AGENT-CLAUDE-MD","detail":"Create atlas_scorecard agent CLAUDE.md"}
+{"ts":"2026-03-15T08:40:15.838Z","actor":"mc","event":"task.created","task_id":"I-037-CREATE-ATLAS-AUTORESEARCH-AGENT-CLAUDE-MD","detail":"Create atlas_autoresearch agent CLAUDE.md"}
+{"ts":"2026-03-15T08:40:27.714Z","actor":"mc","event":"task.created","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"Create atlas_autoresearch_evaluator agent CLAUDE.md"}
+{"ts":"2026-03-15T08:40:35.994Z","actor":"mc","event":"task.created","task_id":"I-039-CREATE-ATLAS-PIPELINE-WATCHDOG-AGENT-CLAUDE-MD","detail":"Create atlas_pipeline_watchdog agent CLAUDE.md"}
+{"ts":"2026-03-15T08:41:06.136Z","actor":"mc","event":"initiative.created","initiative_id":"I-BREAD-BAKER-BOOTSTRAP","detail":"BREAD-BAKER-BOOTSTRAP"}
+{"ts":"2026-03-15T08:41:14.782Z","actor":"mc","event":"task.created","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"Create #atlas-output Discord channel and get channel ID"}
+{"ts":"2026-03-15T08:41:25.446Z","actor":"mc","event":"task.created","task_id":"I-041-CREATE-REGISTER-ATLAS-GROUPS-TS-BOOTSTRAP-SCRIPT","detail":"Create register-atlas-groups.ts bootstrap script"}
+{"ts":"2026-03-15T08:43:16.371Z","actor":"mc","event":"task.status_changed","task_id":"I-001-DECOMPOSE-BREAD-BAKER-IMPLEMENTATION-SPEC-INTO-INITIATIVES-AND-TASKS","detail":"in_progress → done"}
+{"ts":"2026-03-15T08:43:16.381Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-BREAD-BAKER-FULL-TRANSFORMATION","detail":"active → complete"}
+{"ts":"2026-03-15T08:43:16.382Z","actor":"mc","event":"initiative.completed","initiative_id":"I-BREAD-BAKER-FULL-TRANSFORMATION","detail":"All tasks terminal for I-BREAD-BAKER-FULL-TRANSFORMATION"}
+{"ts":"2026-03-15T08:44:03.573Z","actor":"mc","event":"task.status_changed","task_id":"I-001-DECOMPOSE-BREAD-BAKER-IMPLEMENTATION-SPEC-INTO-INITIATIVES-AND-TASKS","detail":"done → verified"}
+{"ts":"2026-03-15T08:43:16.371Z","actor":"verifier","event":"task.verified","task_id":"I-001-DECOMPOSE-BREAD-BAKER-IMPLEMENTATION-SPEC-INTO-INITIATIVES-AND-TASKS","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T08:44:38.547Z","actor":"mc","event":"task.status_changed","task_id":"I-003-EXTEND-SCHEDULER-WITH-DEPENDENCY-GATED-SCHEDULING","detail":"ready → in_progress"}
+{"ts":"2026-03-15T08:44:40.700Z","actor":"homie","event":"worker.spawned","task_id":"I-003-EXTEND-SCHEDULER-WITH-DEPENDENCY-GATED-SCHEDULING","detail":"Dispatched worker via IPC for task I-003-EXTEND-SCHEDULER-WITH-DEPENDENCY-GATED-SCHEDULING"}
+{"ts":"2026-03-15T08:49:11.811Z","actor":"mc","event":"task.status_changed","task_id":"I-003-EXTEND-SCHEDULER-WITH-DEPENDENCY-GATED-SCHEDULING","detail":"in_progress → done"}
+{"ts":"2026-03-15T08:51:14.185Z","actor":"mc","event":"task.status_changed","task_id":"I-003-EXTEND-SCHEDULER-WITH-DEPENDENCY-GATED-SCHEDULING","detail":"done → verified"}
+{"ts":"2026-03-15T08:51:26.819Z","actor":"verifier","event":"task.verified","task_id":"I-003-EXTEND-SCHEDULER-WITH-DEPENDENCY-GATED-SCHEDULING","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T08:52:06.656Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"ready → in_progress"}
+{"ts":"2026-03-15T08:52:09.800Z","actor":"homie","event":"worker.spawned","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Dispatched worker via IPC for task I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION"}
+{"ts":"2026-03-15T08:54:16.535Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → done"}
+{"ts":"2026-03-15T08:55:36.805Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"done → in_progress"}
+{"ts":"2026-03-15T08:55:47Z","actor":"verifier","event":"task.revision_requested","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Revision 1/3: File not created at expected location"}
+{"ts":"2026-03-15T08:57:49.031Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → done"}
+{"ts":"2026-03-15T08:59:01.381Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"done → in_progress"}
+{"ts":"2026-03-15T08:59:11.991Z","actor":"verifier","event":"task.revision_requested","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Revision 2/3: mount-allowlist.json file does not exist"}
+{"ts":"2026-03-15T09:00:40.154Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → done"}
+{"ts":"2026-03-15T09:02:59.770Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"done → in_progress"}
+{"ts":"2026-03-15T09:01:00.000Z","actor":"verifier","event":"task.revision_requested","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Revision 3/3: File not created at ~/.config/bread-baker/"}
+{"ts":"2026-03-15T09:04:24.875Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → done"}
+{"ts":"2026-03-15T09:10:00Z","actor":"verifier","event":"task.verification_failed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Blocked after 3 revision attempts: config file not created"}
+{"ts":"2026-03-15T09:07:15.871Z","actor":"mc","event":"task.status_changed","task_id":"I-005-CREATE-DATA-DIRECTORY-STRUCTURE-AND-INITIALIZE-STATE-FILES","detail":"ready → in_progress"}
+{"ts":"2026-03-15T09:07:19.200Z","actor":"homie","event":"worker.spawned","task_id":"I-005-CREATE-DATA-DIRECTORY-STRUCTURE-AND-INITIALIZE-STATE-FILES","detail":"Dispatched worker via IPC for task I-005 (Create data directory structure and initialize state files)"}
+{"ts":"2026-03-15T09:09:52.207Z","actor":"mc","event":"task.status_changed","task_id":"I-005-CREATE-DATA-DIRECTORY-STRUCTURE-AND-INITIALIZE-STATE-FILES","detail":"in_progress → done"}
+{"ts":"2026-03-15T09:12:06.433Z","actor":"mc","event":"task.status_changed","task_id":"I-005-CREATE-DATA-DIRECTORY-STRUCTURE-AND-INITIALIZE-STATE-FILES","detail":"done → verified"}
+{"ts":"2026-03-15T09:10:00Z","actor":"verifier","event":"task.verified","task_id":"I-005-CREATE-DATA-DIRECTORY-STRUCTURE-AND-INITIALIZE-STATE-FILES","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T09:12:28.686Z","actor":"homie","event":"verifier.spawned","task_id":"I-005-CREATE-DATA-DIRECTORY-STRUCTURE-AND-INITIALIZE-STATE-FILES","detail":"Dispatched verifier for task I-005"}
+{"ts":"2026-03-15T09:16:52.047Z","actor":"mc","event":"task.status_changed","task_id":"I-006-ADD-ENVIRONMENT-VARIABLES-AND-MAKE-SCHEDULER-POLL-INTERVAL-CONFIGURABLE","detail":"ready → in_progress"}
+{"ts":"2026-03-15T09:17:06Z","actor":"homie","event":"worker.spawned","task_id":"I-006-ADD-ENVIRONMENT-VARIABLES-AND-MAKE-SCHEDULER-POLL-INTERVAL-CONFIGURABLE","detail":"Dispatched worker via IPC for task I-006-ADD-ENVIRONMENT-VARIABLES-AND-MAKE-SCHEDULER-POLL-INTERVAL-CONFIGURABLE"}
+{"ts":"2026-03-15T09:21:16.559Z","actor":"mc","event":"task.status_changed","task_id":"I-006-ADD-ENVIRONMENT-VARIABLES-AND-MAKE-SCHEDULER-POLL-INTERVAL-CONFIGURABLE","detail":"in_progress → done"}
+{"ts":"2026-03-15T09:23:29.962Z","actor":"mc","event":"task.status_changed","task_id":"I-006-ADD-ENVIRONMENT-VARIABLES-AND-MAKE-SCHEDULER-POLL-INTERVAL-CONFIGURABLE","detail":"done → verified"}
+{"ts":"2026-03-15T09:23:46.370Z","actor":"verifier","event":"task.verified","task_id":"I-006-ADD-ENVIRONMENT-VARIABLES-AND-MAKE-SCHEDULER-POLL-INTERVAL-CONFIGURABLE","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T09:24:43.401Z","actor":"mc","event":"task.status_changed","task_id":"I-007-UPDATE-DOCKERFILE-WITH-NUMPY-JQ-AND-GIT-CONFIGURATION","detail":"ready → in_progress"}
+{"ts":"2026-03-15T09:24:59.UTC","actor":"homie","event":"worker.spawned","task_id":"I-007-UPDATE-DOCKERFILE-WITH-NUMPY-JQ-AND-GIT-CONFIGURATION","detail":"Dispatched worker via IPC for task I-007 (Update Dockerfile with numpy, jq, git)"}
+{"ts":"2026-03-15T09:27:43.429Z","actor":"mc","event":"task.status_changed","task_id":"I-007-UPDATE-DOCKERFILE-WITH-NUMPY-JQ-AND-GIT-CONFIGURATION","detail":"in_progress → done"}
+{"ts":"2026-03-15T09:30:00.000Z","actor":"worker","event":"task.completed","task_id":"I-007-UPDATE-DOCKERFILE-WITH-NUMPY-JQ-AND-GIT-CONFIGURATION","detail":"Done: Added numpy, jq, git config to Dockerfile (Docker rebuild unavailable in this env)"}
+{"ts":"2026-03-15T09:28:46.073Z","actor":"mc","event":"task.status_changed","task_id":"I-007-UPDATE-DOCKERFILE-WITH-NUMPY-JQ-AND-GIT-CONFIGURATION","detail":"done → verified"}
+{"ts":"2026-03-15T09:29:03Z","actor":"verifier","event":"task.verified","task_id":"I-007-UPDATE-DOCKERFILE-WITH-NUMPY-JQ-AND-GIT-CONFIGURATION","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T09:29:55.460Z","actor":"mc","event":"task.status_changed","task_id":"I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT","detail":"ready → in_progress"}
+{"ts":"2026-03-15T09:29:58.300Z","actor":"homie","event":"worker.spawned","task_id":"I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT","detail":"Dispatched worker via IPC for task I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT (Create deterministic scorecard math Python script)"}
+{"ts":"2026-03-15T09:33:06.857Z","actor":"mc","event":"task.status_changed","task_id":"I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT","detail":"in_progress → done"}
+{"ts":"2026-03-15T09:33:29Z","actor":"worker","event":"task.completed","task_id":"I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT","detail":"done: Created deterministic scorecard math Python script with Sharpe calculation and Darwinian weight updates"}
+{"ts":"2026-03-15T09:33:50Z","actor":"worker","event":"verifier.spawned","task_id":"I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT","detail":"Spawned verifier for task I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT"}
+{"ts":"2026-03-15T09:34:48.023Z","actor":"mc","event":"task.status_changed","task_id":"I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT","detail":"done → verified"}
+{"ts":"2026-03-15T09:35:00.000Z","actor":"verifier","event":"task.verified","task_id":"I-008-CREATE-DETERMINISTIC-SCORECARD-MATH-PYTHON-SCRIPT","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T09:41:42.770Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"ready → in_progress"}
+{"ts":"2026-03-15T09:41:46.875Z","actor":"homie","event":"worker.spawned","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Dispatched worker via IPC for task I-009 (Create API keys configuration file)"}
+{"ts":"2026-03-15T09:47:50.403Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"in_progress → done"}
+{"ts":"2026-03-15T09:47:50.412Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-BREAD-BAKER-INFRASTRUCTURE","detail":"active → complete"}
+{"ts":"2026-03-15T09:47:50.412Z","actor":"mc","event":"initiative.completed","initiative_id":"I-BREAD-BAKER-INFRASTRUCTURE","detail":"All tasks terminal for I-BREAD-BAKER-INFRASTRUCTURE"}
+{"ts":"2026-03-15T09:48:42Z","actor":"worker","event":"task.completed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"done - Created api-keys.json with FMP, Alpaca, Finnhub, FRED keys and mount-allowlist.json"}
+{"ts":"2026-03-15T09:49:41.954Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"done → in_progress"}
+{"ts":"2026-03-15T09:48:00Z","actor":"verifier","event":"task.revision_requested","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Revision 1/3: Output was documentation only, no actual file creation or mount configuration"}
+{"ts":"2026-03-15T09:56:14.620Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"in_progress → done"}
+{"ts":"2026-03-15T09:58:13.690Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"done → in_progress"}
+{"ts":"2026-03-15T10:00:00.000Z","actor":"verifier","event":"task.revision_requested","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Revision 2/3: Files not created - claimed work does not exist"}
+{"ts":"2026-03-15T10:03:15.274Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"in_progress → done"}
+{"ts":"2026-03-15T10:04:55.577Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"done → in_progress"}
+{"ts":"2026-03-15T10:15:00.000Z","actor":"verifier","event":"task.revision_requested","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Revision 3/3: Files not created on filesystem - CLAUDE.md updated but api-keys.json still missing"}
+{"ts":"2026-03-15T10:07:13.078Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"in_progress → done"}
+{"ts":"2026-03-15T10:15:00.000Z","actor":"verifier","event":"task.verification_failed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Blocked after 3 revision attempts: Files not created on filesystem - /home/node/.config/bread-baker/ directory does not exist"}
+{"ts":"2026-03-15T10:09:53.000Z","actor":"homie","event":"verifier.spawned","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Dispatched verifier for task I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION"}
+{"ts":"2026-03-15T10:35:00.000Z","actor":"homie","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Stale lock released. Task reset to ready for retry (retry_count: 1)."}
+{"ts":"2026-03-15T10:35:00.000Z","actor":"homie","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Task reset to ready for retry (retry_count: 1)."}
+{"ts":"2026-03-15T10:38:26.051Z","actor":"mc","event":"task.status_changed","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T10:38:30.000Z","actor":"homie","event":"worker.spawned","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-010 (Create atlas_l1_central_bank agent CLAUDE.md)"}
+{"ts":"2026-03-15T10:43:34.591Z","actor":"mc","event":"task.status_changed","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T10:43:56Z","actor":"worker","event":"task.completed","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"done: Created atlas_l1_central_bank CLAUDE.md with central bank policy analysis, regime classification, holiday flag check, and atomic writes"}
+{"ts":"2026-03-15T10:44:09Z","actor":"worker","event":"verifier.spawned","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"Spawned verifier for task I-010"}
+{"ts":"2026-03-15T10:45:20.241Z","actor":"mc","event":"task.status_changed","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"done → in_progress"}
+{"ts":"2026-03-15T10:45:00Z","actor":"verifier","event":"task.revision_requested","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"Revision 1/3: Output JSON schema does not match canonical L1 schema - missing date, proxy_etf, proxy_direction, key_signals, analysis_summary"}
+{"ts":"2026-03-15T10:46:17.867Z","actor":"mc","event":"task.status_changed","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T10:46:58.482Z","actor":"mc","event":"task.status_changed","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T10:47:08Z","actor":"verifier","event":"task.verified","task_id":"I-010-CREATE-ATLAS-L1-CENTRAL-BANK-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T10:48:06.963Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"ready → in_progress"}
+{"ts":"2026-03-15T10:48:13.618Z","actor":"homie","event":"worker.spawned","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Dispatched worker via IPC for task I-004 (Create mount allowlist configuration)"}
+{"ts":"2026-03-15T10:49:20.026Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → done"}
+{"ts":"2026-03-15T10:51:54.462Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"done → in_progress"}
+{"ts":"2026-03-15T10:51:58.903Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T10:52:10Z","actor":"verifier","event":"task.verification_failed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Blocked after max revisions: mount-allowlist.json file never created"}
+{"ts":"2026-03-15T10:53:55.522Z","actor":"mc","event":"task.status_changed","task_id":"I-011-CREATE-ATLAS-L1-GEOPOLITICAL-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T10:54:02.000Z","actor":"homie","event":"worker.spawned","task_id":"I-011-CREATE-ATLAS-L1-GEOPOLITICAL-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-011 (Create atlas_l1_geopolitical agent CLAUDE.md)"}
+{"ts":"2026-03-15T10:56:00.416Z","actor":"mc","event":"task.status_changed","task_id":"I-011-CREATE-ATLAS-L1-GEOPOLITICAL-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T10:57:19.552Z","actor":"mc","event":"task.status_changed","task_id":"I-011-CREATE-ATLAS-L1-GEOPOLITICAL-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T10:58:33.093Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"ready → in_progress"}
+{"ts":"2026-03-15T10:58:35.000Z","actor":"homie","event":"worker.spawned","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Dispatched worker via IPC for task I-009-CREATE-API-KEYS-CONFIGURATION-FILE (Create API keys configuration file)"}
+{"ts":"2026-03-15T11:01:53.793Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T11:03:16.248Z","actor":"mc","event":"task.status_changed","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T11:03:25.000Z","actor":"homie","event":"worker.spawned","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-012 (Create atlas_l1_china agent CLAUDE.md)"}
+{"ts":"2026-03-15T11:25:20Z","actor":"homie","event":"heartbeat.ok","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Worker running normally, 21 min elapsed"}
+{"ts":"2026-03-15T11:40:20.633Z","actor":"homie","event":"heartbeat.ok","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Worker running normally, 63076621 min elapsed"}
+{"ts":"2026-03-15T11:45:00Z","actor":"homie","event":"heartbeat.ok","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Worker running normally, ) min elapsed"}
+{"ts":"2026-03-15T11:45:06Z","actor":"homie","event":"heartbeat.ok","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Worker running normally, within timeout"}
+{"ts":"2026-03-15T12:05:17Z","actor":"homie","event":"worker.wrap_up_sent","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Grace period entered - 62 min elapsed, timeout 60 min"}
+{"ts":"2026-03-15T12:20:16.139Z","actor":"mc","event":"task.status_changed","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"in_progress → failed"}
+{"ts":"2026-03-15T12:20:23.810Z","actor":"homie","event":"worker.killed","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Container killed by runtime after 76 min. Task marked failed."}
+{"ts":"2026-03-15T12:20:27.215Z","actor":"mc","event":"task.status_changed","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"failed → ready"}
+{"ts":"2026-03-15T12:20:34.795Z","actor":"homie","event":"task.status_changed","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"failed → ready (retry 1/2)"}
+{"ts":"2026-03-15T12:21:00.414Z","actor":"mc","event":"task.status_changed","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T12:21:22.182Z","actor":"homie","event":"worker.spawned","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-012 (retry attempt 2/2)"}
+{"ts":"2026-03-15T12:25:23Z","actor":"homie","event":"heartbeat.ok","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Worker running normally, 3 min elapsed"}
+{"ts":"2026-03-15T12:26:00.646Z","actor":"mc","event":"task.status_changed","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T12:28:01.096Z","actor":"mc","event":"task.status_changed","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T12:28:13Z","actor":"verifier","event":"task.verified","task_id":"I-012-CREATE-ATLAS-L1-CHINA-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T12:28:44.436Z","actor":"mc","event":"task.status_changed","task_id":"I-013-CREATE-ATLAS-L1-DOLLAR-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T12:29:30.535Z","actor":"homie","event":"worker.spawned","task_id":"I-013-CREATE-ATLAS-L1-DOLLAR-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-013 (Create atlas_l1_dollar agent CLAUDE.md)"}
+{"ts":"2026-03-15T12:35:15.550Z","actor":"mc","event":"task.status_changed","task_id":"I-013-CREATE-ATLAS-L1-DOLLAR-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T12:34:48Z","actor":"homie","event":"heartbeat","detail":"Worker running normally, task I-013-CREATE-ATLAS-L1-DOLLAR-AGENT-CLAUDE-MD in progress (6m elapsed)"}
+{"ts":"2026-03-15T12:36:51.852Z","actor":"mc","event":"task.status_changed","task_id":"I-013-CREATE-ATLAS-L1-DOLLAR-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T12:35:15.550Z","actor":"verifier","event":"task.verified","task_id":"I-013-CREATE-ATLAS-L1-DOLLAR-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T12:39:07.765Z","actor":"mc","event":"task.status_changed","task_id":"I-014-CREATE-ATLAS-L1-YIELD-CURVE-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T12:39:13.000Z","actor":"homie","event":"worker.spawned","task_id":"I-014-CREATE-ATLAS-L1-YIELD-CURVE-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-014 (Create atlas_l1_yield_curve agent CLAUDE.md)"}
+{"ts":"2026-03-15T12:45:40.025Z","actor":"mc","event":"task.status_changed","task_id":"I-014-CREATE-ATLAS-L1-YIELD-CURVE-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T12:50:00Z","actor":"worker","event":"task.completed","task_id":"I-014-CREATE-ATLAS-L1-YIELD-CURVE-AGENT-CLAUDE-MD","detail":"done - Created CLAUDE.md and initial state for atlas_l1_yield_curve agent"}
+{"ts":"2026-03-15T12:46:45.822Z","actor":"mc","event":"task.status_changed","task_id":"I-014-CREATE-ATLAS-L1-YIELD-CURVE-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T12:46:55Z","actor":"verifier","event":"task.verified","task_id":"I-014-CREATE-ATLAS-L1-YIELD-CURVE-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T12:47:37.585Z","actor":"mc","event":"task.status_changed","task_id":"I-015-CREATE-ATLAS-L1-COMMODITIES-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T12:47:56Z","actor":"homie","event":"worker.spawned","task_id":"I-015-CREATE-ATLAS-L1-COMMODITIES-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-015 (Create atlas_l1_commodities agent CLAUDE.md)"}
+{"ts":"2026-03-15T12:51:13Z","actor":"homie","event":"heartbeat.ok","task_id":"I-015-CREATE-ATLAS-L1-COMMODITIES-AGENT-CLAUDE-MD","detail":"Worker running normally, 2 min elapsed"}
+{"ts":"2026-03-15T12:51:50.358Z","actor":"mc","event":"task.status_changed","task_id":"I-015-CREATE-ATLAS-L1-COMMODITIES-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T12:52:01Z","actor":"worker","event":"task.completed","task_id":"I-015-CREATE-ATLAS-L1-COMMODITIES-AGENT-CLAUDE-MD","detail":"done - Created atlas_l1_commodities agent CLAUDE.md and initial state"}
+{"ts":"2026-03-15T12:53:30.315Z","actor":"mc","event":"task.status_changed","task_id":"I-015-CREATE-ATLAS-L1-COMMODITIES-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T12:52:00Z","actor":"verifier","event":"task.verified","task_id":"I-015-CREATE-ATLAS-L1-COMMODITIES-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T12:54:15.458Z","actor":"mc","event":"task.status_changed","task_id":"I-016-CREATE-ATLAS-L1-VOLATILITY-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T12:54:25Z","actor":"homie","event":"worker.spawned","task_id":"I-016-CREATE-ATLAS-L1-VOLATILITY-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-016 (Create atlas_l1_volatility agent CLAUDE.md)"}
+{"ts":"2026-03-15T12:57:37.900Z","actor":"mc","event":"task.status_changed","task_id":"I-016-CREATE-ATLAS-L1-VOLATILITY-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T12:58:29.528Z","actor":"mc","event":"task.status_changed","task_id":"I-016-CREATE-ATLAS-L1-VOLATILITY-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T12:58:34Z","actor":"verifier","event":"task.verified","task_id":"I-016-CREATE-ATLAS-L1-VOLATILITY-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T12:59:11.168Z","actor":"mc","event":"task.status_changed","task_id":"I-017-CREATE-ATLAS-L1-EMERGING-MARKETS-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T12:59:14.112Z","actor":"homie","event":"worker.spawned","task_id":"I-017-CREATE-ATLAS-L1-EMERGING-MARKETS-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-017 (Create atlas_l1_emerging_markets agent CLAUDE.md)"}
+{"ts":"2026-03-15T13:03:51.610Z","actor":"mc","event":"task.status_changed","task_id":"I-017-CREATE-ATLAS-L1-EMERGING-MARKETS-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T13:04:03Z","actor":"worker","event":"task.completed","task_id":"I-017-CREATE-ATLAS-L1-EMERGING-MARKETS-AGENT-CLAUDE-MD","detail":"done - Created atlas_l1_emerging_markets CLAUDE.md and output JSON"}
+{"ts":"2026-03-15T13:06:29.988Z","actor":"mc","event":"task.status_changed","task_id":"I-017-CREATE-ATLAS-L1-EMERGING-MARKETS-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T13:06:39Z","actor":"verifier","event":"task.verified","task_id":"I-017-CREATE-ATLAS-L1-EMERGING-MARKETS-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T13:07:40.410Z","actor":"mc","event":"task.status_changed","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T13:07:50Z","actor":"homie","event":"worker.spawned","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-018 (Create atlas_l1_news_sentiment agent CLAUDE.md)"}
+{"ts":"2026-03-15T13:24:59.491Z","actor":"homie","event":"heartbeat.ok","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Worker running normally, 16 min elapsed"}
+{"ts":"2026-03-15T13:29:53.760Z","actor":"homie","event":"heartbeat.ok","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Worker running normally, 22 min elapsed"}
+{"ts":"2026-03-15T13:35:21.257Z","actor":"homie","event":"heartbeat.ok","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Worker running normally, 27 min elapsed"}
+{"ts":"2026-03-15T14:00:19Z","actor":"homie","event":"heartbeat.ok","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Worker running normally, 53 min elapsed"}
+{"ts":"2026-03-15T14:09:54Z","actor":"homie","event":"worker.wrap_up_sent","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Worker exceeded timeout, grace period started"}
+{"ts":"2026-03-15T14:15:31Z","actor":"homie","event":"heartbeat.ok","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Grace period in progress, 68 min elapsed"}
+{"ts":"2026-03-15T14:25:36.195Z","actor":"mc","event":"task.status_changed","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"in_progress → failed"}
+{"ts":"2026-03-15T14:25:40.083Z","actor":"mc","event":"task.status_changed","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"failed → ready"}
+{"ts":"2026-03-15T14:24:00Z","actor":"homie","event":"worker.killed","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Container killed by runtime after 76 minutes (exceeded 75min timeout). Task marked for retry."}
+{"ts":"2026-03-15T14:27:02.899Z","actor":"mc","event":"task.status_changed","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T14:27:06Z","actor":"homie","event":"worker.spawned","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Dispatched retry worker via IPC for task I-018 (Create atlas_l1_news_sentiment agent CLAUDE.md)"}
+{"ts":"2026-03-15T14:28:49.739Z","actor":"mc","event":"task.status_changed","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T14:29:47.605Z","actor":"mc","event":"task.status_changed","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T14:30:00Z","actor":"worker","event":"task.completed","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"done - Created CLAUDE.md and output for atlas_l1_news_sentiment"}
+{"ts":"2026-03-15T14:29:53Z","actor":"verifier","event":"task.verified","task_id":"I-018-CREATE-ATLAS-L1-NEWS-SENTIMENT-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T14:30:35.335Z","actor":"mc","event":"task.status_changed","task_id":"I-019-CREATE-ATLAS-L1-INSTITUTIONAL-FLOW-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T16:40:45Z","actor":"homie","event":"worker.spawned","task_id":"I-019-CREATE-ATLAS-L1-INSTITUTIONAL-FLOW-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-019 (Create atlas_l1_institutional_flow agent CLAUDE.md)"}
+{"ts":"2026-03-15T14:34:52.373Z","actor":"mc","event":"task.status_changed","task_id":"I-019-CREATE-ATLAS-L1-INSTITUTIONAL-FLOW-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T14:34:52.384Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-BREAD-BAKER-L1-AGENTS","detail":"active → complete"}
+{"ts":"2026-03-15T14:34:52.385Z","actor":"mc","event":"initiative.completed","initiative_id":"I-BREAD-BAKER-L1-AGENTS","detail":"All tasks terminal for I-BREAD-BAKER-L1-AGENTS"}
+{"ts":"2026-03-15T14:35:28Z","actor":"homie","event":"heartbeat.ok","task_id":"I-019-CREATE-ATLAS-L1-INSTITUTIONAL-FLOW-AGENT-CLAUDE-MD","detail":"Worker running normally, 5 min elapsed"}
+{"ts":"2026-03-15T14:36:05.753Z","actor":"mc","event":"task.status_changed","task_id":"I-019-CREATE-ATLAS-L1-INSTITUTIONAL-FLOW-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T14:36:12Z","actor":"verifier","event":"task.verified","task_id":"I-019-CREATE-ATLAS-L1-INSTITUTIONAL-FLOW-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T14:37:48.687Z","actor":"mc","event":"task.status_changed","task_id":"I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T14:37:51.815Z","actor":"homie","event":"worker.spawned","task_id":"I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-020 (Create atlas_l2_semiconductor agent CLAUDE.md)"}
+{"ts":"2026-03-15T14:39:00Z","actor":"homie","event":"heartbeat.tick","detail":"Worker running normally on I-020, elapsed ~1min"}
+{"ts":"2026-03-15T14:42:37.023Z","actor":"mc","event":"task.status_changed","task_id":"I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T14:42:57Z","actor":"worker","event":"task.completed","task_id":"I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD","detail":"done - Created atlas_l2_semiconductor agent CLAUDE.md with L2 aggregation formula"}
+{"ts":"2026-03-15T14:43:02Z","actor":"worker","event":"verifier.spawned","task_id":"I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD","detail":"Spawned verifier for task I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD"}
+{"ts":"2026-03-15T14:43:34.422Z","actor":"mc","event":"task.status_changed","task_id":"I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T15:00:00Z","actor":"verifier","event":"task.verified","task_id":"I-020-CREATE-ATLAS-L2-SEMICONDUCTOR-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T14:47:30.196Z","actor":"mc","event":"task.status_changed","task_id":"I-021-CREATE-ATLAS-L2-ENERGY-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T14:47:50Z","actor":"homie","event":"worker.spawned","task_id":"I-021-CREATE-ATLAS-L2-ENERGY-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-021 (Create atlas_l2_energy agent CLAUDE.md)"}
+{"ts":"2026-03-15T14:52:06.454Z","actor":"mc","event":"task.status_changed","task_id":"I-021-CREATE-ATLAS-L2-ENERGY-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T14:53:50.913Z","actor":"mc","event":"task.status_changed","task_id":"I-021-CREATE-ATLAS-L2-ENERGY-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T14:54:47.508Z","actor":"mc","event":"task.status_changed","task_id":"I-022-CREATE-ATLAS-L2-BIOTECH-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T14:54:53Z","actor":"homie","event":"worker.spawned","task_id":"I-022-CREATE-ATLAS-L2-BIOTECH-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-022 (Create atlas_l2_biotech agent CLAUDE.md)"}
+{"ts":"2026-03-15T14:56:10.831Z","actor":"homie","event":"heartbeat.ok","task_id":"I-022-CREATE-ATLAS-L2-BIOTECH-AGENT-CLAUDE-MD","detail":"Worker running normally, ~1 min elapsed"}
+{"ts":"2026-03-15T14:57:22.996Z","actor":"mc","event":"task.status_changed","task_id":"I-022-CREATE-ATLAS-L2-BIOTECH-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T14:58:39.044Z","actor":"mc","event":"task.status_changed","task_id":"I-022-CREATE-ATLAS-L2-BIOTECH-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T14:58:52Z","actor":"verifier","event":"task.verified","task_id":"I-022-CREATE-ATLAS-L2-BIOTECH-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T15:00:00.232Z","actor":"mc","event":"task.status_changed","task_id":"I-023-CREATE-ATLAS-L2-CONSUMER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T15:01:36.638Z","actor":"homie","event":"worker.spawned","task_id":"I-023-CREATE-ATLAS-L2-CONSUMER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-023 (Create atlas_l2_consumer agent CLAUDE.md)"}
+{"ts":"2026-03-15T15:02:49.166Z","actor":"mc","event":"task.status_changed","task_id":"I-023-CREATE-ATLAS-L2-CONSUMER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T15:05:11.130Z","actor":"mc","event":"task.status_changed","task_id":"I-023-CREATE-ATLAS-L2-CONSUMER-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T15:05:00Z","actor":"verifier","event":"task.verified","task_id":"I-023-CREATE-ATLAS-L2-CONSUMER-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T15:05:38.635Z","actor":"mc","event":"task.status_changed","task_id":"I-024-CREATE-ATLAS-L2-FINANCIALS-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T15:06:17.171Z","actor":"homie","event":"worker.spawned","task_id":"I-024-CREATE-ATLAS-L2-FINANCIALS-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-024 (Create atlas_l2_financials agent CLAUDE.md)"}
+{"ts":"2026-03-15T15:06:45.195Z","actor":"homie","event":"daily.briefing","detail":"Morning briefing compiled and sent"}
+{"ts":"2026-03-15T15:10:46.771Z","actor":"mc","event":"task.status_changed","task_id":"I-024-CREATE-ATLAS-L2-FINANCIALS-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T15:12:46Z","actor":"homie","event":"heartbeat.tick","detail":"Verifier running on I-024, worker→verifier feedback loop in progress"}
+{"ts":"2026-03-15T15:13:13.409Z","actor":"mc","event":"task.status_changed","task_id":"I-024-CREATE-ATLAS-L2-FINANCIALS-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T15:10:46Z","actor":"verifier","event":"task.verified","task_id":"I-024-CREATE-ATLAS-L2-FINANCIALS-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T15:13:51.253Z","actor":"mc","event":"task.status_changed","task_id":"I-025-CREATE-ATLAS-L2-INDUSTRIALS-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T15:13:55Z","actor":"homie","event":"worker.spawned","task_id":"I-025-CREATE-ATLAS-L2-INDUSTRIALS-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-025 (Create atlas_l2_industrials agent CLAUDE.md)"}
+{"ts":"2026-03-15T15:19:46.344Z","actor":"mc","event":"task.status_changed","task_id":"I-025-CREATE-ATLAS-L2-INDUSTRIALS-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T15:21:37.102Z","actor":"mc","event":"task.status_changed","task_id":"I-025-CREATE-ATLAS-L2-INDUSTRIALS-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T15:21:37.174Z","actor":"mc","event":"task.status_changed","task_id":"I-026-CREATE-ATLAS-L2-RELATIONSHIP-MAPPER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T15:30:00Z","actor":"verifier","event":"task.verified","task_id":"I-025-CREATE-ATLAS-L2-INDUSTRIALS-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T15:21:55Z","actor":"homie","event":"worker.spawned","task_id":"I-026-CREATE-ATLAS-L2-RELATIONSHIP-MAPPER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-026 (Create atlas_l2_relationship_mapper agent CLAUDE.md)"}
+{"ts":"2026-03-15T15:25:03Z","actor":"homie","event":"heartbeat.tick","task_id":"I-026-CREATE-ATLAS-L2-RELATIONSHIP-MAPPER-AGENT-CLAUDE-MD","detail":"Worker running normally on I-026, elapsed ~3min"}
+{"ts":"2026-03-15T15:25:38.639Z","actor":"mc","event":"task.status_changed","task_id":"I-026-CREATE-ATLAS-L2-RELATIONSHIP-MAPPER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T15:25:38.647Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-BREAD-BAKER-L2-AGENTS","detail":"active → complete"}
+{"ts":"2026-03-15T15:25:38.648Z","actor":"mc","event":"initiative.completed","initiative_id":"I-BREAD-BAKER-L2-AGENTS","detail":"All tasks terminal for I-BREAD-BAKER-L2-AGENTS"}
+{"ts":"2026-03-15T15:27:40.190Z","actor":"mc","event":"task.status_changed","task_id":"I-026-CREATE-ATLAS-L2-RELATIONSHIP-MAPPER-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T15:27:47Z","actor":"verifier","event":"task.verified","task_id":"I-026-CREATE-ATLAS-L2-RELATIONSHIP-MAPPER-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T15:28:44.097Z","actor":"mc","event":"task.status_changed","task_id":"I-027-CREATE-ATLAS-L3-DRUCKENMILLER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T15:28:50Z","actor":"homie","event":"worker.spawned","task_id":"I-027-CREATE-ATLAS-L3-DRUCKENMILLER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-027 (Create atlas_l3_druckenmiller agent CLAUDE.md)"}
+{"ts":"2026-03-15T15:32:55.405Z","actor":"mc","event":"task.status_changed","task_id":"I-027-CREATE-ATLAS-L3-DRUCKENMILLER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T15:35:29.938Z","actor":"mc","event":"task.status_changed","task_id":"I-027-CREATE-ATLAS-L3-DRUCKENMILLER-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T15:35:32.732Z","actor":"homie","event":"heartbeat.tick","detail":"Verifier running on I-027, worker→verifier feedback loop in progress"}
+{"ts":"2026-03-15T15:35:39Z","actor":"verifier","event":"task.verified","task_id":"I-027-CREATE-ATLAS-L3-DRUCKENMILLER-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T15:40:39.744Z","actor":"mc","event":"task.status_changed","task_id":"I-028-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T15:40:55Z","actor":"homie","event":"worker.spawned","task_id":"I-028-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-028 (Create atlas_l3_aschenbrenner agent CLAUDE.md)"}
+{"ts":"2026-03-15T15:43:31.554Z","actor":"mc","event":"task.status_changed","task_id":"I-028-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T23:49:00.000Z","actor":"homie","event":"tick","detail":"Heartbeat - verifier running for I-028"}
+{"ts":"2026-03-15T15:55:26.168Z","actor":"mc","event":"task.status_changed","task_id":"I-028-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T15:56:42.332Z","actor":"mc","event":"task.status_changed","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T15:56:55Z","actor":"homie","event":"worker.spawned","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-029 (Create atlas_l3_baker agent CLAUDE.md)"}
+{"ts":"2026-03-15T15:57:14Z","actor":"verifier","event":"task.verified","task_id":"I-028-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T16:00:00Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Worker running normally on I-029, elapsed ~3min"}
+{"ts":"2026-03-15T16:05:40.532Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~8 min"}
+{"ts":"2026-03-15T16:15:05.135Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~18 min"}
+{"ts":"2026-03-15T16:30:36.324Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~34 min"}
+{"ts":"2026-03-15T16:35:09.137Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~37 min"}
+{"ts":"2026-03-15T16:40:08.641Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~43 min"}
+{"ts":"2026-03-15T16:50:39Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~53min"}
+{"ts":"2026-03-15T16:55:20.249Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~58min, approaching timeout"}
+{"ts":"2026-03-15T17:00:00.000Z","actor":"homie","event":"worker.wrap_up_sent","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Grace period started for I-029, elapsed ~63min"}
+{"ts":"2026-03-15T17:04:00.000Z","actor":"homie","event":"heartbeat.tick","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Grace period in progress, elapsed ~68min"}
+{"ts":"2026-03-15T17:15:33.645Z","actor":"mc","event":"task.status_changed","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T17:15:50.425Z","actor":"homie","event":"worker.killed","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Hard release: container killed by runtime after ~77min. Target directory /workspace/extra/bread-baker/ not mounted - task blocked."}
+{"ts":"2026-03-15T17:18:23.246Z","actor":"homie","event":"task.status_changed","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"in_progress → blocked: Target directory /workspace/extra/bread-baker/ not mounted in container"}
+{"ts":"2026-03-15T17:21:13.595Z","actor":"homie","event":"tick","detail":"No dispatchable tasks. All ready tasks require bread-baker mount which is unavailable. I-029 was killed for this reason. Infrastructure blocker."}
+{"ts":"2026-03-15T17:25:50.939Z","actor":"homie","event":"tick","detail":"No dispatchable tasks. All ready tasks require bread-baker mount which is unavailable."}
+{"ts":"2026-03-15T17:51:22.062Z","actor":"mc","event":"task.status_changed","task_id":"I-030-CREATE-ATLAS-L3-ACKMAN-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T17:51:25.909Z","actor":"homie","event":"worker.spawned","task_id":"I-030-CREATE-ATLAS-L3-ACKMAN-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-030 (Create atlas_l3_ackman agent CLAUDE.md)"}
+{"ts":"2026-03-15T17:54:29.677Z","actor":"mc","event":"task.status_changed","task_id":"I-030-CREATE-ATLAS-L3-ACKMAN-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T17:55:45.986Z","actor":"homie","event":"heartbeat.tick","detail":"Verifier running on I-030, worker→verifier feedback loop in progress"}
+{"ts":"2026-03-15T17:58:11.064Z","actor":"mc","event":"task.status_changed","task_id":"I-030-CREATE-ATLAS-L3-ACKMAN-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T17:55:00Z","actor":"verifier","event":"task.verified","task_id":"I-030-CREATE-ATLAS-L3-ACKMAN-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T17:59:39.819Z","actor":"mc","event":"task.status_changed","task_id":"I-031-CREATE-ATLAS-L4-CRO-CHIEF-RISK-OFFICER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T17:59:43.128Z","actor":"homie","event":"worker.spawned","task_id":"I-031-CREATE-ATLAS-L4-CRO-CHIEF-RISK-OFFICER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-031 (Create atlas_l4_cro agent CLAUDE.md)"}
+{"ts":"2026-03-15T18:04:09.627Z","actor":"mc","event":"task.status_changed","task_id":"I-031-CREATE-ATLAS-L4-CRO-CHIEF-RISK-OFFICER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T18:05:38.853Z","actor":"mc","event":"task.status_changed","task_id":"I-031-CREATE-ATLAS-L4-CRO-CHIEF-RISK-OFFICER-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T18:04:09.627Z","actor":"verifier","event":"task.verified","task_id":"I-031-CREATE-ATLAS-L4-CRO-CHIEF-RISK-OFFICER-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T18:11:18.098Z","actor":"homie","event":"tick","detail":"No dispatchable tasks. All ready tasks (I-032 through I-041) require /workspace/extra/bread-baker/ mount which is unavailable. Infrastructure blocker persists."}
+{"ts":"2026-03-15T18:17:59.773Z","actor":"homie","event":"tick","detail":"Infrastructure blocker: /workspace/extra/bread-baker/ not mounted. All 11 ready tasks (I-002, I-032-041) require this mount. Cannot dispatch work."}
+{"ts":"2026-03-15T18:20:31.668Z","actor":"mc","event":"task.status_changed","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T18:20:37.000Z","actor":"homie","event":"worker.spawned","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-032 (Create atlas_l4_alpha_discovery agent CLAUDE.md)"}
+{"ts":"2026-03-15T18:23:19.333Z","actor":"mc","event":"task.status_changed","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T18:25:00.296Z","actor":"mc","event":"task.status_changed","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"done → in_progress"}
+{"ts":"2026-03-15T18:25:00.000Z","actor":"verifier","event":"task.revision_requested","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"Revision 1/3: No output produced - task marked done but no CLAUDE.md or output file created"}
+{"ts":"2026-03-15T18:25:35.230Z","actor":"homie","event":"heartbeat.tick","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"Verifier running - revision requested (rev 1), task back in progress"}
+{"ts":"2026-03-15T18:26:39.607Z","actor":"mc","event":"task.status_changed","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T18:27:12.054Z","actor":"mc","event":"task.status_changed","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T18:27:24Z","actor":"verifier","event":"task.verified","task_id":"I-032-CREATE-ATLAS-L4-ALPHA-DISCOVERY-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T18:28:11.317Z","actor":"mc","event":"task.status_changed","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T18:28:13Z","actor":"homie","event":"worker.spawned","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-033 (Create atlas_l4_cio (Chief Investment Officer) agent CLAUDE.md)"}
+{"ts":"2026-03-15T18:29:23.433Z","actor":"mc","event":"task.status_changed","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T18:30:24.574Z","actor":"homie","event":"heartbeat.tick","detail":"Verifier running on I-033, worker→verifier feedback loop in progress"}
+{"ts":"2026-03-15T18:31:32.684Z","actor":"mc","event":"task.status_changed","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"done → in_progress"}
+{"ts":"2026-03-15T18:35:00Z","actor":"verifier","event":"task.revision_requested","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"Revision 1/3: Decision rules, position sizing formula, and risk rules not implemented per spec"}
+{"ts":"2026-03-15T18:35:39.652Z","actor":"homie","event":"heartbeat.tick","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"Worker running normally on I-033, elapsed ~7min, revision in progress (verifier feedback loop)"}
+{"ts":"2026-03-15T18:37:14.705Z","actor":"mc","event":"task.status_changed","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T18:40:04.682Z","actor":"homie","event":"heartbeat.tick","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"Verifier reviewing I-033 after revision 1, feedback loop in progress, elapsed ~11min"}
+{"ts":"2026-03-15T18:41:28.070Z","actor":"mc","event":"task.status_changed","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"done → in_progress"}
+{"ts":"2026-03-15T18:41:41Z","actor":"verifier","event":"task.revision_requested","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"Revision 2/3: Output file must be portfolio_actions.json not atlas_l4_cio.json"}
+{"ts":"2026-03-15T18:45:38Z","actor":"homie","event":"heartbeat.tick","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~16min, verifier feedback loop in progress (rev 2/3)"}
+{"ts":"2026-03-15T18:46:03.403Z","actor":"mc","event":"task.status_changed","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T18:49:29.029Z","actor":"mc","event":"task.status_changed","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T18:49:40Z","actor":"verifier","event":"task.verified","task_id":"I-033-CREATE-ATLAS-L4-CIO-CHIEF-INVESTMENT-OFFICER-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T18:51:46.137Z","actor":"mc","event":"initiative.created","initiative_id":"I-PROJECTCAL-GO-TO-MARKET-RESEARCH","detail":"ProjectCal Go-to-Market Research"}
+{"ts":"2026-03-15T18:51:53.690Z","actor":"mc","event":"task.created","task_id":"I-042-IDENTIFY-TARGET-CUSTOMER-SEGMENTS-FOR-PROJECTCAL","detail":"Identify target customer segments for ProjectCal"}
+{"ts":"2026-03-15T18:51:59.228Z","actor":"mc","event":"task.created","task_id":"I-043-RESEARCH-CALIFORNIA-DEVELOPERS-AND-CONTRACTORS-FOR-OUTREACH","detail":"Research California developers and contractors for outreach"}
+{"ts":"2026-03-15T18:52:50.208Z","actor":"mc","event":"task.status_changed","task_id":"I-042-IDENTIFY-TARGET-CUSTOMER-SEGMENTS-FOR-PROJECTCAL","detail":"ready → in_progress"}
+{"ts":"2026-03-15T18:53:19.405Z","actor":"homie","event":"worker.spawned","task_id":"I-042-IDENTIFY-TARGET-CUSTOMER-SEGMENTS-FOR-PROJECTCAL","detail":"Dispatched worker via IPC for task I-042 (Identify target customer segments for ProjectCal)"}
+{"ts":"2026-03-15T18:55:12.000Z","actor":"homie","event":"heartbeat.tick","task_id":"I-042-IDENTIFY-TARGET-CUSTOMER-SEGMENTS-FOR-PROJECTCAL","detail":"Worker running normally, elapsed ~2min"}
+{"ts":"2026-03-15T18:56:01.586Z","actor":"mc","event":"task.status_changed","task_id":"I-042-IDENTIFY-TARGET-CUSTOMER-SEGMENTS-FOR-PROJECTCAL","detail":"in_progress → done"}
+{"ts":"2026-03-15T18:57:04.922Z","actor":"mc","event":"task.status_changed","task_id":"I-042-IDENTIFY-TARGET-CUSTOMER-SEGMENTS-FOR-PROJECTCAL","detail":"done → verified"}
+{"ts":"2026-03-15T18:57:11.147Z","actor":"verifier","event":"task.verified","task_id":"I-042-IDENTIFY-TARGET-CUSTOMER-SEGMENTS-FOR-PROJECTCAL","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T18:58:17.449Z","actor":"mc","event":"task.status_changed","task_id":"I-034-CREATE-ATLAS-L4-AUTONOMOUS-EXECUTION-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T18:58:28.000Z","actor":"homie","event":"worker.spawned","task_id":"I-034-CREATE-ATLAS-L4-AUTONOMOUS-EXECUTION-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-034 (Create atlas_l4_autonomous_execution agent CLAUDE.md)"}
+{"ts":"2026-03-15T19:02:29.053Z","actor":"mc","event":"task.status_changed","task_id":"I-034-CREATE-ATLAS-L4-AUTONOMOUS-EXECUTION-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T19:02:29.064Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-BREAD-BAKER-L4-AGENTS","detail":"active → complete"}
+{"ts":"2026-03-15T19:02:29.065Z","actor":"mc","event":"initiative.completed","initiative_id":"I-BREAD-BAKER-L4-AGENTS","detail":"All tasks terminal for I-BREAD-BAKER-L4-AGENTS"}
+{"ts":"2026-03-15T19:04:03.403Z","actor":"mc","event":"task.status_changed","task_id":"I-034-CREATE-ATLAS-L4-AUTONOMOUS-EXECUTION-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T19:05:00Z","actor":"verifier","event":"task.verified","task_id":"I-034-CREATE-ATLAS-L4-AUTONOMOUS-EXECUTION-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T19:05:01.441Z","actor":"mc","event":"task.status_changed","task_id":"I-043-RESEARCH-CALIFORNIA-DEVELOPERS-AND-CONTRACTORS-FOR-OUTREACH","detail":"ready → in_progress"}
+{"ts":"2026-03-15T19:05:10.000Z","actor":"homie","event":"worker.spawned","task_id":"I-043-RESEARCH-CALIFORNIA-DEVELOPERS-AND-CONTRACTORS-FOR-OUTREACH","detail":"Dispatched worker via IPC for task I-043 (Research California developers and contractors for outreach)"}
+{"ts":"2026-03-15T19:06:24Z","actor":"homie","event":"heartbeat.tick","task_id":"I-043-RESEARCH-CALIFORNIA-DEVELOPERS-AND-CONTRACTORS-FOR-OUTREACH","detail":"Worker running normally, elapsed <1min"}
+{"ts":"2026-03-15T19:07:36.684Z","actor":"mc","event":"task.status_changed","task_id":"I-043-RESEARCH-CALIFORNIA-DEVELOPERS-AND-CONTRACTORS-FOR-OUTREACH","detail":"in_progress → done"}
+{"ts":"2026-03-15T19:07:36.692Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-PROJECTCAL-GO-TO-MARKET-RESEARCH","detail":"active → complete"}
+{"ts":"2026-03-15T19:07:36.693Z","actor":"mc","event":"initiative.completed","initiative_id":"I-PROJECTCAL-GO-TO-MARKET-RESEARCH","detail":"All tasks terminal for I-PROJECTCAL-GO-TO-MARKET-RESEARCH"}
+{"ts":"2026-03-15T19:08:20.385Z","actor":"mc","event":"task.status_changed","task_id":"I-043-RESEARCH-CALIFORNIA-DEVELOPERS-AND-CONTRACTORS-FOR-OUTREACH","detail":"done → verified"}
+{"ts":"2026-03-15T19:11:27Z","actor":"homie","event":"heartbeat.tick","detail":"Infrastructure blocker: /workspace/extra/bread-baker/ not mounted. 8 ready tasks (I-002, I-035-041) require this mount. No dispatchable work."}
+{"ts":"2026-03-15T19:14:04.755Z","actor":"homie","event":"tick","detail":"Infrastructure blocker: /workspace/extra/bread-baker/ not mounted. 8 ready tasks (I-002, I-035-041) require this mount. No dispatchable work."}
+{"ts":"2026-03-15T19:20:46.382Z","actor":"mc","event":"task.status_changed","task_id":"I-035-CREATE-ATLAS-MARKET-FETCHER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T19:21:23.000Z","actor":"homie","event":"worker.spawned","task_id":"I-035-CREATE-ATLAS-MARKET-FETCHER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-035 (Create atlas_market_fetcher agent CLAUDE.md)"}
+{"ts":"2026-03-15T19:24:51.387Z","actor":"mc","event":"task.status_changed","task_id":"I-035-CREATE-ATLAS-MARKET-FETCHER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T19:24:57.137Z","actor":"homie","event":"heartbeat.tick","task_id":"I-035-CREATE-ATLAS-MARKET-FETCHER-AGENT-CLAUDE-MD","detail":"Worker running normally, elapsed ~4min"}
+{"ts":"2026-03-15T19:25:28.356Z","actor":"mc","event":"task.status_changed","task_id":"I-035-CREATE-ATLAS-MARKET-FETCHER-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T19:25:57Z","actor":"verifier","event":"task.verified","task_id":"I-035-CREATE-ATLAS-MARKET-FETCHER-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T19:26:18.747Z","actor":"mc","event":"task.status_changed","task_id":"I-036-CREATE-ATLAS-SCORECARD-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T19:26:20.916Z","actor":"homie","event":"worker.spawned","task_id":"I-036-CREATE-ATLAS-SCORECARD-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-036 (Create atlas_scorecard agent CLAUDE.md)"}
+{"ts":"2026-03-15T19:29:02.822Z","actor":"mc","event":"task.status_changed","task_id":"I-036-CREATE-ATLAS-SCORECARD-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T19:30:50Z","actor":"homie","event":"heartbeat.tick","task_id":"I-036-CREATE-ATLAS-SCORECARD-AGENT-CLAUDE-MD","detail":"Verifier running on I-036, worker→verifier feedback loop in progress, elapsed ~3min"}
+{"ts":"2026-03-15T19:31:01.807Z","actor":"mc","event":"task.status_changed","task_id":"I-036-CREATE-ATLAS-SCORECARD-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T19:31:13Z","actor":"verifier","event":"task.verified","task_id":"I-036-CREATE-ATLAS-SCORECARD-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T19:31:38.262Z","actor":"mc","event":"task.status_changed","task_id":"I-037-CREATE-ATLAS-AUTORESEARCH-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T19:31:41Z","actor":"homie","event":"worker.spawned","task_id":"I-037-CREATE-ATLAS-AUTORESEARCH-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-037 (Create atlas_autoresearch agent CLAUDE.md)"}
+{"ts":"2026-03-15T19:35:15.094Z","actor":"mc","event":"task.status_changed","task_id":"I-037-CREATE-ATLAS-AUTORESEARCH-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T19:36:13.756Z","actor":"mc","event":"task.status_changed","task_id":"I-037-CREATE-ATLAS-AUTORESEARCH-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T19:40:00.000Z","actor":"verifier","event":"task.verified","task_id":"I-037-CREATE-ATLAS-AUTORESEARCH-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T19:37:00.756Z","actor":"mc","event":"task.status_changed","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T19:37:11.752Z","actor":"homie","event":"worker.spawned","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-038 (Create atlas_autoresearch_evaluator agent CLAUDE.md)"}
+{"ts":"2026-03-15T19:37:46Z","actor":"verifier","event":"task.verified","task_id":"I-037-CREATE-ATLAS-AUTORESEARCH-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T19:38:25.244Z","actor":"mc","event":"task.status_changed","task_id":"I-039-CREATE-ATLAS-PIPELINE-WATCHDOG-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T19:38:27.500Z","actor":"homie","event":"worker.spawned","task_id":"I-039-CREATE-ATLAS-PIPELINE-WATCHDOG-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-039 (Create atlas_pipeline_watchdog agent CLAUDE.md)"}
+{"ts":"2026-03-15T19:41:23.814Z","actor":"mc","event":"task.status_changed","task_id":"I-039-CREATE-ATLAS-PIPELINE-WATCHDOG-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T19:43:22.000Z","actor":"mc","event":"task.status_changed","task_id":"I-039-CREATE-ATLAS-PIPELINE-WATCHDOG-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T19:43:37Z","actor":"verifier","event":"task.verified","task_id":"I-039-CREATE-ATLAS-PIPELINE-WATCHDOG-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T19:44:14.468Z","actor":"mc","event":"task.status_changed","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"ready → in_progress"}
+{"ts":"2026-03-15T19:44:18.000Z","actor":"homie","event":"worker.spawned","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"Dispatched worker via IPC for task I-040 (Create #atlas-output Discord channel)"}
+{"ts":"2026-03-15T19:45:45.083Z","actor":"homie","event":"heartbeat.tick","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"Worker running normally, elapsed ~1min"}
+{"ts":"2026-03-15T19:47:16.953Z","actor":"mc","event":"task.status_changed","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T19:49.02Z","actor":"homie","event":"tick","detail":"Infrastructure blocker: /workspace/extra/bread-baker/ not mounted. No dispatchable work."}
+{"ts":"2026-03-15T19:51:47.594Z","actor":"mc","event":"task.status_changed","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"in_progress → failed"}
+{"ts":"2026-03-15T19:51:52.842Z","actor":"mc","event":"task.status_changed","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"failed → ready"}
+{"ts":"2026-03-15T19:52:44Z","actor":"homie","event":"tick","detail":"Infrastructure blocker: /workspace/extra/bread-baker/ not mounted. Ready tasks (I-002, I-038, I-041) require this mount. No dispatchable work."}
+{"ts":"2026-03-15T19:58:02.511Z","actor":"mc","event":"task.status_changed","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T19:58:20.848Z","actor":"homie","event":"worker.spawned","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-038 (Create atlas_autoresearch_evaluator agent CLAUDE.md)"}
+{"ts":"2026-03-15T19:59:49.122Z","actor":"mc","event":"task.status_changed","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T19:59:49.132Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-BREAD-BAKER-PIPELINE-INFRASTRUCTURE","detail":"active → complete"}
+{"ts":"2026-03-15T19:59:49.133Z","actor":"mc","event":"initiative.completed","initiative_id":"I-BREAD-BAKER-PIPELINE-INFRASTRUCTURE","detail":"All tasks terminal for I-BREAD-BAKER-PIPELINE-INFRASTRUCTURE"}
+{"ts":"2026-03-15T20:01:19.956Z","actor":"mc","event":"task.status_changed","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T20:01:37.149Z","actor":"verifier","event":"task.verified","task_id":"I-038-CREATE-ATLAS-AUTORESEARCH-EVALUATOR-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T20:09:05.012Z","actor":"mc","event":"task.status_changed","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"blocked → ready"}
+{"ts":"2026-03-15T20:09:21.970Z","actor":"mc","event":"task.status_changed","task_id":"I-041-CREATE-REGISTER-ATLAS-GROUPS-TS-BOOTSTRAP-SCRIPT","detail":"ready → in_progress"}
+{"ts":"2026-03-15T20:09:25.600Z","actor":"homie","event":"worker.spawned","task_id":"I-041-CREATE-REGISTER-ATLAS-GROUPS-TS-BOOTSTRAP-SCRIPT","detail":"Dispatched worker via IPC for task I-041 (Create register-atlas-groups.ts bootstrap script)"}
+{"ts":"2026-03-15T20:14:19.315Z","actor":"mc","event":"task.status_changed","task_id":"I-041-CREATE-REGISTER-ATLAS-GROUPS-TS-BOOTSTRAP-SCRIPT","detail":"in_progress → done"}
+{"ts":"2026-03-15T20:16:00.111Z","actor":"mc","event":"task.status_changed","task_id":"I-041-CREATE-REGISTER-ATLAS-GROUPS-TS-BOOTSTRAP-SCRIPT","detail":"done → verified"}
+{"ts":"2026-03-15T20:16:20Z","actor":"verifier","event":"task.verified","task_id":"I-041-CREATE-REGISTER-ATLAS-GROUPS-TS-BOOTSTRAP-SCRIPT","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T20:17:30.794Z","actor":"mc","event":"task.status_changed","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"ready → in_progress"}
+{"ts":"2026-03-15T20:17:42.468Z","actor":"homie","event":"worker.spawned","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Dispatched worker via IPC for task I-029 (Create atlas_l3_baker agent CLAUDE.md)"}
+{"ts":"2026-03-15T20:20:56.121Z","actor":"mc","event":"task.status_changed","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"in_progress → done"}
+{"ts":"2026-03-15T20:20:56.130Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-BREAD-BAKER-L3-AGENTS","detail":"active → complete"}
+{"ts":"2026-03-15T20:20:56.131Z","actor":"mc","event":"initiative.completed","initiative_id":"I-BREAD-BAKER-L3-AGENTS","detail":"All tasks terminal for I-BREAD-BAKER-L3-AGENTS"}
+{"ts":"2026-03-15T20:21:40.400Z","actor":"mc","event":"task.status_changed","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"done → verified"}
+{"ts":"2026-03-15T20:21:46Z","actor":"verifier","event":"task.verified","task_id":"I-029-CREATE-ATLAS-L3-BAKER-AGENT-CLAUDE-MD","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T20:24:02.401Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"blocked → ready"}
+{"ts":"2026-03-15T20:24:11.424Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"ready → in_progress"}
+{"ts":"2026-03-15T20:24:37.763Z","actor":"homie","event":"worker.spawned","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Dispatched worker via IPC for task I-004 (Create mount allowlist configuration)"}
+{"ts":"2026-03-15T20:25:52.890Z","actor":"homie","event":"heartbeat.tick","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Worker running normally, elapsed ~1min"}
+{"ts":"2026-03-15T20:26:56.189Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → done"}
+{"ts":"2026-03-15T20:30:00.000Z","actor":"verifier","event":"task.verification_failed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Blocked after 3 revision attempts: mount-allowlist.json still not created"}
+{"ts":"2026-03-15T20:31:20.900Z","actor":"homie","event":"verifier.spawned","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Dispatched verifier for task I-004"}
+{"ts":"2026-03-15T20:32:34.216Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"done → in_progress"}
+{"ts":"2026-03-15T20:32:38.135Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T20:30:00Z","actor":"verifier","event":"task.verification_failed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Blocked after 3 revision attempts: mount-allowlist.json never created at ~/.config/bread-baker/"}
+{"ts":"2026-03-15T20:34:37.950Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"blocked → ready"}
+{"ts":"2026-03-15T20:38:04.877Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"ready → in_progress"}
+{"ts":"2026-03-15T20:38:56.326Z","actor":"homie","event":"worker.spawned","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Dispatched worker via IPC for task I-004 (Create mount allowlist configuration)"}
+{"ts":"2026-03-15T20:40:16.122Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → done"}
+{"ts":"2026-03-15T20:42:22.602Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"done → in_progress"}
+{"ts":"2026-03-15T20:42:26.855Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T20:42:52Z","actor":"verifier","event":"task.verification_failed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Blocked: mount-allowlist.json never created at ~/.config/bread-baker/"}
+{"ts":"2026-03-15T20:46:51.876Z","actor":"homie","event":"tick","detail":"No dispatchable work. I-002 ready but blocked by I-004, I-009, I-040 which require host-side configuration (mounts, Discord API)."}
+{"ts":"2026-03-15T20:51:08.842Z","actor":"mc","event":"task.status_changed","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"blocked → ready"}
+{"ts":"2026-03-15T20:51:14.273Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"blocked → ready"}
+{"ts":"2026-03-15T20:51:14.341Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"blocked → ready"}
+{"ts":"2026-03-15T20:51:28.841Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"ready → in_progress"}
+{"ts":"2026-03-15T20:51:31.989Z","actor":"homie","event":"worker.spawned","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Dispatched worker via IPC for task I-004 (Create mount allowlist configuration)"}
+{"ts":"2026-03-15T20:53:31.668Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → done"}
+ts:2026-03-15T20:55:37.994Z actor:homie event:heartbeat.tick task_id:I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION detail:Verifier reviewing, elapsed ~4min
+{"ts":"2026-03-15T21:26:43.366Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"done → in_progress"}
+{"ts":"2026-03-15T21:26:46.802Z","actor":"mc","event":"task.status_changed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T21:27:14Z","actor":"verifier","event":"task.verification_failed","task_id":"I-004-CREATE-MOUNT-ALLOWLIST-CONFIGURATION","detail":"Blocked: mount-allowlist.json never created - environmental issue (no ~/.config directory)"}
+{"ts":"2026-03-15T21:41:11.051Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"ready → in_progress"}
+{"ts":"2026-03-15T21:41:43.582Z","actor":"homie","event":"worker.spawned","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Dispatched worker via IPC for task I-009 (Create API keys configuration file)"}
+{"ts":"2026-03-15T21:42:53.760Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"in_progress → done"}
+{"ts":"2026-03-15T21:45:33.326Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"done → in_progress"}
+{"ts":"2026-03-15T21:50:00Z","actor":"verifier","event":"task.revision_requested","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Revision 1/3: api-keys.json not created - file does not exist"}
+{"ts":"2026-03-15T21:49:54.864Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"in_progress → done"}
+{"ts":"2026-03-15T21:55:28.068Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"done → in_progress"}
+{"ts":"2026-03-15T21:50:00.000Z","actor":"verifier","event":"task.revision_requested","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Revision 2/3: Files not created on filesystem - directory does not exist"}
+{"ts":"2026-03-15T22:00:00Z","actor":"homie","event":"heartbeat.tick","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Worker running normally, elapsed ~19min"}
+{"ts":"2026-03-15T22:07:16Z","actor":"homie","event":"heartbeat.tick","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"Worker running normally, elapsed ~25min"}
+{"ts":"2026-03-15T22:09:05.500Z","actor":"mc","event":"task.status_changed","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"ready → in_progress"}
+{"ts":"2026-03-15T22:09:41.861Z","actor":"homie","event":"worker.spawned","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"Dispatched worker via IPC for task I-040 (Create #atlas-output Discord channel)"}
+{"ts":"2026-03-15T22:11:23.537Z","actor":"mc","event":"task.status_changed","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T22:10:00.000Z","actor":"homie","event":"heartbeat.tick","task_id":"I-040-CREATE-ATLAS-OUTPUT-DISCORD-CHANNEL-AND-GET-CHANNEL-ID","detail":"Worker running normally on I-040, elapsed ~1min"}
+{"ts":"2026-03-15T22:17:49.264Z","actor":"mc","event":"task.status_changed","task_id":"I-009-CREATE-API-KEYS-CONFIGURATION-FILE","detail":"in_progress → blocked"}
+{"ts":"2026-03-15T22:18:03Z","actor":"homie","event":"tick","detail":"No dispatchable work. I-002 ready but blocked by dependencies I-004 (complete), I-009 (blocked), I-040 (blocked). I-009 and I-040 need host-side action from Vinny."}
+{"ts":"2026-03-15T22:21:33.009Z","actor":"mc","event":"task.status_changed","task_id":"I-002-EXHAUSTIVE-STATIC-ANALYSIS-AND-GAP-REPORTING","detail":"ready → in_progress"}
+{"ts":"2026-03-15T22:21:36.500Z","actor":"homie","event":"worker.spawned","task_id":"I-002-EXHAUSTIVE-STATIC-ANALYSIS-AND-GAP-REPORTING","detail":"Dispatched worker via IPC for task I-002 (Exhaustive Static Analysis and Gap Reporting)"}
+{"ts":"2026-03-15T22:25:38.664Z","actor":"homie","event":"tick","detail":"Lock held by I-002 (static analysis), worker running normally. No ready tasks."}
+{"ts":"2026-03-15T22:28:39.893Z","actor":"mc","event":"task.status_changed","task_id":"I-002-EXHAUSTIVE-STATIC-ANALYSIS-AND-GAP-REPORTING","detail":"in_progress → done"}
+{"ts":"2026-03-15T22:30:16.756Z","actor":"homie","event":"worker.wrap_up_sent","task_id":"I-002-EXHAUSTIVE-STATIC-ANALYSIS-AND-GAP-REPORTING","detail":"Verifier in grace period (68 min elapsed, timeout 60 + grace 15)"}
+{"ts":"2026-03-15T22:30:37.843Z","actor":"mc","event":"task.status_changed","task_id":"I-002-EXHAUSTIVE-STATIC-ANALYSIS-AND-GAP-REPORTING","detail":"done → verified"}
+{"ts":"2026-03-15T22:30:00.000Z","actor":"verifier","event":"task.verified","task_id":"I-002-EXHAUSTIVE-STATIC-ANALYSIS-AND-GAP-REPORTING","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-15T22:33:52.766Z","actor":"mc","event":"task.created","task_id":"T-20260315-0001","detail":"Fix config.ts to read SCHEDULER_POLL_INTERVAL from environment"}
+{"ts":"2026-03-15T22:33:58.834Z","actor":"mc","event":"task.created","task_id":"T-20260315-0002","detail":"Add database columns for dependency-gated scheduling"}
+{"ts":"2026-03-15T22:34:04.926Z","actor":"mc","event":"task.created","task_id":"T-20260315-0003","detail":"Implement dependency-gated execution in scheduler"}
+{"ts":"2026-03-15T22:34:18.288Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0001","detail":"ready → in_progress"}
+{"ts":"2026-03-15T22:34:21.800Z","actor":"homie","event":"worker.spawned","task_id":"T-20260315-0001","detail":"Dispatched worker via IPC for task T-20260315-0001 (Fix config.ts to read SCHEDULER_POLL_INTERVAL from environment)"}
+{"ts":"2026-03-15T23:49:20Z","actor":"homie","event":"worker.wrap_up_sent","task_id":"T-20260315-0001","detail":"Grace period entered for task T-20260315-0001"}
+{"ts":"2026-03-15T23:54:33.050Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0001","detail":"in_progress → failed"}
+{"ts":"2026-03-15T23:54:00Z","actor":"homie","event":"worker.killed","task_id":"T-20260315-0001","detail":"Hard release: container killed by runtime after grace period (80min elapsed, 75min max)"}
+{"ts":"2026-03-15T23:54:46.610Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0001","detail":"failed → ready"}
+{"ts":"2026-03-15T23:54:05Z","actor":"homie","event":"task.status_changed","task_id":"T-20260315-0001","detail":"failed → ready (retry 1/2)"}
+{"ts":"2026-03-15T23:55:02.823Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0001","detail":"ready → in_progress"}
+{"ts":"2026-03-15T23:55:06Z","actor":"homie","event":"worker.spawned","task_id":"T-20260315-0001","detail":"Dispatched worker via IPC for task T-20260315-0001 (Fix config.ts to read SCHEDULER_POLL_INTERVAL from environment)"}
+{"ts":"2026-03-15T23:58:11Z","actor":"verifier","event":"task.verified","task_id":"T-20260315-0001","detail":"Verified: all acceptance criteria met - config.ts reads SCHEDULER_POLL_INTERVAL from process.env with 15000ms default"}
+{"ts":"2026-03-15T23:59:31.973Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0002","detail":"ready → in_progress"}
+{"ts":"2026-03-15T23:59:45Z","actor":"homie","event":"worker.spawned","task_id":"T-20260315-0002","detail":"Dispatched worker via IPC for task T-20260315-0002 (Add database columns for dependency-gated scheduling)"}
+{"ts":"2026-03-16T00:03:34.946Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0002","detail":"in_progress → done"}
+{"ts":"2026-03-16T00:04:00.000Z","actor":"homie","event":"heartbeat.tick","task_id":"T-20260315-0002","detail":"Verifier reviewing done task, elapsed ~5min"}
+{"ts":"2026-03-16T00:05:14.424Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0002","detail":"done → verified"}
+{"ts":"2026-03-16T00:05:36.249Z","actor":"verifier","event":"task.verified","task_id":"T-20260315-0002","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-16T00:07:03.235Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0003","detail":"ready → in_progress"}
+{"ts":"2026-03-16T00:07:21.041Z","actor":"homie","event":"worker.spawned","task_id":"T-20260315-0003","detail":"Dispatched worker via IPC for task T-20260315-0003 (Implement dependency-gated execution in scheduler)"}
+{"ts":"2026-03-16T00:10:18.185Z","actor":"homie","event":"heartbeat.tick","task_id":"T-20260315-0003","detail":"Worker in grace period, elapsed ~62min (timeout 60 + grace 15)"}
+{"ts":"2026-03-16T00:10:34.751Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0003","detail":"in_progress → done"}
+{"ts":"2026-03-16T00:11:25.809Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0003","detail":"done → verified"}
+{"ts":"2026-03-16T00:11:32Z","actor":"verifier","event":"task.verified","task_id":"T-20260315-0003","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-16T00:12:57.107Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0001","detail":"in_progress → done"}
+{"ts":"2026-03-16T00:13:00.445Z","actor":"mc","event":"task.status_changed","task_id":"T-20260315-0001","detail":"done → verified"}
+{"ts":"2026-03-16T00:15:18.249Z","actor":"mc","event":"initiative.created","initiative_id":"I-FIX-MISSING-ATLAS-AGENTS","detail":"Fix Missing ATLAS Agents"}
+{"ts":"2026-03-16T00:15:23.933Z","actor":"mc","event":"task.created","task_id":"I-044-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-GROUP","detail":"Create atlas_l3_aschenbrenner agent group"}
+{"ts":"2026-03-16T00:15:29.253Z","actor":"mc","event":"task.created","task_id":"I-045-CREATE-ATLAS-L4-CIO-AGENT-GROUP","detail":"Create atlas_l4_cio agent group"}
+{"ts":"2026-03-16T00:15:41.979Z","actor":"mc","event":"task.status_changed","task_id":"I-044-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-GROUP","detail":"ready → in_progress"}
+{"ts":"2026-03-16T00:15:56Z","actor":"homie","event":"worker.spawned","task_id":"I-044-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-GROUP","detail":"Dispatched worker via IPC for task I-044 (Create atlas_l3_aschenbrenner agent group)"}
+{"ts":"2026-03-16T00:17:30.390Z","actor":"homie","event":"heartbeat.tick","task_id":"I-044-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-GROUP","detail":"Worker running normally, elapsed <1min"}
+{"ts":"2026-03-16T00:18:22.694Z","actor":"mc","event":"task.status_changed","task_id":"I-044-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-GROUP","detail":"in_progress → done"}
+{"ts":"2026-03-16T00:20:20.446Z","actor":"mc","event":"task.status_changed","task_id":"I-044-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-GROUP","detail":"done → verified"}
+{"ts":"2026-03-15T17:20:00Z","actor":"verifier","event":"task.verified","task_id":"I-044-CREATE-ATLAS-L3-ASCHENBRENNER-AGENT-GROUP","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-16T00:24:33.893Z","actor":"mc","event":"task.status_changed","task_id":"I-045-CREATE-ATLAS-L4-CIO-AGENT-GROUP","detail":"ready → in_progress"}
+{"ts":"2026-03-16T00:24:37Z","actor":"homie","event":"worker.spawned","task_id":"I-045-CREATE-ATLAS-L4-CIO-AGENT-GROUP","detail":"Dispatched worker via IPC for task I-045 (Create atlas_l4_cio agent group)"}
+{"ts":"2026-03-16T00:27:57.505Z","actor":"mc","event":"task.status_changed","task_id":"I-045-CREATE-ATLAS-L4-CIO-AGENT-GROUP","detail":"in_progress → done"}
+{"ts":"2026-03-16T00:27:57.523Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-FIX-MISSING-ATLAS-AGENTS","detail":"active → complete"}
+{"ts":"2026-03-16T00:27:57.524Z","actor":"mc","event":"initiative.completed","initiative_id":"I-FIX-MISSING-ATLAS-AGENTS","detail":"All tasks terminal for I-FIX-MISSING-ATLAS-AGENTS"}
+{"ts":"2026-03-16T00:28:41.414Z","actor":"mc","event":"task.status_changed","task_id":"I-045-CREATE-ATLAS-L4-CIO-AGENT-GROUP","detail":"done → verified"}
+{"ts":"2026-03-16T00:28:56Z","actor":"verifier","event":"task.verified","task_id":"I-045-CREATE-ATLAS-L4-CIO-AGENT-GROUP","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-16T00:31:59.314Z","actor":"mc","event":"initiative.created","initiative_id":"I-PROJECTCAL-LANDING-PAGE-OPTIMIZATION","detail":"ProjectCal Landing Page Optimization"}
+{"ts":"2026-03-16T00:32:04.679Z","actor":"mc","event":"task.created","task_id":"I-046-AUDIT-PROJECTCAL-LANDING-PAGE-CONVERSION-FUNNEL","detail":"Audit ProjectCal landing page conversion funnel"}
+{"ts":"2026-03-16T00:32:40.229Z","actor":"homie","event":"worker.spawned","task_id":"I-046-AUDIT-PROJECTCAL-LANDING-PAGE-CONVERSION-FUNNEL","detail":"Dispatched worker via IPC for task I-046 (Audit ProjectCal landing page conversion funnel)"}
+{"ts":"2026-03-16T00:32:55.780Z","actor":"mc","event":"task.status_changed","task_id":"I-046-AUDIT-PROJECTCAL-LANDING-PAGE-CONVERSION-FUNNEL","detail":"ready → in_progress"}
+{"ts":"2026-03-16T00:34:46.013Z","actor":"mc","event":"task.status_changed","task_id":"I-046-AUDIT-PROJECTCAL-LANDING-PAGE-CONVERSION-FUNNEL","detail":"in_progress → done"}
+{"ts":"2026-03-16T00:34:46.030Z","actor":"mc","event":"initiative.status_changed","initiative_id":"I-PROJECTCAL-LANDING-PAGE-OPTIMIZATION","detail":"active → complete"}
+{"ts":"2026-03-16T00:34:46.031Z","actor":"mc","event":"initiative.completed","initiative_id":"I-PROJECTCAL-LANDING-PAGE-OPTIMIZATION","detail":"All tasks terminal for I-PROJECTCAL-LANDING-PAGE-OPTIMIZATION"}
+{"ts":"2026-03-16T00:35:27.064Z","actor":"mc","event":"task.status_changed","task_id":"I-046-AUDIT-PROJECTCAL-LANDING-PAGE-CONVERSION-FUNNEL","detail":"done → verified"}
+{"ts":"2026-03-15T00:34:46.013Z","actor":"verifier","event":"task.verified","task_id":"I-046-AUDIT-PROJECTCAL-LANDING-PAGE-CONVERSION-FUNNEL","detail":"Verified: all acceptance criteria met"}
+{"ts":"2026-03-16T00:38:07.301Z","actor":"mc","event":"initiative.created","initiative_id":"I-PROJECTCAL-LANDING-PAGE-IMPLEMENTATION","detail":"ProjectCal Landing Page Implementation"}
+{"ts":"2026-03-16T00:38:13.912Z","actor":"mc","event":"task.created","task_id":"I-047-IMPLEMENT-MAP-PAGE-CONVERSION-TRIGGER","detail":"Implement map page conversion trigger"}
+{"ts":"2026-03-16T00:38:19.129Z","actor":"mc","event":"task.created","task_id":"I-048-ADD-TRUST-SIGNALS-SECTION-TO-LANDING-PAGE","detail":"Add trust signals section to landing page"}
+{"ts":"2026-03-16T00:38:24.807Z","actor":"mc","event":"task.created","task_id":"I-049-ADD-FREE-TIER-OR-TRIAL-OPTION-TO-PRICING","detail":"Add free tier or trial option to pricing"}
+{"ts":"2026-03-16T00:38:30.950Z","actor":"mc","event":"task.created","task_id":"I-050-IMPROVE-SIGNUP-FORM-UX-AND-REDUCE-FRICTION","detail":"Improve signup form UX and reduce friction"}
+{"ts":"2026-03-16T00:38:42.407Z","actor":"mc","event":"task.status_changed","task_id":"I-047-IMPLEMENT-MAP-PAGE-CONVERSION-TRIGGER","detail":"ready → in_progress"}
+{"ts":"2026-03-16T00:38:55.468Z","actor":"homie","event":"worker.spawned","task_id":"I-047-IMPLEMENT-MAP-PAGE-CONVERSION-TRIGGER","detail":"Dispatched worker via IPC for task I-047 (Implement map page conversion trigger)"}
+{"ts":"2026-03-16T00:46:33.669Z","actor":"mc","event":"task.status_changed","task_id":"I-047-IMPLEMENT-MAP-PAGE-CONVERSION-TRIGGER","detail":"in_progress → done"}
+{"ts":"2026-03-16T02:44:47.462Z","actor":"mc","event":"task.status_changed","task_id":"I-047-IMPLEMENT-MAP-PAGE-CONVERSION-TRIGGER","detail":"done → verified"}
+{"ts":"2026-03-16T02:45:09.162Z","actor":"mc","event":"task.status_changed","task_id":"I-048-ADD-TRUST-SIGNALS-SECTION-TO-LANDING-PAGE","detail":"ready → in_progress"}
+{"ts":"2026-03-16T02:45:26Z","actor":"homie","event":"worker.spawned","task_id":"I-048-ADD-TRUST-SIGNALS-SECTION-TO-LANDING-PAGE","detail":"Dispatched worker via IPC for task I-048 (Add trust signals section to landing page)"}

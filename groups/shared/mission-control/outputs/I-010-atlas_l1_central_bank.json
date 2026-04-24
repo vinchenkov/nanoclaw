@@ -1,0 +1,15 @@
+{
+  "agent": "atlas_l1_central_bank",
+  "date": "2026-03-15",
+  "regime": "NEUTRAL",
+  "regime_conviction": 50,
+  "proxy_etf": "XLF",
+  "proxy_direction": "LONG",
+  "key_signals": {
+    "yield_curve_shape": "unknown",
+    "dxy_trend": "unknown",
+    "fed_stance": "unknown"
+  },
+  "analysis_summary": "Awaiting market data. Agent will analyze yield_curve.json, macro_indicators.json, and dxy.json on execution.",
+  "last_updated": "2026-03-15T00:00:00Z"
+}

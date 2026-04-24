@@ -1,0 +1,12 @@
+{
+  "agent": "atlas_l1_china",
+  "regime": "NEUTRAL",
+  "regime_conviction": 50,
+  "signals": {
+    "fxi_momentum": "unknown",
+    "dxy_trend": "unknown",
+    "news_sentiment": "unknown"
+  },
+  "rationale": "Initial state - agent created. Awaiting first data fetch.",
+  "last_updated": "2026-03-15T00:00:00Z"
+}

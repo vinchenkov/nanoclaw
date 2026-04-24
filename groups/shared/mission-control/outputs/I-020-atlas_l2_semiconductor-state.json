@@ -1,0 +1,15 @@
+{
+  "agent": "atlas_l2_semiconductor",
+  "regime": "NEUTRAL",
+  "regime_conviction": 50,
+  "macro_score": 0.0,
+  "signals": {
+    "nvda_momentum": "unknown",
+    "sector_relative_strength": "unknown",
+    "macro_environment": "unknown"
+  },
+  "ticker_universe": ["NVDA","AMD","TSM","INTC","AMAT","ASML","KLAC","LRCX","MRVL","AVGO"],
+  "top_picks": [],
+  "rationale": "Initial state - agent created. Awaiting first analysis run.",
+  "last_updated": "2026-03-15T00:00:00Z"
+}

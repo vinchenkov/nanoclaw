@@ -1,0 +1,16 @@
+{
+  "agent": "atlas_l2_energy",
+  "regime": "NEUTRAL",
+  "regime_conviction": 50,
+  "macro_score": 0.0,
+  "signals": {
+    "oil_price_trend": "unknown",
+    "sector_relative_strength": "unknown",
+    "macro_environment": "unknown",
+    "geopolitical_tension": "unknown"
+  },
+  "ticker_universe": ["XOM","CVX","COP","SLB","EOG","PXD","MPC","VLO","OXY","HAL"],
+  "top_picks": [],
+  "rationale": "Initial state - agent created. Awaiting first analysis run.",
+  "last_updated": "2026-03-15T07:48:00Z"
+}

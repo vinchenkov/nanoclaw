@@ -1,0 +1,26 @@
+{
+  "agent_name": "ATLAS Pipeline Watchdog",
+  "group_folder": "atlas_pipeline_watchdog",
+  "role": "Pipeline watchdog agent - monitors and validates ATLAS investment pipeline execution",
+  "schedule": "09:30 UTC weekdays",
+  "container_paths": {
+    "market_data": "/workspace/extra/market/",
+    "shared_state": "/workspace/extra/state/",
+    "scorecard_data": "/workspace/extra/scorecard/",
+    "agent_memory": "/workspace/group/"
+  },
+  "responsibilities": [
+    "Monitor pipeline execution state",
+    "Validate pipeline outputs (L1, L2, L3, L4)",
+    "Provide health status reporting",
+    "Alert on pipeline failures via Discord"
+  ],
+  "acceptance_criteria": {
+    "CLAUDE.md_created": true,
+    "monitors_pipeline_execution_state": true,
+    "validates_pipeline_outputs": true,
+    "provides_health_status_reporting": true
+  },
+  "location": "/workspace/extra/bread-baker/nanoclaw/groups/atlas_pipeline_watchdog/CLAUDE.md",
+  "created": "2026-03-15T12:41:00Z"
+}

@@ -1,0 +1,11 @@
+{
+  "locked": true,
+  "task_id": "I-048-ADD-TRUST-SIGNALS-SECTION-TO-LANDING-PAGE",
+  "owner": "worker:coding",
+  "model": null,
+  "subagent_id": null,
+  "acquired_at": "2026-03-16T02:45:12.979Z",
+  "timeout_minutes": 60,
+  "grace_minutes": 15,
+  "wrap_up_sent": false
+}
