@@ -1,60 +1,43 @@
 # Skills reapply plan
 
-The user confirmed they never modified skill *content* directly after applying — so all upstream-derived skills should be reapplied from upstream's latest version, not from the fork's stale copy. This automatically picks up upstream's evolution of the skill system (intent files, manifest restructuring, npm/pnpm conventions, etc.).
+`.claude/skills/` is **disposable**. The user does not maintain any custom skill content. Hard-overwrite the entire directory from upstream during migration — don't try to preserve anything from the fork's local copy.
 
-## Strategy
+## On upgrade
 
-1. Don't merge `upstream/skill/*` branches — none of the fork's skills came in via branch merge. They were applied via `scripts/apply-skill.ts`.
-2. For each upstream-derived skill: run `npx tsx scripts/apply-skill.ts .claude/skills/<name>` against the **upstream version** of the skill content (already present in upstream's `.claude/skills/`).
-3. For custom-authored skills: copy `.claude/skills/<name>/` verbatim from the user's tree.
+```bash
+rm -rf .claude/skills
+git checkout upstream/main -- .claude/skills
+```
 
-## Upstream-derived skills (reapply via `apply-skill`)
+That's the entire skills migration. The upstream copy is canonical going forward.
 
-These exist in `upstream/main:.claude/skills/`. The fork's local copy is a stale snapshot — reapply from upstream's current version.
+## Re-apply only what this install actually uses
 
-| Skill | Upstream source | Kind | Required for this install? |
-|---|---|---|---|
-| `add-discord` | `upstream/main:.claude/skills/add-discord/` | source-modifying | **yes** — primary channel |
-| `add-ollama-tool` | `upstream/main:.claude/skills/add-ollama-tool/` (also `upstream/skill/ollama-tool`) | source-modifying | optional |
-| `add-parallel` | `upstream/main:.claude/skills/add-parallel/` | source-modifying | optional |
-| `add-slack` | `upstream/main:.claude/skills/add-slack/` | source-modifying | optional |
-| `add-telegram` | `upstream/main:.claude/skills/add-telegram/` | source-modifying | optional |
-| `add-whatsapp` | `upstream/main:.claude/skills/add-whatsapp/` | source-modifying | optional |
-| `convert-to-apple-container` | `upstream/main:.claude/skills/convert-to-apple-container/` (also `upstream/skill/apple-container`) | source-modifying | optional |
-| `customize` | `upstream/main:.claude/skills/customize/` | pure-instructions | optional |
-| `debug` | `upstream/main:.claude/skills/debug/` | pure-instructions | optional |
-| `get-qodo-rules` | `upstream/main:.claude/skills/get-qodo-rules/` | pure-instructions | optional |
-| `migrate-nanoclaw` | `upstream/main:.claude/skills/migrate-nanoclaw/` (also `upstream/skill/migrate-nanoclaw`) | mixed | this skill — already there if you ran it |
-| `qodo-pr-resolver` | `upstream/main:.claude/skills/qodo-pr-resolver/` | pure-instructions | optional |
-| `setup` | `upstream/main:.claude/skills/setup/` | source-modifying | **yes** — run first |
-| `update-nanoclaw` | `upstream/main:.claude/skills/update-nanoclaw/` | pure-instructions | optional |
-| `update-skills` | `upstream/main:.claude/skills/update-skills/` | pure-instructions | optional |
-| `x-integration` | `upstream/main:.claude/skills/x-integration/` | source-modifying | optional |
+Most skills under `.claude/skills/<name>/` are install recipes — they sit there until you run `apply-skill` to actually patch `src/` (channels, integrations) or invoke them as slash commands. After overwriting from upstream, re-run `apply-skill` only for the skills this install actually needs.
 
-For skills that exist on both `upstream/main` and `upstream/skill/<name>`, prefer `upstream/main` — branches tend to be out of date.
+For this install, the only required skill application is:
 
-## Custom-authored skills (copy verbatim)
+```bash
+npx tsx scripts/apply-skill.ts .claude/skills/add-discord
+```
 
-These have no upstream equivalent. Copy `.claude/skills/<name>/` from the user's main tree to the worktree as-is.
+(Discord is the only active channel — see the homie group's `AGENTS.md`.)
 
-- **`add-gmail`** — `manifest.yaml` + `SKILL.md` + `add/`, `modify/`, `tests/`. Source-modifying: adds `gmail.ts` channel, modifies `src/channels/index.ts`, `src/container-runner.ts`, `container/agent-runner/src/index.ts`. Run `apply-skill` after copy if you want it applied.
-- **`add-telegram-swarm`** — `SKILL.md` only. Pure-instructions extension on top of `add-telegram`. Reference only; no `apply-skill` action.
-- **`add-voice-transcription`** — `manifest.yaml` + `SKILL.md` + `add/`, `modify/`, `tests/`. Source-modifying: adds `transcription.ts`, modifies WhatsApp handling. Depends on `add-whatsapp` being applied first.
-- **`use-local-whisper`** — `manifest.yaml` + `SKILL.md` + `modify/`, `tests/`. Depends on `add-voice-transcription`. Modifies `transcription.ts` to use local whisper.cpp instead of OpenAI Whisper API.
+Run `setup` first if the worktree wasn't initialized:
 
-## Apply order
+```bash
+npx tsx scripts/apply-skill.ts .claude/skills/setup
+```
 
-1. `setup` — must run first (initial scaffolding).
-2. `add-discord` — primary channel for this install.
-3. Other upstream channel skills if you want them.
-4. `add-gmail` (custom) if you want Gmail.
-5. `add-telegram` then `add-voice-transcription` then `use-local-whisper` (custom chain) if you want voice.
-6. Any other optional upstream skills.
+Anything else (other channels, integrations, dev-tooling skills) is opt-in. Pick from upstream's current catalog by browsing `.claude/skills/` after the overwrite.
 
-After all skills are applied, return to the architectural sections (01–07).
+## What this means in practice
+
+- The fork-local skills you previously had — `add-gmail`, `add-voice-transcription`, `add-telegram-swarm`, `use-local-whisper` — are dropped. They don't have direct upstream equivalents and aren't needed for the active Discord-only setup.
+- Stale skills you never used (`add-whatsapp`, `add-slack`, `add-telegram`, `add-parallel`, `qodo-pr-resolver`, `x-integration`, etc.) get refreshed to upstream's current version automatically. No action needed unless you decide to start using one.
+- Upstream has added many new skills since the fork's BASE (e.g. `add-codex`, `add-gmail-tool`, `add-imessage`, `add-linear`, `add-resend`, `manage-channels`, `claw`). Browse the upstream `.claude/skills/` after overwrite to see what's available.
 
 ## Risk notes
 
-- Several upstream skills have likely evolved their internal mechanism in 875 commits (intent files, manifest restructuring). Reapplying from upstream's current version is the right move precisely because of this — the fork's stale copy would re-introduce the old structure.
-- Custom skills (`add-gmail`, `add-voice-transcription`, `use-local-whisper`) target file paths that may have shifted upstream. After apply, build + test; if a `modify/*.patch` fails to apply, the upstream file structure has changed and the custom skill needs updating before the migration can complete.
-- `add-telegram-swarm` is documentation only — confirm it doesn't reference removed/renamed Telegram skill internals if you keep it.
+- If `add-discord` upstream has refactored its `modify/*` patches, the patch files may not apply against the architectural changes from sections 01–07 (which themselves modify `src/channels/index.ts`, `src/container-runner.ts`, etc.). Apply order matters: do `add-discord` *before* the architectural sections so its patches apply against fresh upstream files; the architectural sections then layer on top.
+- Section 05 of this guide already inlines the manual Discord channel setup (file copy + import line + dep). If `apply-skill add-discord` does the same thing in a different way, prefer the skill's path — it's tracking upstream's evolution.

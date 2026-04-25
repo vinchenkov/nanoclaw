@@ -33,9 +33,8 @@ A heavy NanoClaw fork that builds a multi-agent system on top of the base:
 ## Migration plan
 
 1. Start from clean upstream worktree.
-2. Reapply upstream-derived skills via `scripts/apply-skill.ts` against upstream's latest skill source — see `08-skills.md`.
-3. Copy custom skills verbatim from the user's tree (see `08-skills.md`).
-4. Apply architectural sections in this order:
+2. Hard-overwrite `.claude/skills/` from upstream and re-apply only the skills this install actually uses (`add-discord`). See `08-skills.md` — the fork has no custom skill content to preserve.
+3. Apply architectural sections in this order:
    1. `07-config-and-env.md` — flags + env + secrets that everything else depends on.
    2. `01-multi-sdk-runtime.md` — db schema, runtime-registry, container-runner + agent-runner refactor.
    3. `02-multi-agent-groups.md` — homie/worker/verifier/critic groups + mission-control bin + seed functions.
@@ -43,13 +42,13 @@ A heavy NanoClaw fork that builds a multi-agent system on top of the base:
    5. `04-evaluate-mode.md` — critic injection.
    6. `05-discord-channel.md` — discord.js integration.
    7. `06-container-security.md` — mount tightening.
-5. Copy net-new infra verbatim:
+4. Copy net-new infra verbatim:
    - `groups/{homie,worker,verifier,critic}/AGENTS.md` (+ `AGENT-SPIRIT.md` for homie/worker/verifier; + `CLAUDE.md` symlinks).
    - `groups/global/AGENTS.md` and `CLAUDE.md`, `groups/main/CLAUDE.md` if present.
    - `groups/shared/bin/mc.ts`, `groups/shared/bin/dashboard-server.mjs`.
    - `scripts/{startclaw.sh, killclaw.sh, clear-history.sh, shell-critic.sh, seed-bread-baker.js}` if you want them.
-6. `npm install && npm run build && npm test`.
-7. Live smoke test before swap.
+5. `npm install && npm run build && npm test`.
+6. Live smoke test before swap.
 
 ## Sections
 

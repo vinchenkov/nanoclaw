@@ -82,4 +82,4 @@ groups/state/
 
 - `ASSISTANT_HAS_OWN_NUMBER` existed at BASE; if upstream renamed or repurposed it in 875 commits, re-read the upstream definition before re-using.
 - The secrets array in `container-runner.ts` may have moved or been split into per-runtime arrays upstream — locate by reading the surrounding context, not by line offset.
-- Custom-skill installation (section 08) may add additional env vars (e.g. Gmail OAuth keys, voice-transcription Whisper keys). Re-run `apply-skill` for those skills after upgrade and audit the resulting `.env.example` if the skill writes one.
+- Re-applying skills (e.g. `add-discord`) may set additional env vars in `.env` or `.env.example`. Audit the env files after running `apply-skill` for any skill.
