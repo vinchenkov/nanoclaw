@@ -49,6 +49,7 @@ A heavy NanoClaw fork that builds a multi-agent system on top of the base:
    - `scripts/{startclaw.sh, killclaw.sh, clear-history.sh, shell-critic.sh, seed-bread-baker.js}` if you want them.
 5. `npm install && npm run build && npm test`.
 6. Live smoke test before swap.
+7. **Reconcile `MY-UNDERSTANDING.md`** — see "Mental model reconciliation" below.
 
 ## Sections
 
@@ -60,6 +61,48 @@ A heavy NanoClaw fork that builds a multi-agent system on top of the base:
 - [06-container-security.md](./06-container-security.md) — mount tightening
 - [07-config-and-env.md](./07-config-and-env.md) — config flags, env vars, secrets
 - [08-skills.md](./08-skills.md) — skills reapply plan
+
+## Mental model reconciliation
+
+`MY-UNDERSTANDING.md` (in the project root) is the user's mental model of how this NanoClaw install works. The migration changes several things it asserts. After the architectural sections are applied and tests pass, **spawn a sub-agent** to read `MY-UNDERSTANDING.md` against the freshly-migrated codebase and update it. The user wants to be aware of big architectural or control shifts — the agent must surface these to the user, not just silently rewrite the file.
+
+### Known impacts to reconcile
+
+These are the sections of `MY-UNDERSTANDING.md` the migration is known to invalidate. The reconciling agent should verify each against the new codebase and update accordingly:
+
+| `MY-UNDERSTANDING.md` section | Affected by | Change |
+|---|---|---|
+| Containers > Visible paths for a group (main) | section 06 | `/workspace/project/` mount is **removed** for main. Homie no longer sees the NanoClaw repo. |
+| Containers > Visible paths for a group | section 01 | `/home/node/.codex/` mount appears alongside `/home/node/.claude/` when `AGENT_SDK=codex`. |
+| Containers > Sessions | section 01 | Per-group `data/sessions/{group}/.codex/` exists alongside `.claude/`. Sessions table now keys on `(group_folder, sdk)` — flipping `AGENT_SDK` keeps the other SDK's session intact. |
+| Containers > Secrets | section 07 | Adds `BRAVE_API_KEY`, `FIRECRAWL_API_KEY`, `CODEX_API_KEY`, `OPENAI_BASE_URL` to the secrets read on host and passed via stdin. |
+| Containers > Mount Validation | (verify) | The allowlist path may have shifted upstream; verify against current `src/mount-security.ts`. The fork uses `~/.config/nanoclaw/mount-allowlist.json`, not `config-examples/...`. |
+| Containers > Life timeline | section 03 | New control path: agents can spawn other agents via `spawn_agent` IPC (with allowlisted pairs). Document the worker → verifier and main → any flows. |
+| Tasks | section 02 | `seedRegisteredGroup` and `seedScheduledTasks` run at host startup — main is no longer the only seeded group; critic is also seeded. |
+| Agent Meta Configurability | section 01 | The per-group `agent-runner-src/` copy still applies, but the source now contains the dispatcher + `runner-claude.ts` + `runner-codex.ts` + `shared.ts` instead of a monolithic `index.ts`. |
+
+### Sections to add
+
+- **Multi-SDK runtime** — `AGENT_SDK=claude|codex` selects the runtime at host startup; selection is threaded through to every container; per-SDK auth lives separately (`.claude/` vs `.codex/` per group).
+- **Critic group** — out-of-band adherence reviewer. Has elevated mounts: `groups/` rw (can edit other groups' AGENTS.md), `data/sessions/` ro (can read other groups' transcripts), `.git` rw (can commit prompt edits with `GIT_AUTHOR_NAME=critic`). Active only when `EVALUATE_MODE=true`.
+- **EVALUATE_MODE** — when on, every non-critic agent run gets an injected directive at the end of its prompt that spawns a critic to review adherence. Critique files land in `groups/critic/critiques/`.
+- **spawn_agent IPC** — cross-group delegation primitive. Authorization matrix: main → any; self-spawn allowed; allowlisted pairs (worker↔verifier, worker→critic, verifier→critic). `contextMode: 'isolated' | 'group'` controls whether the spawned run reuses session id.
+
+### How to invoke the reconciliation step
+
+Before the swap (step 8 in the skill's Phase 2 — i.e. while still in the worktree), spawn an agent:
+
+```
+Read MY-UNDERSTANDING.md. For each section listed under "Known impacts" in
+.nanoclaw-migrations/index.md, verify against the current codebase and update
+the document. Add the new sections listed under "Sections to add". Then
+produce a short summary for the user listing every architectural or
+control-flow shift that's user-facing — e.g. "homie no longer sees project
+root", "agents can now spawn other agents", "sessions are now per-SDK".
+Surface this summary in the response, do not just silently rewrite the file.
+```
+
+The user explicitly asked to be made aware of big shifts, so the summary is mandatory.
 
 ## Disposable files (NOT migrated)
 
