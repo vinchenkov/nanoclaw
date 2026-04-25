@@ -137,6 +137,8 @@ Key `.env` values read at startup (see `src/config.ts`):
 | `ASSISTANT_NAME` | `Andy` | Trigger word (`@Andy`) |
 | `ASSISTANT_HAS_OWN_NUMBER` | `false` | When `true`, bot has its own phone number (changes trigger behavior) |
 | `AGENT_SDK` | `claude` | Selects which agent runtime to launch: `claude` or `codex` |
+| `CODEX_MODEL` | _(codex default)_ | Model for Codex SDK mode — written to per-group `~/.codex/config.toml` |
+| `OPENAI_BASE_URL` | _(codex default)_ | OpenAI-compat API base URL for Codex SDK mode — injected as `OPENAI_BASE_URL` into each container |
 | `CONTAINER_IMAGE` | `nanoclaw-agent:latest` | Agent container image |
 | `CONTAINER_TIMEOUT` | `1800000` (30m) | Hard kill timeout |
 | `CONTAINER_MAX_OUTPUT_SIZE` | `10485760` (10MB) | Max bytes captured from container stdout |

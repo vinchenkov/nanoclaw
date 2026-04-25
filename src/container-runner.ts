@@ -223,6 +223,7 @@ function readSecrets(): Record<string, string> {
     'BRAVE_API_KEY',
     'FIRECRAWL_API_KEY',
     'CODEX_API_KEY',
+    'OPENAI_BASE_URL'
   ]);
 }
 

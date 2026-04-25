@@ -273,3 +273,30 @@ ________________________________________
                                                                                                                                                                                     
   The cleanest short-term win is @playwright/mcp + a new send_file IPC message type in NanoClaw — agents take screenshots and pipe them to Discord for human visual review, while   
   the model itself reasons via accessibility tree. That unblocks the "judge visual appearance" workflow without needing a vision-capable model in the loop.
+
+
+
+-----------------------------------------------------------
+
+⏺ The research confirms what I expected. The short answer: headed, not headless — and this has direct implications for your containers.
+                                                                                                                                                                                    
+  Visual agents (screenshot-based, pixel-seeing ones) run browsers in headed mode with a virtual display (Xvfb on Linux). "Headless" is a misnomer that people often use loosely —  
+  real visual agents need a rendering pipeline. The reasons:                                                                                                                        
+                                                                                                                                                                                    
+  - Some sites detect and block navigator.webdriver in headless mode                                                                                                                
+  - Vision models perform measurably better on real pixel renders vs headless output (subtle CSS differences, WebGL, fonts)                                                         
+  - Headed mode enables live debugging via VNC/video stream                                                                                                                         
+                                                                                                                                                                                    
+  What this means for NanoClaw containers specifically:                                                                                                                             
+                                                                                                                                                                                    
+  Your containers currently have no display server. agent-browser and @playwright/mcp both default to Playwright's headless: true — which works fine for accessibility-tree mode (no
+   pixels involved), but for screenshot-based visual evaluation, you'd want headed mode with Xvfb.
+                                                                                                                                                                                    
+  The good news: the Playwright package already installed in your container image supports this. You'd just need to add Xvfb to the container image (apt-get install xvfb) and      
+  launch it before the browser session. This is exactly what tools like browser-use do in Linux environments — they start Xvfb, point DISPLAY=:99 at it, and run a headed browser
+  that renders real pixels to the virtual framebuffer.                                                                                                                              
+                                                            
+  So the full picture for getting genuine visual evaluation in NanoClaw containers:                                                                                                 
+  1. ✅ Codex SDK → MiniMax base URL (just done)
+  2. Add Xvfb to the container image + DISPLAY=:99 env setup                                                                                                                        
+  3. Add a vision-capable browser MCP tool running in headed mode against that display
